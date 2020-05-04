@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView text = new TextView(getApplicationContext());
                 text.setTextSize(15);
                 text.setBackgroundResource(R.drawable.back);
-                text.setText("Hello");
+                text.setText("Sample Text.");
                 text.setWidth(1500);
                 text.setPadding(5, 70, 5, 70);
                 textViewList.add(text);
