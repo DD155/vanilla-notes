@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">VanillaNotes</string>
     <string name="button_text">Add Note</string>
+    <string name="enter_your_note">Enter your note...</string>
+    <string name="save">Save</string>
 </resources>

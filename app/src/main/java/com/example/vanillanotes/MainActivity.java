@@ -2,6 +2,7 @@ package com.example.vanillanotes;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -30,15 +31,24 @@ public class MainActivity extends AppCompatActivity {
         Button b = findViewById(R.id.button);
         b.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v) { // used to create clickable text
                 TextView text = new TextView(getApplicationContext());
                 text.setTextSize(15);
                 text.setBackgroundResource(R.drawable.back);
-                text.setText("Sample Text.");
+                text.setText("Click to edit...");
                 text.setWidth(1500);
                 text.setPadding(5, 70, 5, 70);
                 textViewList.add(text);
                 linear.addView(textViewList.get(textViewList.size()-1));
+                text.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) { // clicked text sends user to edit the note
+                        Intent goToSecond = new Intent();
+                        goToSecond.setClass(getApplicationContext(), NoteEdit.class);
+                        //goToSecond.putExtra("nbStars", rating);
+                        startActivity(goToSecond);
+                    }
+                });
             }
         });
         /*
