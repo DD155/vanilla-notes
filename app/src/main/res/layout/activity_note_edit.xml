@@ -10,6 +10,7 @@
         android:id="@+id/saveButton"
         android:layout_width="135dp"
         android:layout_height="50dp"
+        android:onClick="saveText"
         android:text="@string/save"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
