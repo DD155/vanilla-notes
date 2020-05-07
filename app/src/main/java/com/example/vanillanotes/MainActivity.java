@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         final LinearLayout linear = findViewById(R.id.linear);
         final Intent goToSecond = new Intent();
 
+        linear.getLayoutParams().height = 500;
 
         //editor.remove("textStrings");
         //editor.commit();
