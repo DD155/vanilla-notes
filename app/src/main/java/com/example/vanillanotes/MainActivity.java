@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) { // clicked text sends user to edit the note
                         goToSecond.setClass(getApplicationContext(), NoteEdit.class);
-                        goToSecond.putExtra("savedText", textList.get(finalI));
+                        goToSecond.putExtra("savedText", textList.get(finalI)); // pass current text
                         goToSecond.putExtra("index", finalI); // pass index to next activity to change content later
                         startActivity(goToSecond);
                     }
