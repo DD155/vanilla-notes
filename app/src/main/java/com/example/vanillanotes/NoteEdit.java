@@ -18,8 +18,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class NoteEdit extends AppCompatActivity {
-
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,12 +34,15 @@ public class NoteEdit extends AppCompatActivity {
         text.setBackgroundResource(R.drawable.back);
     }
 
+    //Post-Condition: save the text of the note to the previous activity
+    //case 1: user is creating new note: the key "savedText" should be null
+    //case 2: user is editing a preexisting note: key "savedText" is not null and should use index
     public void saveText(View v){
         String t = getIntent().getStringExtra("savedText");
         Intent prev = new Intent();
         EditText text = findViewById(R.id.editText);
-
         prev.setClass(this, MainActivity.class);
+
         if (t == null) { // case where the note is new
             String s = text.getText().toString();
             prev.putExtra("note", s);
@@ -53,7 +55,7 @@ public class NoteEdit extends AppCompatActivity {
         startActivity(prev);
     }
 
-    public ArrayList<String> getArrayList(String key){
+    public ArrayList<String> getArrayList(String key){ //returns the arraylist from sharedprefs
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         Gson gson = new Gson();
         String json = prefs.getString(key, null);

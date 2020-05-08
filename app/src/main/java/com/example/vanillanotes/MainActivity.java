@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,44 +20,35 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final ArrayList<String> textList;
+
+        final ArrayList<String> textList; //declare arraylist for the strings of the text on each note
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        final SharedPreferences.Editor editor = prefs.edit();
         final LinearLayout linear = findViewById(R.id.linear);
         final Intent goToSecond = new Intent();
 
         linear.getLayoutParams().height = 500;
 
-        //editor.remove("textStrings");
-        //editor.commit();
-
         if (prefs.contains("textStrings")) { // checks if user has notes already
             Log.d("myTag", "textStrings is valid.");
             textList = getArrayList("textStrings");
-        }
-        else{
-            textList = new ArrayList<String>();
-        }
+        } // otherwise just make the new arraylist
+        else textList = new ArrayList<>();
+
 
         // information from edited note activity
         Intent caller = getIntent();
         final String editedText = caller.getStringExtra("note");
 
         if (editedText != null){ // if the user has input text already, add new note with that text
-            Log.d("myTag", "not null");
             textList.add(editedText);
             saveArrayList(textList, "textStrings");
         }
 
         if (textList.size() != 0){ // makes sure user has already notes, loads them on entering app
-            Log.d("myTag", "array valid");
-            Log.d("myTag", textList.size()+"");
             for (int i = 0; i < textList.size(); i++) {
                 final TextView text = new TextView(this);
                 Log.d("myTag", textList.get(i));
@@ -67,22 +57,20 @@ public class MainActivity extends AppCompatActivity {
                 linear.addView(text);
 
                 // make the text clickable
-                final int finalI = i;
+                final int finalI = i; //index of arraylist
                 text.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) { // clicked text sends user to edit the note
                         goToSecond.setClass(getApplicationContext(), NoteEdit.class);
                         goToSecond.putExtra("savedText", textList.get(finalI));
-                        goToSecond.putExtra("index", finalI);
+                        goToSecond.putExtra("index", finalI); // pass index to next activity to change content later
                         startActivity(goToSecond);
-                        Log.d("textLog", textList.get(finalI));
-
                     }
                 });
             }
         }
 
-        Button b = findViewById(R.id.button);
+        Button b = findViewById(R.id.addButton);
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { // button to next activity
@@ -92,11 +80,28 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void initializeText(TextView text){ //set attributes for text
+    //Post-condition: set attributes for text:
+    //Text-size is now 15.
+    //TextView now has border.
+    //Change width and padding accordingly
+    public void initializeText(TextView text){
         text.setTextSize(15);
         text.setBackgroundResource(R.drawable.back);
         text.setWidth(1500);
         text.setPadding(5, 70, 5, 70);
+    }
+
+    //Post-condition: Remove notes by clearing shared preferences and resetting linear layout.
+    public void clearNotes(View v){
+        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editor = prefs.edit();
+
+        editor.clear();
+        editor.apply();
+
+        LinearLayout ll = findViewById(R.id.linear);
+        ll.removeAllViews();
+
     }
 
     public void saveArrayList(ArrayList<String> list, String key){ // saves the arraylist using json
@@ -108,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    public ArrayList<String> getArrayList(String key){
+    public ArrayList<String> getArrayList(String key){ //returns the arraylist from sharedprefs
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         Gson gson = new Gson();
         String json = prefs.getString(key, null);
