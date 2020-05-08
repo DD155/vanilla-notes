@@ -2,30 +2,71 @@ package com.example.vanillanotes;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+
 public class NoteEdit extends AppCompatActivity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_edit);
 
+        String t = getIntent().getStringExtra("savedText");
         EditText text = findViewById(R.id.editText);
+
+        if (t != null) { // case where user is editing old note
+            text.setText(t); //set the text on the note page as the old string
+        }
+
         text.setBackgroundResource(R.drawable.back);
     }
 
     public void saveText(View v){
-        EditText text = findViewById(R.id.editText);
-        String s = text.getText().toString();
+        String t = getIntent().getStringExtra("savedText");
         Intent prev = new Intent();
+        EditText text = findViewById(R.id.editText);
+
         prev.setClass(this, MainActivity.class);
-        prev.putExtra("note", s);
-        prev.putExtra("isSaved", true);
+        if (t == null) { // case where the note is new
+            String s = text.getText().toString();
+            prev.putExtra("note", s);
+        } else { // case where the note is being edited
+            ArrayList<String> list = getArrayList("textStrings");
+            //replace old string with new string in the arraylist
+            list.set(getIntent().getIntExtra("index", 0), text.getText().toString());
+            saveArrayList(list, "textStrings");
+        }
         startActivity(prev);
+    }
+
+    public ArrayList<String> getArrayList(String key){
+        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = prefs.getString(key, null);
+        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        return gson.fromJson(json, type);
+    }
+
+    public void saveArrayList(ArrayList<String> list, String key){ // saves the arraylist using json
+        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+        editor.putString(key, json);
+        editor.apply();
     }
 }
