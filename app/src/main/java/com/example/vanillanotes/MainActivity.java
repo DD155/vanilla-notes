@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -70,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        Button b = findViewById(R.id.addButton);
+        ImageButton b = findViewById(R.id.addButton);
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { // button to next activity
