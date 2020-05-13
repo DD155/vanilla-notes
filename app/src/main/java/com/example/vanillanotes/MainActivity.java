@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -31,8 +33,6 @@ public class MainActivity extends AppCompatActivity {
         myToolbar.setTitle("Notes");
         setSupportActionBar(myToolbar);
 
-
-
         final ArrayList<String> textList; //declare arraylist for the strings of the text on each note
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         final LinearLayout linear = findViewById(R.id.linear);
@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
             textList = getArrayList("textStrings");
         } // otherwise just make the new arraylist
         else textList = new ArrayList<>();
-
 
         // information from edited note activity
         Intent caller = getIntent();
@@ -77,15 +76,6 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         }
-
-        ImageButton b = findViewById(R.id.addButton);
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { // button to next activity
-                goToSecond.setClass(getApplicationContext(), NoteEdit.class);
-                startActivity(goToSecond);
-            }
-        });
     }
 
     //Post-condition: set attributes for text:
@@ -127,6 +117,31 @@ public class MainActivity extends AppCompatActivity {
         String json = prefs.getString(key, null);
         Type type = new TypeToken<ArrayList<String>>() {}.getType();
         return gson.fromJson(json, type);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.toolbar_actions, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                // User chose the "Settings" item, show the app settings UI...
+                return true;
+
+            case R.id.action_add:
+                Intent notesActivity = new Intent();
+                notesActivity.setClass(getApplicationContext(), NoteEdit.class);
+                startActivity(notesActivity);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 }
