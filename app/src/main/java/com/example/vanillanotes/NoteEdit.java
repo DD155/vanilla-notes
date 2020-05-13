@@ -26,15 +26,16 @@ public class NoteEdit extends AppCompatActivity {
         setContentView(R.layout.activity_note_edit);
 
         Toolbar myToolbar = findViewById(R.id.toolbar);
-        myToolbar.setTitle("Notes");
+        myToolbar.setTitle("");
         setSupportActionBar(myToolbar);
-        //getActionBar().show();
 
         String t = getIntent().getStringExtra("savedText");
         EditText text = findViewById(R.id.editText);
+        text.setPadding(50, 50, 50, 50);
 
         if (t != null) { // case where user is editing old note
             text.setText(t); //set the text on the note page as the old string
+            text.setSelection(text.getText().length()); //set cursor to the end
         }
 
         text.setBackgroundResource(R.drawable.back);

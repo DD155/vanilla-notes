@@ -86,11 +86,11 @@ public class MainActivity extends AppCompatActivity {
         text.setTextSize(15);
         text.setBackgroundResource(R.drawable.back);
         text.setWidth(1500);
-        text.setPadding(5, 70, 5, 70);
+        text.setPadding(30, 70, 30, 70);
     }
 
     //Post-condition: Remove notes by clearing shared preferences and resetting linear layout.
-    public void clearNotes(View v){
+    public void clearNotes(){
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         final SharedPreferences.Editor editor = prefs.edit();
 
@@ -138,6 +138,11 @@ public class MainActivity extends AppCompatActivity {
                 notesActivity.setClass(getApplicationContext(), NoteEdit.class);
                 startActivity(notesActivity);
                 return true;
+
+            case R.id.action_remove:
+                clearNotes();
+                return true;
+
 
             default:
                 return super.onOptionsItemSelected(item);
