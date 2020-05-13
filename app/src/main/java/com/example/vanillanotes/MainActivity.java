@@ -1,6 +1,7 @@
 package com.example.vanillanotes;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +26,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Toolbar myToolbar = findViewById(R.id.toolbar);
+        myToolbar.setTitle("Notes");
+        setSupportActionBar(myToolbar);
+
+
 
         final ArrayList<String> textList; //declare arraylist for the strings of the text on each note
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);

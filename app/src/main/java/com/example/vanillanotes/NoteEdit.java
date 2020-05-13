@@ -1,6 +1,7 @@
 package com.example.vanillanotes;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +24,11 @@ public class NoteEdit extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_edit);
+
+        Toolbar myToolbar = findViewById(R.id.toolbar);
+        myToolbar.setTitle("Notes");
+        setSupportActionBar(myToolbar);
+        //getActionBar().show();
 
         String t = getIntent().getStringExtra("savedText");
         EditText text = findViewById(R.id.editText);

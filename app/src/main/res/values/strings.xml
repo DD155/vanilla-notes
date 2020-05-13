@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">Notes</string>
+    <string name="app_name">Vanilla Notes</string>
     <string name="button_text">Add Note</string>
-    <string name="enter_your_note">Enter your note...</string>
+    <string name="enter_your_note">Enter your note…</string>
     <string name="save">Save</string>
     <string name="clear">Clear</string>
 </resources>
