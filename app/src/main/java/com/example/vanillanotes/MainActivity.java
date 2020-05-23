@@ -1,9 +1,15 @@
 package com.example.vanillanotes;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDialogFragment;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -78,6 +84,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public static class ClearDialog extends AppCompatDialogFragment {
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Clear Notes");
+            builder.setMessage("Would you like to clear all of your notes?");
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+
+            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+
+            return builder.create();
+        }
+    }
+
     //Post-condition: set attributes for text:
     //Text-size is now 15.
     //TextView now has border.
@@ -140,13 +171,44 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_remove:
-                clearNotes();
+                //clearNotes();
+                createDialog();
                 return true;
-
 
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
+    public void createDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Clear All Notes");
+        builder.setMessage("Would you like to clear all the notes?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                clearNotes();
+            }
+        });
+
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    /*
+    public void OpenClearDialog(){
+        ClearDialog1 clear = new ClearDialog1();
+        clear.show(getSupportFragmentManager(), "Clear Dialog");
+    }*/
+
+
 
 }
