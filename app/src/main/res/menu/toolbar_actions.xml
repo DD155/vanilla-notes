@@ -5,19 +5,19 @@
         <!-- Add Note -->
         <item android:id="@+id/action_add"
             android:title="@string/action_add"
-            android:icon="@drawable/baseline_add_black_18dp"
-            app:showAsAction="always" />
+            android:icon="@drawable/ic_add_black_24dp"
+            app:showAsAction="ifRoom" />
 
         <!-- Add Clear -->
         <item android:id="@+id/action_remove"
             android:title="@string/action_remove"
-            android:icon="@drawable/round_delete_black_18dp"
-            app:showAsAction="always" />
+            android:icon="@drawable/ic_delete_black_24dp"
+            app:showAsAction="ifRoom" />
 
         <!-- Settings -->
         <item android:id="@+id/action_settings"
             android:title="@string/action_settings"
-            android:icon="@drawable/round_more_vert_black_18dp"
-            app:showAsAction="always" />
+            android:icon="@drawable/ic_more_vert_black_24dp"
+            app:showAsAction="never" />
 
 </menu>
