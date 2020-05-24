@@ -84,31 +84,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static class ClearDialog extends AppCompatDialogFragment {
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Clear Notes");
-            builder.setMessage("Would you like to clear all of your notes?");
-            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
-                }
-            });
-
-            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
-                }
-            });
-
-            return builder.create();
-        }
-    }
-
     //Post-condition: set attributes for text:
     //Text-size is now 15.
     //TextView now has border.
@@ -157,12 +132,13 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                // User chose the "Settings" item, show the app settings UI...
+                Intent a = new Intent();
+                a.setClass(getApplicationContext(), SettingsActivity.class);
+                startActivity(a);
                 return true;
 
             case R.id.action_add:
@@ -172,7 +148,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_remove:
-                //clearNotes();
                 createDialog();
                 return true;
 

@@ -8,4 +8,5 @@
     <string name="action_add">Add Note</string>
     <string name="action_remove">Delete</string>
     <string name="action_save">save</string>
+    <string name="action_delete">Delete note</string>
 </resources>
