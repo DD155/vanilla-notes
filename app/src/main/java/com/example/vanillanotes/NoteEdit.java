@@ -46,7 +46,7 @@ public class NoteEdit extends AppCompatActivity {
     //Post-Condition: save the text of the note to the previous activity
     //case 1: user is creating new note: the key "savedText" should be null
     //case 2: user is editing a preexisting note: key "savedText" is not null and should use index
-    public void saveText(View v){
+    public void saveText(){
         String t = getIntent().getStringExtra("savedText");
         Intent prev = new Intent();
         EditText text = findViewById(R.id.editText);
@@ -94,6 +94,10 @@ public class NoteEdit extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_settings:
                 // User chose the "Settings" item, show the app settings UI...
+                return true;
+
+            case R.id.action_save:
+                saveText();
                 return true;
 
             default:

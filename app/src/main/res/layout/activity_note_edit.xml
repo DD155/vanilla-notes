@@ -11,25 +11,13 @@
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="69dp" />
 
-    <Button
-        android:id="@+id/saveButton"
-        android:layout_width="135dp"
-        android:layout_height="50dp"
-        android:onClick="saveText"
-        android:text="@string/save"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText"
-        app:layout_constraintVertical_bias="0.19" />
-
     <EditText
         android:id="@+id/editText"
-        android:layout_width="359dp"
-        android:layout_height="483dp"
+        android:layout_width="354dp"
+        android:layout_height="565dp"
         android:layout_marginStart="27dp"
         android:layout_marginLeft="27dp"
-        android:layout_marginTop="88dp"
+        android:layout_marginTop="72dp"
         android:layout_marginEnd="27dp"
         android:layout_marginRight="27dp"
         android:ems="10"
@@ -37,7 +25,7 @@
         android:hint="@string/enter_your_note"
         android:inputType="textMultiLine"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.333"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
