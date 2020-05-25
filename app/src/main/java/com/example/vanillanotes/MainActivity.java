@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         final LinearLayout linear = findViewById(R.id.linear);
         final Intent goToSecond = new Intent();
 
+
         linear.getLayoutParams().height = 500;
 
         if (prefs.contains("textStrings")) { // checks if user has notes already
@@ -89,10 +90,14 @@ public class MainActivity extends AppCompatActivity {
     //TextView now has border.
     //Change width and padding accordingly
     public void initializeText(TextView text){
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(0, 25, 0, 25);
         text.setTextSize(15);
         text.setBackgroundResource(R.drawable.back);
         text.setWidth(1500);
         text.setPadding(30, 70, 30, 70);
+        text.setLayoutParams(params);
+
     }
 
     //Post-condition: Remove notes by clearing shared preferences and resetting linear layout.
