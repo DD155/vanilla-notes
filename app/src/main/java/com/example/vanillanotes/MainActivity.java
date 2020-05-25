@@ -1,25 +1,23 @@
 package com.example.vanillanotes;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDialogFragment;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -42,10 +40,23 @@ public class MainActivity extends AppCompatActivity {
         final ArrayList<String> textList; //declare arraylist for the strings of the text on each note
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         final LinearLayout linear = findViewById(R.id.linear);
-        final Intent goToSecond = new Intent();
+        final Intent notesActivity = new Intent();
 
+        /*
+        TypedValue tv = new TypedValue();
+        getApplicationContext().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true);
+        int toolbarHeight = Integer.parseInt(tv.toString());
 
-        linear.getLayoutParams().height = 500;
+        android.R.attr.actionBarSize
+
+        ScrollView scrollView = findViewById(R.id.scrollView);
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams)scrollView.getLayoutParams();
+        params.setMargins(0, 175,0,
+                getNavigationBarSize(getApplicationContext()));
+        scrollView.setLayoutParams(params);
+*/
+
+        //linear.getLayoutParams().height = 100;
 
         if (prefs.contains("textStrings")) { // checks if user has notes already
             Log.d("myTag", "textStrings is valid.");
@@ -75,10 +86,10 @@ public class MainActivity extends AppCompatActivity {
                 text.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) { // clicked text sends user to edit the note
-                        goToSecond.setClass(getApplicationContext(), NoteEdit.class);
-                        goToSecond.putExtra("savedText", textList.get(finalI)); // pass current text
-                        goToSecond.putExtra("index", finalI); // pass index to next activity to change content later
-                        startActivity(goToSecond);
+                        notesActivity.setClass(getApplicationContext(), NoteEdit.class);
+                        notesActivity.putExtra("savedText", textList.get(finalI)); // pass current text
+                        notesActivity.putExtra("index", finalI); // pass index to next activity to change content later
+                        startActivity(notesActivity);
                     }
                 });
             }
@@ -88,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
     //Post-condition: set attributes for text:
     //Text-size is now 15.
     //TextView now has border.
-    //Change width and padding accordingly
+    //Change width and padding/margin accordingly
     public void initializeText(TextView text){
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.setMargins(0, 25, 0, 25);
@@ -190,6 +201,13 @@ public class MainActivity extends AppCompatActivity {
         clear.show(getSupportFragmentManager(), "Clear Dialog");
     }*/
 
-
+    public int getNavigationBarSize(Context context){
+        Resources resources = context.getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            return resources.getDimensionPixelSize(resourceId);
+        }
+        return 0;
+    }
 
 }
