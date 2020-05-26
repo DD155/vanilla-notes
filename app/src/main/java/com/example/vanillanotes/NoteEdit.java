@@ -71,6 +71,21 @@ public class NoteEdit extends AppCompatActivity {
         startActivity(prev);
     }
 
+    public void deleteNote(){
+        String t = getIntent().getStringExtra("savedText");
+        ArrayList<String> list  = getArrayList("textStrings");
+        if (t != null) {
+            list.remove(getIntent().getIntExtra("index", 0));
+            saveArrayList(list, "textStrings");
+        }
+
+        Intent i = new Intent();
+        i.setClass(getApplicationContext(), MainActivity.class);
+        startActivity(i);
+    }
+
+
+    //creates dialog for empty notes
     public void warningDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Error");
@@ -86,23 +101,8 @@ public class NoteEdit extends AppCompatActivity {
         alert.show();
     }
 
-    public ArrayList<String> getArrayList(String key){ //returns the arraylist from sharedprefs
-        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = prefs.getString(key, null);
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
-        return gson.fromJson(json, type);
-    }
 
-    public void saveArrayList(ArrayList<String> list, String key){ // saves the arraylist using json
-        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(list);
-        editor.putString(key, json);
-        editor.apply();
-    }
-
+    //functions for toolbar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -125,8 +125,31 @@ public class NoteEdit extends AppCompatActivity {
                 saveText();
                 return true;
 
+            case R.id.action_delete:
+                deleteNote();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+
+    // saving array list functions
+    public ArrayList<String> getArrayList(String key){ //returns the arraylist from sharedprefs
+        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = prefs.getString(key, null);
+        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        return gson.fromJson(json, type);
+    }
+
+    public void saveArrayList(ArrayList<String> list, String key){ // saves the arraylist using json
+        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+        editor.putString(key, json);
+        editor.apply();
     }
 }
