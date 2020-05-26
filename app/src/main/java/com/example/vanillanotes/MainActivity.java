@@ -42,22 +42,6 @@ public class MainActivity extends AppCompatActivity {
         final LinearLayout linear = findViewById(R.id.linear);
         final Intent notesActivity = new Intent();
 
-        /*
-        TypedValue tv = new TypedValue();
-        getApplicationContext().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true);
-        int toolbarHeight = Integer.parseInt(tv.toString());
-
-        android.R.attr.actionBarSize
-
-        ScrollView scrollView = findViewById(R.id.scrollView);
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams)scrollView.getLayoutParams();
-        params.setMargins(0, 175,0,
-                getNavigationBarSize(getApplicationContext()));
-        scrollView.setLayoutParams(params);
-*/
-
-        //linear.getLayoutParams().height = 100;
-
         if (prefs.contains("textStrings")) { // checks if user has notes already
             Log.d("myTag", "textStrings is valid.");
             textList = getArrayList("textStrings");
@@ -121,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout ll = findViewById(R.id.linear);
         ll.removeAllViews();
-
     }
 
     public void saveArrayList(ArrayList<String> list, String key){ // saves the arraylist using json

@@ -3,7 +3,9 @@ package com.example.vanillanotes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -52,6 +54,11 @@ public class NoteEdit extends AppCompatActivity {
         EditText text = findViewById(R.id.editText);
         prev.setClass(this, MainActivity.class);
 
+        if (text.getText().length() == 0) { //check that the note is not empty
+            warningDialog();
+            return;
+        }
+
         if (t == null) { // case where the note is new
             String s = text.getText().toString();
             prev.putExtra("note", s);
@@ -62,6 +69,21 @@ public class NoteEdit extends AppCompatActivity {
             saveArrayList(list, "textStrings");
         }
         startActivity(prev);
+    }
+
+    public void warningDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Error");
+        builder.setMessage("Your note is currently blank. Please enter text to save it.");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     public ArrayList<String> getArrayList(String key){ //returns the arraylist from sharedprefs
