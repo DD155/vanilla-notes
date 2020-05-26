@@ -101,6 +101,28 @@ public class NoteEdit extends AppCompatActivity {
         alert.show();
     }
 
+    public void confirmDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delete Note");
+        builder.setMessage("Are you sure you want to delete this note?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                deleteNote();
+            }
+        });
+
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
 
     //functions for toolbar
     @Override
@@ -126,7 +148,7 @@ public class NoteEdit extends AppCompatActivity {
                 return true;
 
             case R.id.action_delete:
-                deleteNote();
+                confirmDialog();
                 return true;
 
             default:
