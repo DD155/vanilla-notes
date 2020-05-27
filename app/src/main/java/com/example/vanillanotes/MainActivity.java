@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -88,10 +89,11 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.setMargins(0, 25, 0, 25);
         text.setTextSize(15);
-        text.setBackgroundResource(R.drawable.back);
+        text.setBackgroundResource(R.drawable.shadow_border);
         text.setWidth(1500);
         text.setPadding(30, 70, 30, 70);
         text.setLayoutParams(params);
+        text.setTextColor(Color.parseColor("#434343"));
 
     }
 
