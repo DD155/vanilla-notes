@@ -2,7 +2,6 @@ package com.example.vanillanotes;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -13,12 +12,10 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -179,12 +176,6 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog alert = builder.create();
         alert.show();
     }
-
-    /*
-    public void OpenClearDialog(){
-        ClearDialog1 clear = new ClearDialog1();
-        clear.show(getSupportFragmentManager(), "Clear Dialog");
-    }*/
 
     public int getNavigationBarSize(Context context){
         Resources resources = context.getResources();
