@@ -6,12 +6,31 @@
     android:layout_height="match_parent"
     tools:context=".NoteEdit"
     android:background = "#E0E0E0">
-    >
 
 
 
-    <include
-        layout="@layout/toolbar" />
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#EEEEEE"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/toolbar_back"
+            style="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:drawableLeft="@drawable/ic_arrow_back_ios_black_24dp"
+            android:gravity="center_horizontal" />
+
+    </androidx.appcompat.widget.Toolbar>
 
     <EditText
         android:id="@+id/editText"

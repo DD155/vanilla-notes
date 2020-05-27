@@ -11,6 +11,12 @@
         android:title="@string/action_delete"
         app:showAsAction="never" />
 
+    <!-- Pin current note -->
+    <item android:id="@+id/action_pin"
+        android:title="@string/action_pin"
+        android:icon="@drawable/ic_more_vert_black_24dp"
+        app:showAsAction="never" />
+
     <!-- Settings -->
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
