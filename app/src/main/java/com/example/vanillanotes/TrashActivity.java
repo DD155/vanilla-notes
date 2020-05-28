@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -72,6 +73,13 @@ public class TrashActivity extends AppCompatActivity {
                     }
                 });
             }
+        } else { //have message that trash can is empty
+            TextView defaultText = new TextView(getApplicationContext());
+            defaultText.setText("The trash can is currently empty.");
+            defaultText.setTextSize(20);
+            defaultText.setGravity(Gravity.CENTER_HORIZONTAL);
+            //defaultText.setWidth();
+            linear.addView(defaultText);
         }
     }
 
