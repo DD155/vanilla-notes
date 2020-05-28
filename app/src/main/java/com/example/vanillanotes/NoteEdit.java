@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
@@ -42,7 +43,7 @@ public class NoteEdit extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                returnToMainActivity();
+                goToActivity(MainActivity.class);
             }
         });
 
@@ -82,13 +83,34 @@ public class NoteEdit extends AppCompatActivity {
 
     public void deleteNote(){
         String t = getIntent().getStringExtra("savedText");
+        String caller = getIntent().getStringExtra("caller");
+        ArrayList<String> trashList;
+
+        if (getArrayList("trashStrings") != null) // check if trash can list is valid
+            trashList = getArrayList("trashStrings");
+        else {
+            trashList = new ArrayList<>();
+        }
         ArrayList<String> list  = getArrayList("textStrings");
-        if (t != null) {
-            list.remove(getIntent().getIntExtra("index", 0));
+
+
+        if (t != null) { // save the note to trash while deleting from main notes
+            if (caller.equals("TrashActivity")) {
+                trashList.remove(getIntent().getIntExtra("index", 0)); //remove from trash can
+            } else {
+                trashList.add(t);
+                list.remove(getIntent().getIntExtra("index", 0));
+            }
             saveArrayList(list, "textStrings");
+            saveArrayList(trashList, "trashStrings");
         }
 
-        returnToMainActivity();
+        //load previously called activity
+        if (caller.equals("TrashActivity")){
+            goToActivity(TrashActivity.class);
+        } else {
+            goToActivity(MainActivity.class);
+        }
     }
 
 
@@ -144,7 +166,7 @@ public class NoteEdit extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_settings:
                 // User chose the "Settings" item, show the app settings UI...
-                returnToMainActivity();
+                goToActivity(MainActivity.class);
                 return true;
 
             case R.id.action_save:
@@ -179,9 +201,9 @@ public class NoteEdit extends AppCompatActivity {
         editor.apply();
     }
 
-    public void returnToMainActivity(){
+    public void goToActivity(Class act){
         Intent i = new Intent();
-        i.setClass(getApplicationContext(), MainActivity.class);
+        i.setClass(getApplicationContext(), act);
         startActivity(i);
     }
 }

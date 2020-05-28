@@ -71,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
                         notesActivity.setClass(getApplicationContext(), NoteEdit.class);
                         notesActivity.putExtra("savedText", textList.get(finalI)); // pass current text
                         notesActivity.putExtra("index", finalI); // pass index to next activity to change content later
+                        notesActivity.putExtra("caller", "MainActivity");
+                        notesActivity.putExtra("class", MainActivity.class);
                         startActivity(notesActivity);
                     }
                 });
@@ -134,24 +136,27 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent a = new Intent();
-                a.setClass(getApplicationContext(), SettingsActivity.class);
-                startActivity(a);
+                goToActivity(SettingsActivity.class);
                 return true;
 
             case R.id.action_add:
-                Intent notesActivity = new Intent();
-                notesActivity.setClass(getApplicationContext(), NoteEdit.class);
-                startActivity(notesActivity);
+                goToActivity(NoteEdit.class);
                 return true;
 
             case R.id.action_remove:
-                createDialog();
+                //createDialog();
+                goToActivity(TrashActivity.class);
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void goToActivity(Class act){
+        Intent i = new Intent();
+        i.setClass(getApplicationContext(), act);
+        startActivity(i);
     }
 
     //creates dialog for the clear
