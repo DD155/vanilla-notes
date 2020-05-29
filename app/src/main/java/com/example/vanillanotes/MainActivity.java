@@ -140,11 +140,11 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_add:
+
                 goToActivity(NoteEdit.class);
                 return true;
 
             case R.id.action_remove:
-                //createDialog();
                 goToActivity(TrashActivity.class);
                 return true;
 
@@ -156,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
     public void goToActivity(Class act){
         Intent i = new Intent();
         i.setClass(getApplicationContext(), act);
+        i.putExtra("caller", "MainActivity");
         startActivity(i);
     }
 

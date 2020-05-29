@@ -113,6 +113,21 @@ public class NoteEdit extends AppCompatActivity {
         }
     }
 
+    public void restoreNote(){
+        int index = getIntent().getIntExtra("index", 0);
+        ArrayList<String> trash, list;
+        trash = getArrayList("trashStrings");
+        list = getArrayList("textStrings");
+
+        list.add(trash.get(index));
+        trash.remove(index);
+
+        saveArrayList(trash, "trashStrings");
+        saveArrayList(list, "textStrings");
+
+        goToActivity(MainActivity.class);
+    }
+
 
     //creates dialog for empty notes
     public void warningDialog(){
@@ -162,7 +177,7 @@ public class NoteEdit extends AppCompatActivity {
             getMenuInflater().inflate(R.menu.trash_actions, menu);
         } else
             getMenuInflater().inflate(R.menu.notes_actions, menu);
-        
+
         return true;
     }
 
@@ -176,6 +191,10 @@ public class NoteEdit extends AppCompatActivity {
 
             case R.id.action_save:
                 saveText();
+                return true;
+
+            case R.id.action_restore:
+                restoreNote();
                 return true;
 
             case R.id.action_delete:
