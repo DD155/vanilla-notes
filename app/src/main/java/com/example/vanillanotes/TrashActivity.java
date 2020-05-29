@@ -120,4 +120,44 @@ public class TrashActivity extends AppCompatActivity {
         startActivity(i);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.trash_actions, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                // User chose the "Settings" item, show the app settings UI...
+                goToActivity(SettingsActivity.class);
+                return true;
+
+            case R.id.action_home:
+                goToActivity(MainActivity.class);
+                return true;
+
+            case R.id.action_empty:
+                clearNotes();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    public void clearNotes(){
+        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editor = prefs.edit();
+
+        editor.clear();
+        editor.apply();
+
+        LinearLayout ll = findViewById(R.id.linear);
+        ll.removeAllViews();
+    }
 }

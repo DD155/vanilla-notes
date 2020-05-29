@@ -9,18 +9,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.Editable;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
@@ -43,7 +41,10 @@ public class NoteEdit extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToActivity(MainActivity.class);
+                if (getIntent().getStringExtra("caller").equals("MainActivity"))
+                    goToActivity(MainActivity.class);
+                else
+                    goToActivity(TrashActivity.class);
             }
         });
 
@@ -113,6 +114,7 @@ public class NoteEdit extends AppCompatActivity {
         }
     }
 
+    //restore the note from the trash can to the main notes
     public void restoreNote(){
         int index = getIntent().getIntExtra("index", 0);
         ArrayList<String> trash, list;
@@ -125,7 +127,8 @@ public class NoteEdit extends AppCompatActivity {
         saveArrayList(trash, "trashStrings");
         saveArrayList(list, "textStrings");
 
-        goToActivity(MainActivity.class);
+        Toast.makeText(getApplicationContext(), "Note restored", Toast.LENGTH_LONG).show();
+        //goToActivity(MainActivity.class);
     }
 
 
@@ -174,7 +177,7 @@ public class NoteEdit extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
 
         if (getIntent().getStringExtra("caller").equals("TrashActivity")) {
-            getMenuInflater().inflate(R.menu.trash_actions, menu);
+            getMenuInflater().inflate(R.menu.trash_note_actions, menu);
         } else
             getMenuInflater().inflate(R.menu.notes_actions, menu);
 

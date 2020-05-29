@@ -11,4 +11,6 @@
     <string name="action_delete">Delete note</string>
     <string name="action_pin">Pin note</string>
     <string name="action_restore">Restore note</string>
+    <string name="action_home">Home</string>
+    <string name="action_empty">Empty trash</string>
 </resources>
