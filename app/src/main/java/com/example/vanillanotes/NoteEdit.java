@@ -157,7 +157,12 @@ public class NoteEdit extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.notes_actions, menu);
+
+        if (getIntent().getStringExtra("caller").equals("TrashActivity")) {
+            getMenuInflater().inflate(R.menu.trash_actions, menu);
+        } else
+            getMenuInflater().inflate(R.menu.notes_actions, menu);
+        
         return true;
     }
 

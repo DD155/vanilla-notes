@@ -10,6 +10,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -111,4 +113,11 @@ public class TrashActivity extends AppCompatActivity {
         Type type = new TypeToken<ArrayList<String>>() {}.getType();
         return gson.fromJson(json, type);
     }
+
+    public void goToActivity(Class act){
+        Intent i = new Intent();
+        i.setClass(getApplicationContext(), act);
+        startActivity(i);
+    }
+
 }
