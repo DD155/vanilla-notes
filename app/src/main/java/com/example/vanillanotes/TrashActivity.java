@@ -3,7 +3,9 @@ package com.example.vanillanotes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -15,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -141,7 +144,7 @@ public class TrashActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_empty:
-                clearNotes();
+                confirmDialog();
                 return true;
 
             default:
@@ -149,15 +152,37 @@ public class TrashActivity extends AppCompatActivity {
         }
     }
 
+    public void confirmDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Empty Trash");
+        builder.setMessage("Are you sure you want to empty the trash? The notes cannot be recovered after this.");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                clearNotes();
+            }
+        });
+
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
 
     public void clearNotes(){
-        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        final SharedPreferences.Editor editor = prefs.edit();
-
-        editor.clear();
-        editor.apply();
+        ArrayList<String> list = getArrayList("trashStrings");
+        list.clear();
+        saveArrayList(list, "trashStrings");
 
         LinearLayout ll = findViewById(R.id.linear);
         ll.removeAllViews();
+
+        Toast.makeText(getApplicationContext(), "Trash emptied", Toast.LENGTH_LONG).show();
+
     }
 }
