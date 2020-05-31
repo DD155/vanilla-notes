@@ -105,6 +105,7 @@ public class NoteEdit extends AppCompatActivity {
             saveArrayList(list, "textStrings");
             saveArrayList(trashList, "trashStrings");
         }
+        Toast.makeText(getApplicationContext(), "Note deleted", Toast.LENGTH_LONG).show();
 
         //load previously called activity
         if (caller.equals("TrashActivity")){

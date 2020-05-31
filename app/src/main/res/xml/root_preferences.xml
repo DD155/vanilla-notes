@@ -15,7 +15,7 @@
 
         <SwitchPreferenceCompat
             app:iconSpaceReserved="false"
-            app:key="sync"
+            app:key="dark_mode"
             app:title="@string/darkmode_title"
             app:summary="@string/darkmode_summary"/>
 

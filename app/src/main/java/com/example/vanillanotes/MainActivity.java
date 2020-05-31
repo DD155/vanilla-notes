@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.vanillanotes.settings.SettingsActivity;
 import com.google.gson.Gson;
@@ -97,16 +98,22 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //Post-condition: Remove notes by clearing shared preferences and resetting linear layout.
+    //Post-condition: Remove notes by clearing note arraylist and resetting linear layout.
     public void clearNotes(){
-        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        final SharedPreferences.Editor editor = prefs.edit();
+        ArrayList<String> list = getArrayList("textStrings");
+        ArrayList<String> trash = getArrayList("trashStrings");
+        for (int i = 0; i < list.size(); i++)
+            trash.add(list.get(i));
 
-        editor.clear();
-        editor.apply();
+        list.clear();
+        saveArrayList(list, "textStrings");
+        saveArrayList(trash, "trashStrings");
 
         LinearLayout ll = findViewById(R.id.linear);
         ll.removeAllViews();
+
+        Toast.makeText(getApplicationContext(), "Notes cleared", Toast.LENGTH_LONG).show();
+
     }
 
     public void saveArrayList(ArrayList<String> list, String key){ // saves the arraylist using json
@@ -147,6 +154,10 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.action_remove:
                 goToActivity(TrashActivity.class);
+                return true;
+
+            case R.id.action_clear:
+                createDialog();
                 return true;
 
             default:
