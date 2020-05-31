@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.vanillanotes.settings.SettingsActivity;
+import com.example.vanillanotes.settings.SettingsActivity2;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -137,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                goToActivity(SettingsActivity.class);
+                goToActivity(SettingsActivity2.class);
                 return true;
 
             case R.id.action_add:

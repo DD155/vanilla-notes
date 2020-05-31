@@ -185,6 +185,5 @@ public class TrashActivity extends AppCompatActivity {
         ll.removeAllViews();
 
         Toast.makeText(getApplicationContext(), "Trash emptied", Toast.LENGTH_LONG).show();
-
     }
 }
