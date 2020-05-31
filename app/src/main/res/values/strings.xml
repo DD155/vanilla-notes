@@ -33,4 +33,7 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="settings_interface">Interface</string>
+    <string name="darkmode_title">Dark Mode</string>
+    <string name="darkmode_summary">Enable a dark theme for the application</string>
 </resources>

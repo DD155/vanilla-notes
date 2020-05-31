@@ -2,13 +2,28 @@
 
     <PreferenceCategory
         app:iconSpaceReserved="false"
-        app:title="@string/settings_notes">
+        app:title="@string/settings_interface">
 
-        <Preference
+        <ListPreference
+            app:defaultValue="medium"
+            app:entries="@array/font_entries"
+            app:entryValues="@array/font_values"
             app:iconSpaceReserved="false"
             app:key="font_size"
             app:title="@string/font_size_title"
             app:summary="@string/font_size_summary" />
+
+        <SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            app:key="sync"
+            app:title="@string/darkmode_title"
+            app:summary="@string/darkmode_summary"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/settings_notes">
 
         <Preference
             app:iconSpaceReserved="false"
@@ -22,10 +37,7 @@
         app:iconSpaceReserved="false"
         app:title="@string/sync_header">
 
-        <SwitchPreferenceCompat
-            app:iconSpaceReserved="false"
-            app:key="sync"
-            app:title="@string/sync_title" />
+
 
         <SwitchPreferenceCompat
             app:iconSpaceReserved="false"
