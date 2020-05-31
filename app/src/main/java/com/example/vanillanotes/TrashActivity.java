@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.vanillanotes.settings.SettingsActivity;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -80,7 +81,7 @@ public class TrashActivity extends AppCompatActivity {
             }
         } else { //have message that trash can is empty
             TextView defaultText = new TextView(getApplicationContext());
-            defaultText.setText("The trash can is currently empty.");
+            defaultText.setText(getResources().getString(R.string.trash_empty));
             defaultText.setTextSize(20);
             defaultText.setGravity(Gravity.CENTER_HORIZONTAL);
             //defaultText.setWidth();
@@ -155,7 +156,8 @@ public class TrashActivity extends AppCompatActivity {
     public void confirmDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Empty Trash");
-        builder.setMessage("Are you sure you want to empty the trash? The notes cannot be recovered after this.");
+        getResources().getString(R.string.trash_clear_confirm);
+        builder.setMessage(getResources().getString(R.string.trash_clear_confirm));
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
