@@ -21,9 +21,11 @@
     <string name="settings_notes">Notes</string>
     <string name="sync_header">Sync</string>
 
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
+    <!-- Notes Preferences -->
+    <string name="clear_title">Clear</string>
+    <string name="clear_summary">Deletes all notes in the home page</string>
+    <string name="font_size_title">Font Size</string>
+    <string name="font_size_summary">Adjust the font size of the notes</string>
 
     <!-- Sync Preferences -->
     <string name="sync_title">Sync email periodically</string>
