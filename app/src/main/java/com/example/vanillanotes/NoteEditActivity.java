@@ -215,9 +215,28 @@ public class NoteEditActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_settings:
-                // User chose the "Settings" item, show the app settings UI...
+                // Create dialog if user wants to continue to settings, discarding the current note.
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Discard changes");
+                builder.setMessage("Are you sure you want to discard your changes?");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        goToActivity(SettingsActivity.class);
+                    }
+                });
 
-                goToActivity(SettingsActivity.class);
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                AlertDialog alert = builder.create();
+                alert.show();
+
+
                 return true;
 
             case R.id.action_save:
