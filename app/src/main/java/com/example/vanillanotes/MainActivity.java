@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 text.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) { // clicked text sends user to edit the note
-                        notesActivity.setClass(getApplicationContext(), NoteEdit.class);
+                        notesActivity.setClass(getApplicationContext(), NoteEditActivity.class);
                         notesActivity.putExtra("savedText", textList.get(finalI)); // pass current text
                         notesActivity.putExtra("index", finalI); // pass index to next activity to change content later
                         notesActivity.putExtra("caller", "MainActivity");
@@ -102,9 +102,11 @@ public class MainActivity extends AppCompatActivity {
     public void clearNotes(){
         ArrayList<String> list = getArrayList("textStrings");
         ArrayList<String> trash = getArrayList("trashStrings");
+        trash.addAll(list);
+        /*
         for (int i = 0; i < list.size(); i++)
             trash.add(list.get(i));
-
+        */
         list.clear();
         saveArrayList(list, "textStrings");
         saveArrayList(trash, "trashStrings");
@@ -149,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.action_add:
 
-                goToActivity(NoteEdit.class);
+                goToActivity(NoteEditActivity.class);
                 return true;
 
             case R.id.action_remove:

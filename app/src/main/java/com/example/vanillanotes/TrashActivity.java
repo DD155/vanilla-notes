@@ -70,11 +70,10 @@ public class TrashActivity extends AppCompatActivity {
                 text.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) { // clicked text sends user to edit the note
-                        notesActivity.setClass(getApplicationContext(), NoteEdit.class);
+                        notesActivity.setClass(getApplicationContext(), NoteEditActivity.class);
                         notesActivity.putExtra("savedText", trashList.get(finalI)); // pass current text
                         notesActivity.putExtra("index", finalI); // pass index to next activity to change content later
                         notesActivity.putExtra("caller", "TrashActivity");
-                        notesActivity.putExtra("class", TrashActivity.class);
                         startActivity(notesActivity);
                     }
                 });
@@ -118,9 +117,10 @@ public class TrashActivity extends AppCompatActivity {
         return gson.fromJson(json, type);
     }
 
-    public void goToActivity(Class act){
+    public void goToActivity(Class<?> act){
         Intent i = new Intent();
         i.setClass(getApplicationContext(), act);
+        i.putExtra("caller", "TrashActivity");
         startActivity(i);
     }
 
@@ -145,7 +145,21 @@ public class TrashActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_empty:
-                confirmDialog();
+                if (getArrayList("trashStrings").size() != 0)
+                    confirmDialog();
+                else {  // case where the trash is already empty
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle(R.string.clear_error_title);
+                    builder.setMessage(getResources().getString(R.string.trash_error));
+                    builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                }
                 return true;
 
             default:
@@ -156,7 +170,6 @@ public class TrashActivity extends AppCompatActivity {
     public void confirmDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Empty Trash");
-        getResources().getString(R.string.trash_clear_confirm);
         builder.setMessage(getResources().getString(R.string.trash_clear_confirm));
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
@@ -183,6 +196,12 @@ public class TrashActivity extends AppCompatActivity {
 
         LinearLayout ll = findViewById(R.id.linear);
         ll.removeAllViews();
+
+        TextView defaultText = new TextView(getApplicationContext());
+        defaultText.setText(getResources().getString(R.string.trash_empty));
+        defaultText.setTextSize(20);
+        defaultText.setGravity(Gravity.CENTER_HORIZONTAL);
+        ll.addView(defaultText);
 
         Toast.makeText(getApplicationContext(), "Trash emptied", Toast.LENGTH_LONG).show();
     }

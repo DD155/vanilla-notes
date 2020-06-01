@@ -23,7 +23,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-public class NoteEdit extends AppCompatActivity {
+public class NoteEditActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +33,8 @@ public class NoteEdit extends AppCompatActivity {
         Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("Edit");
         setSupportActionBar(myToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         String t = getIntent().getStringExtra("savedText");
         EditText text = findViewById(R.id.editText);
@@ -52,10 +53,19 @@ public class NoteEdit extends AppCompatActivity {
     //case 1: user is creating new note: the key "savedText" should be null
     //case 2: user is editing a preexisting note: key "savedText" is not null and should use index
     public void saveText(){
+        ArrayList<String> list; //arraylist for either main notes or trash notes
+        String key = "textStrings";
+        Intent prev;
+        boolean isTrash = false;
         String t = getIntent().getStringExtra("savedText");
-        Intent prev = new Intent();
+        String caller = getIntent().getStringExtra("caller");
         EditText text = findViewById(R.id.editText);
-        prev.setClass(this, MainActivity.class);
+
+        if (caller.equals("MainActivity")) prev = new Intent(getApplicationContext(), MainActivity.class);
+        else {
+            prev = new Intent(getApplicationContext(), TrashActivity.class);
+            isTrash = true;
+        }
 
         if (text.getText().length() == 0) { //check that the note is not empty
             warningDialog();
@@ -66,10 +76,17 @@ public class NoteEdit extends AppCompatActivity {
             String s = text.getText().toString();
             prev.putExtra("note", s);
         } else { // case where the note is being edited
-            ArrayList<String> list = getArrayList("textStrings");
+            //determine which list to use
+            if (isTrash) {
+                list = getArrayList("trashStrings");
+                key = "trashStrings";
+            }
+            else list = getArrayList("textStrings");
+
+
             //replace old string with new string in the arraylist
             list.set(getIntent().getIntExtra("index", 0), text.getText().toString());
-            saveArrayList(list, "textStrings");
+            saveArrayList(list, key);
         }
         startActivity(prev);
     }
@@ -239,8 +256,9 @@ public class NoteEdit extends AppCompatActivity {
         editor.apply();
     }
 
-    public void goToActivity(Class act){
+    public void goToActivity(Class<?> act){
         Intent i = new Intent();
+        i.putExtra("caller", "NoteEditActivity");
         i.setClass(getApplicationContext(), act);
         startActivity(i);
     }

@@ -11,7 +11,9 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.example.vanillanotes.MainActivity;
+import com.example.vanillanotes.NoteEditActivity;
 import com.example.vanillanotes.R;
+import com.example.vanillanotes.TrashActivity;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -25,7 +27,8 @@ public class SettingsActivity extends AppCompatActivity {
         Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("Settings");
         setSupportActionBar(myToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
         getSupportFragmentManager().beginTransaction().replace(R.id.settings_content,
@@ -33,8 +36,16 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public boolean onOptionsItemSelected(MenuItem item){
-        Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivityForResult(myIntent, 0);
+        Intent intent;
+        if (getIntent().getStringExtra("caller").equals("MainActivity"))
+            intent = new Intent(getApplicationContext(), MainActivity.class);
+        else if (getIntent().getStringExtra("caller").equals("TrashActivity"))
+            intent = new Intent(getApplicationContext(), TrashActivity.class);
+        else {
+            intent = new Intent(getApplicationContext(), NoteEditActivity.class);
+        }
+
+        startActivityForResult(intent, 0);
         return true;
     }
 

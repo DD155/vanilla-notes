@@ -37,4 +37,6 @@
     <string name="darkmode_title">Dark Mode</string>
     <string name="darkmode_summary">Enable a dark theme for the application</string>
     <string name="action_clear">Clear all notes</string>
+    <string name="clear_error_title">Trash Empty</string>
+    <string name="trash_error">The trash is already empty and cannot be cleared again.</string>
 </resources>
