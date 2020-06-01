@@ -3,12 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".settings.SettingsActivity">
 
     <include layout="@layout/toolbar"/>
 
     <LinearLayout
-        android:id="@+id/setting_content"
+        android:id="@+id/settings_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="56dp"

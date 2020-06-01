@@ -5,8 +5,12 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.MenuItem;
 
+import com.example.vanillanotes.MainActivity;
 import com.example.vanillanotes.R;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -17,15 +21,21 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         //add toolbar
+
         Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("Settings");
         setSupportActionBar(myToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        //add settings
-        getSupportFragmentManager().beginTransaction().replace(R.id.setting_content,
+        getSupportFragmentManager().beginTransaction().replace(R.id.settings_content,
                 new SettingsFragment()).commit();
-
-
     }
+
+    public boolean onOptionsItemSelected(MenuItem item){
+        Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivityForResult(myIntent, 0);
+        return true;
+    }
+
 }

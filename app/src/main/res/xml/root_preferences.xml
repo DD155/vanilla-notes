@@ -37,11 +37,8 @@
         app:iconSpaceReserved="false"
         app:title="@string/sync_header">
 
-
-
         <SwitchPreferenceCompat
             app:iconSpaceReserved="false"
-            app:dependency="sync"
             app:key="attachment"
             app:summaryOff="@string/attachment_summary_off"
             app:summaryOn="@string/attachment_summary_on"

@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.vanillanotes.settings.SettingsActivity;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -30,23 +31,14 @@ public class NoteEdit extends AppCompatActivity {
         setContentView(R.layout.activity_note_edit);
 
         Toolbar myToolbar = findViewById(R.id.toolbar);
-        myToolbar.setTitle("");
+        myToolbar.setTitle("Edit");
         setSupportActionBar(myToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         String t = getIntent().getStringExtra("savedText");
         EditText text = findViewById(R.id.editText);
         text.setPadding(50, 50, 50, 50);
 
-        TextView back = findViewById(R.id.toolbar_back);
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getIntent().getStringExtra("caller").equals("MainActivity"))
-                    goToActivity(MainActivity.class);
-                else
-                    goToActivity(TrashActivity.class);
-            }
-        });
 
         if (t != null) { // case where user is editing old note
             text.setText(t); //set the text on the note page as the old string
@@ -185,12 +177,30 @@ public class NoteEdit extends AppCompatActivity {
         return true;
     }
 
+    /*
+    if (getIntent().getStringExtra("caller").equals("MainActivity"))
+                    goToActivity(MainActivity.class);
+                else
+                    goToActivity(TrashActivity.class);
+     */
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent();
+                if (getIntent().getStringExtra("caller").equals("MainActivity"))
+                    intent.setClass(getApplicationContext(), MainActivity.class);
+                else
+                    intent.setClass(getApplicationContext(), TrashActivity.class);
+
+                startActivityForResult(intent, 0);
+                return true;
+
             case R.id.action_settings:
                 // User chose the "Settings" item, show the app settings UI...
-                goToActivity(MainActivity.class);
+
+                goToActivity(SettingsActivity.class);
                 return true;
 
             case R.id.action_save:
