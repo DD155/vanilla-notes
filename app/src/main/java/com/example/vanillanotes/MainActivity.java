@@ -103,14 +103,11 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<String> list = getArrayList("textStrings");
         ArrayList<String> trash = getArrayList("trashStrings");
         trash.addAll(list);
-        /*
-        for (int i = 0; i < list.size(); i++)
-            trash.add(list.get(i));
-        */
         list.clear();
+
         saveArrayList(list, "textStrings");
         saveArrayList(trash, "trashStrings");
-
+        //remove notes from layout
         LinearLayout ll = findViewById(R.id.linear);
         ll.removeAllViews();
 

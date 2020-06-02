@@ -244,7 +244,7 @@ public class NoteEditActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-    
+
     // saving array list functions
     public ArrayList<String> getArrayList(String key){ //returns the arraylist from sharedprefs
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
