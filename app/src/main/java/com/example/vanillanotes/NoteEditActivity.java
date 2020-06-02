@@ -40,7 +40,6 @@ public class NoteEditActivity extends AppCompatActivity {
         EditText text = findViewById(R.id.editText);
         text.setPadding(50, 50, 50, 50);
 
-
         if (t != null) { // case where user is editing old note
             text.setText(t); //set the text on the note page as the old string
             text.setSelection(text.getText().length()); //set cursor to the end
@@ -61,6 +60,7 @@ public class NoteEditActivity extends AppCompatActivity {
         String caller = getIntent().getStringExtra("caller");
         EditText text = findViewById(R.id.editText);
 
+        //determine if previous activity was trash activity or not
         if (caller.equals("MainActivity")) prev = new Intent(getApplicationContext(), MainActivity.class);
         else {
             prev = new Intent(getApplicationContext(), TrashActivity.class);
@@ -141,7 +141,6 @@ public class NoteEditActivity extends AppCompatActivity {
         //goToActivity(MainActivity.class);
     }
 
-
     //creates dialog for empty notes
     public void warningDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -180,7 +179,6 @@ public class NoteEditActivity extends AppCompatActivity {
         alert.show();
     }
 
-
     //functions for toolbar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -193,13 +191,6 @@ public class NoteEditActivity extends AppCompatActivity {
 
         return true;
     }
-
-    /*
-    if (getIntent().getStringExtra("caller").equals("MainActivity"))
-                    goToActivity(MainActivity.class);
-                else
-                    goToActivity(TrashActivity.class);
-     */
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -235,8 +226,6 @@ public class NoteEditActivity extends AppCompatActivity {
 
                 AlertDialog alert = builder.create();
                 alert.show();
-
-
                 return true;
 
             case R.id.action_save:
@@ -255,8 +244,7 @@ public class NoteEditActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-
+    
     // saving array list functions
     public ArrayList<String> getArrayList(String key){ //returns the arraylist from sharedprefs
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
