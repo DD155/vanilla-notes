@@ -45,22 +45,21 @@ public class NoteEditActivity extends AppCompatActivity {
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Log.d("tag", "getting string...");
         String t = getIntent().getStringExtra("savedText");
-        Log.d("tag", "got string");
-
+        EditText title = findViewById(R.id.titleText);
         EditText text = findViewById(R.id.editText);
+        title.setPadding(50, 50, 50, 0);
         text.setPadding(50, 50, 50, 50);
 
-        Log.d("tag", "text box created");
+
         if (t != null) { // case where user is editing old note
             text.setText(t); //set the text on the note page as the old string
             text.setSelection(text.getText().length()); //set cursor to the end
         }
-        Log.d("tag", "string checked.");
 
-        text.setBackgroundResource(R.drawable.back);
-        Log.d("tag", "background checked.");
+
+        text.setBackgroundResource(R.drawable.shadow_border);
+        title.setBackgroundResource(R.drawable.shadow_border);
     }
 
     //Post-Condition: save the text of the note to the previous activity
