@@ -106,15 +106,15 @@ public class MainActivity extends AppCompatActivity {
             height = 250;
             Log.d("density", "Density is 3.0");
         } else if (density >= 2.0) {
-            height = 200;
+            height = 150;
             Log.d("density", "Density is 2.0");
 
         } else if (density >= 1.5) {
-            height = 150;
+            height = 100;
             Log.d("density", "Density is 1.5");
         } else
         {
-            height = 100;
+            height = 75;
             Log.d("density", "Density is 1.0");
         }
 
