@@ -95,15 +95,39 @@ public class MainActivity extends AppCompatActivity {
     //TextView now has border.
     //Change width and padding/margin accordingly
     public void initializeText(TextView text){
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        float density = getResources().getDisplayMetrics().density;
+        int height = 0;
+        Log.d("density", Float.toString(density));
+        //set height based on dpi
+        if (density >= 4.0) {
+            height = 300;
+            Log.d("density", "Density is 4.0");
+        } else if (density >= 3.0) {
+            height = 250;
+            Log.d("density", "Density is 3.0");
+        } else if (density >= 2.0) {
+            height = 200;
+            Log.d("density", "Density is 2.0");
+
+        } else if (density >= 1.5) {
+            height = 150;
+            Log.d("density", "Density is 1.5");
+        } else
+        {
+            height = 100;
+            Log.d("density", "Density is 1.0");
+        }
+
+
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         params.setMargins(0, 25, 0, 25);
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         text.setBackgroundResource(R.drawable.shadow_border);
-        text.setWidth(1500);
+        text.setHeight(height);
         text.setPadding(30, 70, 30, 70);
         text.setLayoutParams(params);
         text.setTextColor(Color.parseColor("#434343"));
-
     }
 
     //Post-condition: Remove notes by clearing note arraylist and resetting linear layout.
@@ -155,7 +179,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_add:
-
                 goToActivity(NoteEditActivity.class);
                 return true;
 
