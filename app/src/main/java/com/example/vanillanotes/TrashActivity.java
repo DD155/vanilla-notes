@@ -46,7 +46,10 @@ public class TrashActivity extends AppCompatActivity {
             Log.d("myTag", "trashStrings is valid.");
             trashList = getArrayList("trashStrings");
         } // otherwise just make the new arraylist
-        else trashList = new ArrayList<>();
+        else {
+            trashList = new ArrayList<>();
+            saveArrayList(trashList, "trashStrings");
+        }
 
         // information from edited note activity
         Intent caller = getIntent();

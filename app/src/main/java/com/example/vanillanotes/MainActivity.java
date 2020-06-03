@@ -16,6 +16,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -96,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
     public void initializeText(TextView text){
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.setMargins(0, 25, 0, 25);
-        text.setTextSize(15);
+        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         text.setBackgroundResource(R.drawable.shadow_border);
         text.setWidth(1500);
         text.setPadding(30, 70, 30, 70);
