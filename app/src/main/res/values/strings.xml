@@ -39,4 +39,6 @@
     <string name="action_clear">Clear all notes</string>
     <string name="clear_error_title">Trash Empty</string>
     <string name="trash_error">The trash is already empty and cannot be cleared again.</string>
+    <string name="channel_name">Notifications</string>
+    <string name="channel_description">Channel for pinned notes</string>
 </resources>

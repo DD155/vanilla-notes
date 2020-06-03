@@ -2,14 +2,18 @@ package com.example.vanillanotes;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
 
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -28,10 +32,14 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String CHANNEL_ID = "NoteChannel";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        createNotificationChannel();
 
         Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("Notes");
@@ -74,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
                         notesActivity.putExtra("savedText", textList.get(finalI)); // pass current text
                         notesActivity.putExtra("index", finalI); // pass index to next activity to change content later
                         notesActivity.putExtra("caller", "MainActivity");
-                        notesActivity.putExtra("class", MainActivity.class);
                         startActivity(notesActivity);
                     }
                 });
@@ -202,4 +209,20 @@ public class MainActivity extends AppCompatActivity {
         return 0;
     }
 
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
 }
+

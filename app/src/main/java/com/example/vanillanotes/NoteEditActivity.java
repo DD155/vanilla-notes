@@ -2,13 +2,22 @@ package com.example.vanillanotes;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.TaskStackBuilder;
 
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,16 +45,22 @@ public class NoteEditActivity extends AppCompatActivity {
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        Log.d("tag", "getting string...");
         String t = getIntent().getStringExtra("savedText");
+        Log.d("tag", "got string");
+
         EditText text = findViewById(R.id.editText);
         text.setPadding(50, 50, 50, 50);
 
+        Log.d("tag", "text box created");
         if (t != null) { // case where user is editing old note
             text.setText(t); //set the text on the note page as the old string
             text.setSelection(text.getText().length()); //set cursor to the end
         }
+        Log.d("tag", "string checked.");
 
         text.setBackgroundResource(R.drawable.back);
+        Log.d("tag", "background checked.");
     }
 
     //Post-Condition: save the text of the note to the previous activity
@@ -240,6 +255,11 @@ public class NoteEditActivity extends AppCompatActivity {
                 confirmDialog();
                 return true;
 
+            case R.id.action_pin:
+                // notification function
+                createNotification();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -269,4 +289,48 @@ public class NoteEditActivity extends AppCompatActivity {
         i.setClass(getApplicationContext(), act);
         startActivity(i);
     }
+
+    public void createNotification(){
+        EditText text = findViewById(R.id.editText);
+        String message = text.getText().toString();
+        /*
+        String className = getIntent().getStringExtra("caller");
+        Intent intent = new Intent(this, NoteEditActivity.class);
+
+        intent.putExtra("savedText", "hello");
+        intent.putExtra("caller", "MainActivity");
+        intent.putExtra("index", 0);
+
+         */
+        // Create an Intent for the activity you want to start
+        Intent intent = new Intent(this, NoteEditActivity.class);
+        intent.putExtra("savedText", message);
+        intent.putExtra("caller", getIntent().getStringExtra("caller"));
+        intent.putExtra("index", getIntent().getIntExtra("index", 0));
+        // Create the TaskStackBuilder and add the intent, which inflates the back stack
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addNextIntentWithParentStack(intent);
+        // Get the PendingIntent containing the entire back stack
+        PendingIntent resultPendingIntent =
+        stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "NoteChannel")
+                .setSmallIcon(R.drawable.ic_baseline_event_note_24)
+                .setContentTitle("Pinned Note")
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                .setAutoCancel(true)
+                .setContentText(message)
+                .setContentIntent(resultPendingIntent)
+                //.setContentText(text.getText().toString())
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+
+
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
+        notificationManagerCompat.notify(100, builder.build());
+    }
+
 }
