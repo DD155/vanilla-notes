@@ -25,8 +25,10 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import com.example.vanillanotes.Utility;
 
 public class TrashActivity extends AppCompatActivity {
+    private Utility utility = new Utility(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +46,11 @@ public class TrashActivity extends AppCompatActivity {
 
         if (prefs.contains("trashStrings")) { // checks if user has notes already
             Log.d("myTag", "trashStrings is valid.");
-            trashList = getArrayList("trashStrings");
+            trashList = utility.getArrayList("trashStrings");
         } // otherwise just make the new arraylist
         else {
             trashList = new ArrayList<>();
-            saveArrayList(trashList, "trashStrings");
+            utility.saveArrayList(trashList, "trashStrings");
         }
 
         // information from edited note activity
@@ -57,7 +59,7 @@ public class TrashActivity extends AppCompatActivity {
 
         if (editedText != null){ // if the user has input text already, add new note with that text
             trashList.add(editedText);
-            saveArrayList(trashList, "trashStrings");
+            utility.saveArrayList(trashList, "trashStrings");
         }
 
         if (trashList.size() != 0){ // makes sure user has already notes, loads them on entering app
@@ -103,30 +105,6 @@ public class TrashActivity extends AppCompatActivity {
 
     }
 
-    public void saveArrayList(ArrayList<String> list, String key){ // saves the arraylist using json
-        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(list);
-        editor.putString(key, json);
-        editor.apply();
-    }
-
-    public ArrayList<String> getArrayList(String key){ //returns the arraylist from sharedprefs
-        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = prefs.getString(key, null);
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
-        return gson.fromJson(json, type);
-    }
-
-    public void goToActivity(Class<?> act){
-        Intent i = new Intent();
-        i.setClass(getApplicationContext(), act);
-        i.putExtra("caller", "TrashActivity");
-        startActivity(i);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -140,15 +118,15 @@ public class TrashActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_settings:
                 // User chose the "Settings" item, show the app settings UI...
-                goToActivity(SettingsActivity.class);
+                utility.goToActivity(SettingsActivity.class, "TrashActivity", getApplicationContext());
                 return true;
 
             case R.id.action_home:
-                goToActivity(MainActivity.class);
+                utility.goToActivity(MainActivity.class, "TrashActivity", getApplicationContext());
                 return true;
 
             case R.id.action_empty:
-                if (getArrayList("trashStrings").size() != 0)
+                if (utility.getArrayList("trashStrings").size() != 0)
                     confirmDialog();
                 else {  // case where the trash is already empty
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -193,9 +171,9 @@ public class TrashActivity extends AppCompatActivity {
     }
 
     public void clearNotes(){
-        ArrayList<String> list = getArrayList("trashStrings");
+        ArrayList<String> list = utility.getArrayList("trashStrings");
         list.clear();
-        saveArrayList(list, "trashStrings");
+        utility.saveArrayList(list, "trashStrings");
 
         LinearLayout ll = findViewById(R.id.linear);
         ll.removeAllViews();

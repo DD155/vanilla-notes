@@ -34,6 +34,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     private static final String CHANNEL_ID = "NoteChannel";
+    private Utility util = new Utility(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (prefs.contains("textStrings")) { // checks if user has notes already
             Log.d("myTag", "textStrings is valid.");
-            textList = getArrayList("textStrings");
+            textList = util.getArrayList("textStrings");
         } // otherwise just make the new arraylist
         else textList = new ArrayList<>();
 
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (editedText != null){ // if the user has input text already, add new note with that text
             textList.add(editedText);
-            saveArrayList(textList, "textStrings");
+            util.saveArrayList(textList, "textStrings");
         }
 
         if (textList.size() != 0){ // makes sure user has already notes, loads them on entering app
@@ -96,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
     //Change width and padding/margin accordingly
     public void initializeText(TextView text){
         float density = getResources().getDisplayMetrics().density;
-        int height = 0;
+        int height;
         Log.d("density", Float.toString(density));
         //set height based on dpi
         if (density >= 4.0) {
@@ -118,8 +119,6 @@ public class MainActivity extends AppCompatActivity {
             Log.d("density", "Density is 1.0");
         }
 
-
-
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         params.setMargins(0, 25, 0, 25);
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
@@ -131,37 +130,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Post-condition: Remove notes by clearing note arraylist and resetting linear layout.
-    public void clearNotes(){
-        ArrayList<String> list = getArrayList("textStrings");
-        ArrayList<String> trash = getArrayList("trashStrings");
+    private void clearNotes(){
+        ArrayList<String> list = util.getArrayList("textStrings");
+        ArrayList<String> trash = util.getArrayList("trashStrings");
         trash.addAll(list);
         list.clear();
 
-        saveArrayList(list, "textStrings");
-        saveArrayList(trash, "trashStrings");
+        util.saveArrayList(list, "textStrings");
+        util.saveArrayList(trash, "trashStrings");
         //remove notes from layout
         LinearLayout ll = findViewById(R.id.linear);
         ll.removeAllViews();
 
         Toast.makeText(getApplicationContext(), "Notes cleared", Toast.LENGTH_LONG).show();
-
-    }
-
-    public void saveArrayList(ArrayList<String> list, String key){ // saves the arraylist using json
-        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(list);
-        editor.putString(key, json);
-        editor.apply();
-    }
-
-    public ArrayList<String> getArrayList(String key){ //returns the arraylist from sharedprefs
-        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = prefs.getString(key, null);
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
-        return gson.fromJson(json, type);
     }
 
     @Override
@@ -175,15 +156,15 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                goToActivity(SettingsActivity.class);
+                util.goToActivity(SettingsActivity.class, "MainActivity", getApplicationContext());
                 return true;
 
             case R.id.action_add:
-                goToActivity(NoteEditActivity.class);
+                util.goToActivity(NoteEditActivity.class, "MainActivity", getApplicationContext());
                 return true;
 
             case R.id.action_remove:
-                goToActivity(TrashActivity.class);
+                util.goToActivity(TrashActivity.class,"MainActivity", getApplicationContext());
                 return true;
 
             case R.id.action_clear:
@@ -193,12 +174,6 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    public void goToActivity(Class<?> act){
-        Intent i = new Intent();
-        i.putExtra("caller", "MainActivity");
-        startActivity(i.setClass(getApplicationContext(), act));
     }
 
     //creates dialog for the clear
