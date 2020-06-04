@@ -47,18 +47,18 @@ public class MainActivity extends AppCompatActivity {
         myToolbar.setTitle("Notes");
         setSupportActionBar(myToolbar);
 
-        final ArrayList<String> textList; //declare arraylist for the strings of the text on each note
+        final ArrayList<String> textList; // Declare ArrayList for the strings of the text on each note
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         final LinearLayout linear = findViewById(R.id.linear);
         final Intent notesActivity = new Intent();
 
-        if (prefs.contains("textStrings")) { // checks if user has notes already
+        if (prefs.contains("textStrings")) { // Checks if user has notes already
             Log.d("myTag", "textStrings is valid.");
             textList = util.getArrayList("textStrings");
-        } // otherwise just make the new arraylist
+        } // Otherwise just make the new ArrayList
         else textList = new ArrayList<>();
 
-        // information from edited note activity
+        // Information from edited note activity
         Intent caller = getIntent();
         final String editedText = caller.getStringExtra("note");
 
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             util.saveArrayList(textList, "textStrings");
         }
 
-        if (textList.size() != 0){ // makes sure user has already notes, loads them on entering app
+        if (textList.size() != 0){ // Makes sure user has already notes, loads them on entering app
             for (int i = 0; i < textList.size(); i++) {
                 final TextView text = new TextView(this);
                 Log.d("myTag", textList.get(i));
@@ -75,14 +75,14 @@ public class MainActivity extends AppCompatActivity {
                 text.setText(textList.get(i));
                 linear.addView(text);
 
-                // make the text clickable
-                final int finalI = i; //index of arraylist
+                // Make the text clickable
+                final int index = i; // Index of ArrayList
                 text.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) { // clicked text sends user to edit the note
                         notesActivity.setClass(getApplicationContext(), NoteEditActivity.class);
-                        notesActivity.putExtra("savedText", textList.get(finalI)); // pass current text
-                        notesActivity.putExtra("index", finalI); // pass index to next activity to change content later
+                        notesActivity.putExtra("savedText", textList.get(index)); // pass current text
+                        notesActivity.putExtra("index", index); // pass index to next activity to change content later
                         notesActivity.putExtra("caller", "MainActivity");
                         startActivity(notesActivity);
                     }
@@ -91,15 +91,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //Post-condition: set attributes for text:
-    //Text-size is now 15.
-    //TextView now has border.
-    //Change width and padding/margin accordingly
-    public void initializeText(TextView text){
+    // Set attributes for TextView depending on dpi
+    private void initializeText(TextView text){
         float density = getResources().getDisplayMetrics().density;
         int height;
         Log.d("density", Float.toString(density));
-        //set height based on dpi
+        // Set height based on dpi
         if (density >= 4.0) {
             height = 300;
             Log.d("density", "Density is 4.0");
@@ -129,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         text.setTextColor(Color.parseColor("#434343"));
     }
 
-    //Post-condition: Remove notes by clearing note arraylist and resetting linear layout.
+    // Remove notes by clearing note ArrayList and resetting linear layout.
     private void clearNotes(){
         ArrayList<String> list = util.getArrayList("textStrings");
         ArrayList<String> trash = util.getArrayList("trashStrings");
@@ -138,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
         util.saveArrayList(list, "textStrings");
         util.saveArrayList(trash, "trashStrings");
-        //remove notes from layout
+        // Remove notes from layout
         LinearLayout ll = findViewById(R.id.linear);
         ll.removeAllViews();
 
@@ -176,8 +173,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //creates dialog for the clear
-    public void createDialog() {
+    // Creates dialog for the clear
+    private void createDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Clear All Notes");
         builder.setMessage("Would you like to clear all the notes?");
@@ -199,26 +196,16 @@ public class MainActivity extends AppCompatActivity {
         alert.show();
     }
 
-    public int getNavigationBarSize(Context context){
-        Resources resources = context.getResources();
-        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            return resources.getDimensionPixelSize(resourceId);
-        }
-        return 0;
-    }
-
+    // Create the NotificationChannel, but only on API 26+ because
+    // the NotificationChannel class is new and not in the support library
     private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = getString(R.string.channel_name);
             String description = getString(R.string.channel_description);
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
+
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }

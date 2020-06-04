@@ -33,6 +33,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class NoteEditActivity extends AppCompatActivity {
+    private Utility util = new Utility(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +53,9 @@ public class NoteEditActivity extends AppCompatActivity {
         text.setPadding(50, 50, 50, 50);
 
 
-        if (t != null) { // case where user is editing old note
-            text.setText(t); //set the text on the note page as the old string
-            text.setSelection(text.getText().length()); //set cursor to the end
+        if (t != null) { // Case where user is editing old note
+            text.setText(t); // Set the text on the note page as the old string
+            text.setSelection(text.getText().length()); // Set cursor to the end
         }
 
 
@@ -62,11 +63,9 @@ public class NoteEditActivity extends AppCompatActivity {
         title.setBackgroundResource(R.drawable.shadow_border);
     }
 
-    //Post-Condition: save the text of the note to the previous activity
-    //case 1: user is creating new note: the key "savedText" should be null
-    //case 2: user is editing a preexisting note: key "savedText" is not null and should use index
-    public void saveText(){
-        ArrayList<String> list; //arraylist for either main notes or trash notes
+    // Save the text of the note to the previous activity
+    private void saveText(){
+        ArrayList<String> list; // ArrayList for either main notes or trash notes
         String key = "textStrings";
         Intent prev;
         boolean isTrash = false;
@@ -74,48 +73,47 @@ public class NoteEditActivity extends AppCompatActivity {
         String caller = getIntent().getStringExtra("caller");
         EditText text = findViewById(R.id.editText);
 
-        //determine if previous activity was trash activity or not
+        // Determine if previous activity was trash activity or not
         if (caller.equals("MainActivity")) prev = new Intent(getApplicationContext(), MainActivity.class);
         else {
             prev = new Intent(getApplicationContext(), TrashActivity.class);
             isTrash = true;
         }
 
-        if (text.getText().length() == 0) { //check that the note is not empty
+        if (text.getText().length() == 0) { // Check that the note is not empty
             warningDialog();
             return;
         }
 
-        if (t == null) { // case where the note is new
+        if (t == null) { // Case where the note is new
             String s = text.getText().toString();
             prev.putExtra("note", s);
-        } else { // case where the note is being edited
-            //determine which list to use
+        } else { // Case where the note is being edited
+            // Determine which list to use
             if (isTrash) {
-                list = getArrayList("trashStrings");
+                list = util.getArrayList("trashStrings");
                 key = "trashStrings";
             }
-            else list = getArrayList("textStrings");
+            else list = util.getArrayList("textStrings");
 
-
-            //replace old string with new string in the arraylist
+            // Replace old string with new string in the ArrayList
             list.set(getIntent().getIntExtra("index", 0), text.getText().toString());
-            saveArrayList(list, key);
+            util.saveArrayList(list, key);
         }
         startActivity(prev);
     }
 
-    public void deleteNote(){
+    private void deleteNote(){
         String t = getIntent().getStringExtra("savedText");
         String caller = getIntent().getStringExtra("caller");
         ArrayList<String> trashList;
 
-        if (getArrayList("trashStrings") != null) // check if trash can list is valid
-            trashList = getArrayList("trashStrings");
+        if (util.getArrayList("trashStrings") != null) // check if trash can list is valid
+            trashList = util.getArrayList("trashStrings");
         else {
             trashList = new ArrayList<>();
         }
-        ArrayList<String> list  = getArrayList("textStrings");
+        ArrayList<String> list  = util.getArrayList("textStrings");
 
 
         if (t != null) { // save the note to trash while deleting from main notes
@@ -125,38 +123,37 @@ public class NoteEditActivity extends AppCompatActivity {
                 trashList.add(t);
                 list.remove(getIntent().getIntExtra("index", 0));
             }
-            saveArrayList(list, "textStrings");
-            saveArrayList(trashList, "trashStrings");
+            util.saveArrayList(list, "textStrings");
+            util.saveArrayList(trashList, "trashStrings");
         }
         Toast.makeText(getApplicationContext(), "Note deleted", Toast.LENGTH_LONG).show();
 
-        //load previously called activity
+        // Load previously called activity
         if (caller.equals("TrashActivity")){
-            goToActivity(TrashActivity.class);
+            util.goToActivity(TrashActivity.class, "NoteEditActivity", getApplicationContext());
         } else {
-            goToActivity(MainActivity.class);
+            util.goToActivity(MainActivity.class, "NoteEditActivity", getApplicationContext());
         }
     }
 
-    //restore the note from the trash can to the main notes
-    public void restoreNote(){
+    // Restore the note from the trash can to the main notes
+    private void restoreNote(){
         int index = getIntent().getIntExtra("index", 0);
         ArrayList<String> trash, list;
-        trash = getArrayList("trashStrings");
-        list = getArrayList("textStrings");
+        trash = util.getArrayList("trashStrings");
+        list = util.getArrayList("textStrings");
 
         list.add(trash.get(index));
         trash.remove(index);
 
-        saveArrayList(trash, "trashStrings");
-        saveArrayList(list, "textStrings");
+        util.saveArrayList(trash, "trashStrings");
+        util.saveArrayList(list, "textStrings");
 
         Toast.makeText(getApplicationContext(), "Note restored", Toast.LENGTH_LONG).show();
-        //goToActivity(MainActivity.class);
     }
 
-    //creates dialog for empty notes
-    public void warningDialog(){
+    // Creates dialog for empty notes
+    private void warningDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Error");
         builder.setMessage("Your note is currently blank. Please enter text to save it.");
@@ -171,7 +168,7 @@ public class NoteEditActivity extends AppCompatActivity {
         alert.show();
     }
 
-    public void confirmDialog(){
+    private void confirmDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Delete Note");
         builder.setMessage("Are you sure you want to delete this note?");
@@ -197,7 +194,6 @@ public class NoteEditActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-
         if (getIntent().getStringExtra("caller").equals("TrashActivity")) {
             getMenuInflater().inflate(R.menu.trash_note_actions, menu);
         } else
@@ -227,7 +223,7 @@ public class NoteEditActivity extends AppCompatActivity {
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        goToActivity(SettingsActivity.class);
+                        util.goToActivity(SettingsActivity.class,"NoteEditActivity", getApplicationContext());
                     }
                 });
 
@@ -255,7 +251,6 @@ public class NoteEditActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_pin:
-                // notification function
                 createNotification();
                 return true;
 
@@ -264,44 +259,11 @@ public class NoteEditActivity extends AppCompatActivity {
         }
     }
 
-    // saving array list functions
-    public ArrayList<String> getArrayList(String key){ //returns the arraylist from sharedprefs
-        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = prefs.getString(key, null);
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
-        return gson.fromJson(json, type);
-    }
-
-    public void saveArrayList(ArrayList<String> list, String key){ // saves the arraylist using json
-        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(list);
-        editor.putString(key, json);
-        editor.apply();
-    }
-
-    public void goToActivity(Class<?> act){
-        Intent i = new Intent();
-        i.putExtra("caller", "NoteEditActivity");
-        i.setClass(getApplicationContext(), act);
-        startActivity(i);
-    }
-
-    public void createNotification(){
+    private void createNotification(){
         EditText text = findViewById(R.id.editText);
         String message = text.getText().toString();
-        /*
-        String className = getIntent().getStringExtra("caller");
-        Intent intent = new Intent(this, NoteEditActivity.class);
 
-        intent.putExtra("savedText", "hello");
-        intent.putExtra("caller", "MainActivity");
-        intent.putExtra("index", 0);
-
-         */
-        // Create an Intent for the activity you want to start
+        // Create an Intent for the activity
         Intent intent = new Intent(this, NoteEditActivity.class);
         intent.putExtra("savedText", message);
         intent.putExtra("caller", getIntent().getStringExtra("caller"));
@@ -313,9 +275,7 @@ public class NoteEditActivity extends AppCompatActivity {
         PendingIntent resultPendingIntent =
         stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
-
-
-
+        // Build the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "NoteChannel")
                 .setSmallIcon(R.drawable.ic_baseline_event_note_24)
                 .setContentTitle("Pinned Note")
@@ -323,13 +283,9 @@ public class NoteEditActivity extends AppCompatActivity {
                 .setAutoCancel(true)
                 .setContentText(message)
                 .setContentIntent(resultPendingIntent)
-                //.setContentText(text.getText().toString())
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManagerCompat.notify(100, builder.build());
     }
-
 }
