@@ -53,4 +53,11 @@ public class Utility extends ContextWrapper {
         return 0;
     }
 
+    public int countLines(String str){
+        String[] lines = str.split("\r\n|\r|\n");
+        return lines.length;
+    }
+
+
+
 }

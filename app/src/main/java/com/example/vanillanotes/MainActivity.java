@@ -16,9 +16,11 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.InputFilter;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.util.TypedValue;
@@ -83,6 +85,16 @@ public class MainActivity extends AppCompatActivity {
                 String title = currNote.getTitle();
                 String description = currNote.getText();
 
+                // If the note is longer than 2 lines, cut off the ending and add an ellipsis
+                if (util.countLines(description) > 2){
+                    String[] strParts = description.split("\\r?\\n|\\r");
+                    if (strParts[1].length() > 42) {
+                        strParts[1] = strParts[1].substring(0, strParts[1].length() - 3);
+                    }
+                    strParts[1] += "...";
+                    description = strParts[0] + "\n" + strParts[1];
+                }
+
                 SpannableString str = new SpannableString(title + "\n" + description);
                 str.setSpan(new RelativeSizeSpan(1.3f), 0, title.length(),
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -135,7 +147,8 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         params.setMargins(0, 25, 0, 25);
-        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        text.setFilters(new InputFilter[] { new InputFilter.LengthFilter(45) });
         text.setBackgroundResource(R.drawable.shadow_border);
         text.setHeight(height);
         text.setPadding(30, 30, 30, 30);
