@@ -15,6 +15,11 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -75,8 +80,15 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < noteList.size(); i++) {
                 final TextView text = new TextView(this);
                 Note currNote = noteList.get(i);
+                String title = currNote.getTitle();
+                String description = currNote.getText();
+
+                SpannableString str = new SpannableString(title + "\n" + description);
+                str.setSpan(new RelativeSizeSpan(1.3f), 0, title.length(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
                 initializeText(text);
-                text.setText(currNote.getTitle() + "\n" + currNote.getText());
+                text.setText(str);
                 linear.addView(text);
 
                 // Make the text clickable
