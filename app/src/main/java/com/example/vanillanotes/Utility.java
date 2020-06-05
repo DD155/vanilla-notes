@@ -58,6 +58,15 @@ public class Utility extends ContextWrapper {
         return lines.length;
     }
 
+    public String addEllipsis(String str){
+        String s;
+        if (str.length() >= 83){
+            s = str.substring(0, 75) + "…";
+        } else {
+            s = str + "…";
+        }
+        return s;
+    }
 
 
 }

@@ -84,17 +84,20 @@ public class MainActivity extends AppCompatActivity {
                 Note currNote = noteList.get(i);
                 String title = currNote.getTitle();
                 String description = currNote.getText();
+                /*
+                String[] strParts = description.split("\\r?\\n|\\r");
 
-                // If the note is longer than 2 lines, cut off the ending and add an ellipsis
-                if (util.countLines(description) > 2){
-                    String[] strParts = description.split("\\r?\\n|\\r");
-                    if (strParts[1].length() > 42) {
-                        strParts[1] = strParts[1].substring(0, strParts[1].length() - 3);
-                    }
-                    strParts[1] += "...";
-                    description = strParts[0] + "\n" + strParts[1];
+                Log.d("length", Integer.toString(strParts[0].length()));
+                if (strParts[0].length() >= 82){
+                    description = util.addEllipsis(strParts[0]);
+                    Log.d("length", Integer.toString(description.length()));
+                } else if (util.countLines(description) > 2){
+                    // Create array of the text without any new lines
+                    description = strParts[0] + "\n" + util.addEllipsis(strParts[1]); // Concatenate everything
                 }
+                 */
 
+                // Make the title larger than the description
                 SpannableString str = new SpannableString(title + "\n" + description);
                 str.setSpan(new RelativeSizeSpan(1.3f), 0, title.length(),
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -127,10 +130,10 @@ public class MainActivity extends AppCompatActivity {
         Log.d("density", Float.toString(density));
         // Set height based on dpi
         if (density >= 4.0) {
-            height = 300;
+            height = 350;
             Log.d("density", "Density is 4.0");
         } else if (density >= 3.0) {
-            height = 250;
+            height = 300;
             Log.d("density", "Density is 3.0");
         } else if (density >= 2.0) {
             height = 150;
@@ -147,11 +150,11 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         params.setMargins(0, 25, 0, 25);
-        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        text.setFilters(new InputFilter[] { new InputFilter.LengthFilter(45) });
+        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+        text.setFilters(new InputFilter[] { new InputFilter.LengthFilter(82) });
         text.setBackgroundResource(R.drawable.shadow_border);
         text.setHeight(height);
-        text.setPadding(30, 30, 30, 30);
+        text.setPadding(50, 20, 50, 30);
         text.setLayoutParams(params);
         text.setTextColor(Color.parseColor("#434343"));
     }
