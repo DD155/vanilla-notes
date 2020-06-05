@@ -35,26 +35,73 @@ public class TrashActivity extends AppCompatActivity {
         myToolbar.setTitle("Trash");
         setSupportActionBar(myToolbar);
 
-        final ArrayList<String> trashList; // Declare ArrayList for the strings of the text on each note
+        final ArrayList<Note> noteList; // Declare Notes ArrayList
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         final LinearLayout linear = findViewById(R.id.linear);
         final Intent notesActivity = new Intent();
 
-        if (prefs.contains("trashStrings")) { // Checks if user has notes already
-            Log.d("myTag", "trashStrings is valid.");
-            trashList = utility.getArrayList("trashStrings");
+
+        if (prefs.contains("trash")) { // Checks if user has notes already
+            noteList = utility.getNotes("trash");
+        } // Otherwise just make the new ArrayList
+        else noteList = new ArrayList<>();
+
+        // Information from edited note activity
+        Intent caller = getIntent();
+        final String editedText = caller.getStringExtra("note");
+
+        if (editedText != null){ // if the user has input text already, add new note with that text
+            noteList.add(new Note("",editedText));
+            utility.saveNotes(noteList, "trash");
+        }
+
+        if (noteList.size() != 0){ // Makes sure user has already notes, loads them on entering app
+            for (int i = 0; i < noteList.size(); i++) {
+                final TextView text = new TextView(this);
+                initializeText(text);
+                text.setText(noteList.get(i).getText());
+                linear.addView(text);
+
+                // Make the text clickable
+                final int index = i; // Index of ArrayList
+                text.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) { // clicked text sends user to edit the note
+                        notesActivity.setClass(getApplicationContext(), NoteEditActivity.class);
+                        notesActivity.putExtra("savedText", noteList.get(index).getText()); // pass current text
+                        notesActivity.putExtra("index", index); // pass index to next activity to change content later
+                        notesActivity.putExtra("caller", "TrashActivity");
+                        startActivity(notesActivity);
+                    }
+                });
+            }
+        } else { // Have message that trash can is empty
+            TextView defaultText = new TextView(getApplicationContext());
+            defaultText.setText(getResources().getString(R.string.trash_empty));
+            defaultText.setTextSize(20);
+            defaultText.setGravity(Gravity.CENTER_HORIZONTAL);
+            linear.addView(defaultText);
+        }
+
+        /*
+        final ArrayList<Note> trashList; // Declare ArrayList of Notes
+        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        final LinearLayout linear = findViewById(R.id.linear);
+        final Intent notesActivity = new Intent();
+
+        if (prefs.contains("trash")) { // Checks if user has notes already
+            trashList = utility.getNotes("trash");
         } // Otherwise just make the new ArrayList
         else {
             trashList = new ArrayList<>();
-            utility.saveArrayList(trashList, "trashStrings");
+            utility.saveNotes(trashList, "trashStrings");
         }
-
         // Information from edited note activity
         final String editedText = getIntent().getStringExtra("note");
 
         if (editedText != null){ // If the user has input text already, add new note with that text
             trashList.add(editedText);
-            utility.saveArrayList(trashList, "trashStrings");
+            utility.saveNotes(trashList, "trashStrings");
         }
 
         if (trashList.size() != 0){ // Makes sure user has already notes, loads them on entering app
@@ -84,7 +131,7 @@ public class TrashActivity extends AppCompatActivity {
             defaultText.setTextSize(20);
             defaultText.setGravity(Gravity.CENTER_HORIZONTAL);
             linear.addView(defaultText);
-        }
+        }*/
     }
 
     private void initializeText(TextView text){
@@ -102,7 +149,6 @@ public class TrashActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.trash_actions, menu);
-
         return true;
     }
 
@@ -118,7 +164,7 @@ public class TrashActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_empty:
-                if (utility.getArrayList("trashStrings").size() != 0)
+                if (utility.getNotes("trash").size() != 0)
                     confirmDialog();
                 else {  // Case where the trash is already empty
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -163,9 +209,9 @@ public class TrashActivity extends AppCompatActivity {
     }
 
     private void clearNotes(){
-        ArrayList<String> list = utility.getArrayList("trashStrings");
+        ArrayList<Note> list = utility.getNotes("trash");
         list.clear();
-        utility.saveArrayList(list, "trashStrings");
+        utility.saveNotes(list, "trash");
 
         LinearLayout ll = findViewById(R.id.linear);
         ll.removeAllViews();

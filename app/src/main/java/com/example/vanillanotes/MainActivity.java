@@ -50,13 +50,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(myToolbar);
 
         final ArrayList<Note> noteList; // Declare Notes ArrayList
-        /*
-        noteList.add(new Note("Test", "Test"));
-        util.saveNotes(noteList, "notes");
-        ArrayList<Note> test = util.getNotes("notes");
-        Log.d("array_test", test.get(0).getText());
-        *util.saveArrayList(noteList, "notes");
-        */
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         final LinearLayout linear = findViewById(R.id.linear);
         final Intent notesActivity = new Intent();
