@@ -91,51 +91,6 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         }
-
-        /*
-        final ArrayList<String> textList; // Declare ArrayList for the strings of the text on each note
-        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        final LinearLayout linear = findViewById(R.id.linear);
-        final Intent notesActivity = new Intent();
-
-
-        if (prefs.contains("textStrings")) { // Checks if user has notes already
-            Log.d("myTag", "textStrings is valid.");
-            textList = util.getArrayList("textStrings");
-        } // Otherwise just make the new ArrayList
-        else textList = new ArrayList<>();
-
-        // Information from edited note activity
-        Intent caller = getIntent();
-        final String editedText = caller.getStringExtra("note");
-
-        if (editedText != null){ // if the user has input text already, add new note with that text
-            textList.add(editedText);
-            util.saveArrayList(textList, "textStrings");
-        }
-
-        if (textList.size() != 0){ // Makes sure user has already notes, loads them on entering app
-            for (int i = 0; i < textList.size(); i++) {
-                final TextView text = new TextView(this);
-                Log.d("myTag", textList.get(i));
-                initializeText(text);
-                text.setText(textList.get(i));
-                linear.addView(text);
-
-                // Make the text clickable
-                final int index = i; // Index of ArrayList
-                text.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) { // clicked text sends user to edit the note
-                        notesActivity.setClass(getApplicationContext(), NoteEditActivity.class);
-                        notesActivity.putExtra("savedText", textList.get(index)); // pass current text
-                        notesActivity.putExtra("index", index); // pass index to next activity to change content later
-                        notesActivity.putExtra("caller", "MainActivity");
-                        startActivity(notesActivity);
-                    }
-                });
-            }
-        }*/
     }
 
     // Set attributes for TextView depending on dpi
@@ -175,13 +130,13 @@ public class MainActivity extends AppCompatActivity {
 
     // Remove notes by clearing note ArrayList and resetting linear layout.
     private void clearNotes(){
-        ArrayList<String> list = util.getArrayList("textStrings");
-        ArrayList<String> trash = util.getArrayList("trashStrings");
+        ArrayList<Note> list = util.getNotes("notes");
+        ArrayList<Note> trash = util.getNotes("trash");
         trash.addAll(list);
         list.clear();
 
-        util.saveArrayList(list, "textStrings");
-        util.saveArrayList(trash, "trashStrings");
+        util.saveNotes(list, "notes");
+        util.saveNotes(trash, "trash");
         // Remove notes from layout
         LinearLayout ll = findViewById(R.id.linear);
         ll.removeAllViews();

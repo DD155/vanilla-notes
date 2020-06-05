@@ -26,17 +26,7 @@ public class Utility extends ContextWrapper {
         startActivity(i);
     }
 
-    // saves the string array list using gson
-    public void saveArrayList(ArrayList<String> list, String key){ // saves the arraylist using json
-        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(list);
-        editor.putString(key, json);
-        editor.apply();
-    }
-
-    public void saveNotes(ArrayList<Note> list, String key){ // saves the arraylist using json
+    public void saveNotes(ArrayList<Note> list, String key){ // saves the arraylist using gson
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         Gson gson = new Gson();
@@ -52,16 +42,7 @@ public class Utility extends ContextWrapper {
         Type type = new TypeToken<ArrayList<Note>>() {}.getType();
         return gson.fromJson(json, type);
     }
-
-    // retrieves the string array list from sharedprefs using gson
-    public ArrayList<String> getArrayList(String key){ //returns the arraylist from sharedprefs
-        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = prefs.getString(key, null);
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
-        return gson.fromJson(json, type);
-    }
-
+    
     // returns the value of the system navigation bar height
     public int getNavigationBarSize(Context context){
         Resources resources = context.getResources();
