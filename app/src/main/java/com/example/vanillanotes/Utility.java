@@ -42,7 +42,7 @@ public class Utility extends ContextWrapper {
         Type type = new TypeToken<ArrayList<Note>>() {}.getType();
         return gson.fromJson(json, type);
     }
-    
+
     // returns the value of the system navigation bar height
     public int getNavigationBarSize(Context context){
         Resources resources = context.getResources();

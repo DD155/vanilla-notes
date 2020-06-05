@@ -9,8 +9,9 @@ public class Note {
         this.text = text;
     }
 
-    public Note(String title){
-        this.title = title;
+    public Note(String text){
+        this.title = "";
+        this.text = text;
     }
 
     public String getTitle(){

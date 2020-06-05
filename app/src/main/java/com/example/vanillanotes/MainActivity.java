@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (prefs.contains("notes")) { // Checks if user has notes already
-            Log.d("myTag", "notes is valid.");
             noteList = util.getNotes("notes");
         } // Otherwise just make the new ArrayList
         else noteList = new ArrayList<>();
@@ -64,17 +63,20 @@ public class MainActivity extends AppCompatActivity {
         // Information from edited note activity
         Intent caller = getIntent();
         final String editedText = caller.getStringExtra("note");
+        final String titleText = caller.getStringExtra("title");
 
-        if (editedText != null){ // if the user has input text already, add new note with that text
-            noteList.add(new Note("",editedText));
+        if (editedText != null){ // If the user has input text already, add new note with that text
+            noteList.add(new Note(editedText));
+            if (titleText != null) noteList.get(noteList.size() - 1).setTitle(titleText); // Check if there is a title
             util.saveNotes(noteList, "notes");
         }
 
         if (noteList.size() != 0){ // Makes sure user has already notes, loads them on entering app
             for (int i = 0; i < noteList.size(); i++) {
                 final TextView text = new TextView(this);
+                Note currNote = noteList.get(i);
                 initializeText(text);
-                text.setText(noteList.get(i).getText());
+                text.setText(currNote.getTitle() + "\n" + currNote.getText());
                 linear.addView(text);
 
                 // Make the text clickable
@@ -84,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(View v) { // clicked text sends user to edit the note
                         notesActivity.setClass(getApplicationContext(), NoteEditActivity.class);
                         notesActivity.putExtra("savedText", noteList.get(index).getText()); // pass current text
+                        notesActivity.putExtra("savedTitle", noteList.get(index).getTitle());
                         notesActivity.putExtra("index", index); // pass index to next activity to change content later
                         notesActivity.putExtra("caller", "MainActivity");
                         startActivity(notesActivity);
@@ -123,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         text.setBackgroundResource(R.drawable.shadow_border);
         text.setHeight(height);
-        text.setPadding(30, 70, 30, 70);
+        text.setPadding(30, 30, 30, 30);
         text.setLayoutParams(params);
         text.setTextColor(Color.parseColor("#434343"));
     }

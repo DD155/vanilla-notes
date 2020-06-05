@@ -46,19 +46,23 @@ public class NoteEditActivity extends AppCompatActivity {
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        String t = getIntent().getStringExtra("savedText");
-        EditText title = findViewById(R.id.titleText);
-        EditText text = findViewById(R.id.editText);
-        title.setPadding(50, 50, 50, 0);
-        text.setPadding(50, 50, 50, 50);
+        // Set attributes of EditTexts
+        String text = getIntent().getStringExtra("savedText");
+        String title = getIntent().getStringExtra("savedTitle");
+        EditText titleView = findViewById(R.id.titleText);
+        EditText textView = findViewById(R.id.editText);
+        titleView.setPadding(50, 50, 50, 0);
+        textView.setPadding(50, 50, 50, 50);
 
-        if (t != null) { // Case where user is editing old note
-            text.setText(t); // Set the text on the note page as the old string
-            text.setSelection(text.getText().length()); // Set cursor to the end
+        if (text != null) { // Case where user is editing old note
+            if (title != null) titleView.setText(title);
+            textView.setText(text); // Set the text on the note page as the old string
+            textView.setSelection(textView.getText().length()); // Set cursor to the end
+            textView.requestFocus(); // Set cursor to this View specifically
         }
 
-        text.setBackgroundResource(R.drawable.shadow_border);
-        title.setBackgroundResource(R.drawable.shadow_border);
+        textView.setBackgroundResource(R.drawable.shadow_border);
+        titleView.setBackgroundResource(R.drawable.shadow_border);
     }
 
     // Save the text of the note to the previous activity
@@ -67,9 +71,10 @@ public class NoteEditActivity extends AppCompatActivity {
         String key = "notes";
         Intent prev;
         boolean isTrash = false;
-        String t = getIntent().getStringExtra("savedText");
+        String text = getIntent().getStringExtra("savedText");
         String caller = getIntent().getStringExtra("caller");
-        EditText text = findViewById(R.id.editText);
+        EditText textView = findViewById(R.id.editText);
+        EditText titleView = findViewById(R.id.titleText);
 
         // Determine if previous activity was trash activity or not
         if (caller.equals("MainActivity")) prev = new Intent(getApplicationContext(), MainActivity.class);
@@ -78,14 +83,14 @@ public class NoteEditActivity extends AppCompatActivity {
             isTrash = true;
         }
 
-        if (text.getText().length() == 0) { // Check that the note is not empty
+        if (textView.getText().length() == 0) { // Check that the note is not empty
             warningDialog();
             return;
         }
 
-        if (t == null) { // Case where the note is new
-            String s = text.getText().toString();
-            prev.putExtra("note", s);
+        if (text == null) { // Case where the note is new
+            prev.putExtra("note", textView.getText().toString());
+            prev.putExtra("title", titleView.getText().toString());
         } else { // Case where the note is being edited
             // Determine which list to use
             if (isTrash) {
@@ -94,8 +99,9 @@ public class NoteEditActivity extends AppCompatActivity {
             }
             else list = util.getNotes("notes");
 
-            // Replace old string with new string in the ArrayList
-            list.get(getIntent().getIntExtra("index", 0)).setText(text.getText().toString());
+            // Replace old strings with new strings in the ArrayList
+            list.get(getIntent().getIntExtra("index", 0)).setText(textView.getText().toString());
+            list.get(getIntent().getIntExtra("index", 0)).setTitle(titleView.getText().toString());
             util.saveNotes(list, key);
         }
         startActivity(prev);
@@ -118,7 +124,7 @@ public class NoteEditActivity extends AppCompatActivity {
             if (caller.equals("TrashActivity")) {
                 trashList.remove(getIntent().getIntExtra("index", 0)); //remove from trash can
             } else {
-                trashList.add(new Note("",text));
+                trashList.add(new Note(text));
                 list.remove(getIntent().getIntExtra("index", 0));
             }
             util.saveNotes(list, "notes");

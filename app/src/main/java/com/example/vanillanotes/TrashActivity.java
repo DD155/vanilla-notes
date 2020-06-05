@@ -51,7 +51,7 @@ public class TrashActivity extends AppCompatActivity {
         final String editedText = caller.getStringExtra("note");
 
         if (editedText != null){ // if the user has input text already, add new note with that text
-            noteList.add(new Note("",editedText));
+            noteList.add(new Note(editedText));
             utility.saveNotes(noteList, "trash");
         }
 
