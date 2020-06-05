@@ -52,12 +52,10 @@ public class NoteEditActivity extends AppCompatActivity {
         title.setPadding(50, 50, 50, 0);
         text.setPadding(50, 50, 50, 50);
 
-
         if (t != null) { // Case where user is editing old note
             text.setText(t); // Set the text on the note page as the old string
             text.setSelection(text.getText().length()); // Set cursor to the end
         }
-
 
         text.setBackgroundResource(R.drawable.shadow_border);
         title.setBackgroundResource(R.drawable.shadow_border);
@@ -65,8 +63,8 @@ public class NoteEditActivity extends AppCompatActivity {
 
     // Save the text of the note to the previous activity
     private void saveText(){
-        ArrayList<String> list; // ArrayList for either main notes or trash notes
-        String key = "textStrings";
+        ArrayList<Note> list; // ArrayList for either main notes or trash notes
+        String key = "notes";
         Intent prev;
         boolean isTrash = false;
         String t = getIntent().getStringExtra("savedText");
@@ -91,40 +89,40 @@ public class NoteEditActivity extends AppCompatActivity {
         } else { // Case where the note is being edited
             // Determine which list to use
             if (isTrash) {
-                list = util.getArrayList("trashStrings");
-                key = "trashStrings";
+                list = util.getNotes("trash");
+                key = "trash";
             }
-            else list = util.getArrayList("textStrings");
+            else list = util.getNotes("notes");
 
             // Replace old string with new string in the ArrayList
-            list.set(getIntent().getIntExtra("index", 0), text.getText().toString());
-            util.saveArrayList(list, key);
+            list.get(getIntent().getIntExtra("index", 0)).setText(text.getText().toString());
+            util.saveNotes(list, key);
         }
         startActivity(prev);
     }
 
     private void deleteNote(){
-        String t = getIntent().getStringExtra("savedText");
+        String text = getIntent().getStringExtra("savedText");
         String caller = getIntent().getStringExtra("caller");
-        ArrayList<String> trashList;
+        ArrayList<Note> trashList;
 
-        if (util.getArrayList("trashStrings") != null) // check if trash can list is valid
-            trashList = util.getArrayList("trashStrings");
+        if (util.getNotes("trash") != null) // check if trash can list is valid
+            trashList = util.getNotes("trash");
         else {
             trashList = new ArrayList<>();
         }
-        ArrayList<String> list  = util.getArrayList("textStrings");
+        ArrayList<Note> list  = util.getNotes("notes");
 
 
-        if (t != null) { // save the note to trash while deleting from main notes
+        if (text != null) { // save the note to trash while deleting from main notes
             if (caller.equals("TrashActivity")) {
                 trashList.remove(getIntent().getIntExtra("index", 0)); //remove from trash can
             } else {
-                trashList.add(t);
+                trashList.add(new Note("",text));
                 list.remove(getIntent().getIntExtra("index", 0));
             }
-            util.saveArrayList(list, "textStrings");
-            util.saveArrayList(trashList, "trashStrings");
+            util.saveNotes(list, "notes");
+            util.saveNotes(trashList, "trash");
         }
         Toast.makeText(getApplicationContext(), "Note deleted", Toast.LENGTH_LONG).show();
 
@@ -139,15 +137,15 @@ public class NoteEditActivity extends AppCompatActivity {
     // Restore the note from the trash can to the main notes
     private void restoreNote(){
         int index = getIntent().getIntExtra("index", 0);
-        ArrayList<String> trash, list;
-        trash = util.getArrayList("trashStrings");
-        list = util.getArrayList("textStrings");
+        ArrayList<Note> trash, list;
+        trash = util.getNotes("trash");
+        list = util.getNotes("notes");
 
         list.add(trash.get(index));
         trash.remove(index);
 
-        util.saveArrayList(trash, "trashStrings");
-        util.saveArrayList(list, "textStrings");
+        util.saveNotes(trash, "trash");
+        util.saveNotes(list, "notes");
 
         Toast.makeText(getApplicationContext(), "Note restored", Toast.LENGTH_LONG).show();
     }

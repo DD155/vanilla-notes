@@ -96,7 +96,6 @@ public class TrashActivity extends AppCompatActivity {
         text.setPadding(30, 70, 30, 70);
         text.setLayoutParams(params);
         text.setTextColor(Color.parseColor("#434343"));
-
     }
 
     @Override

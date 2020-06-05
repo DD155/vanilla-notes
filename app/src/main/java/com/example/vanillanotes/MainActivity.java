@@ -28,6 +28,7 @@ import com.example.vanillanotes.settings.SettingsActivity;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
@@ -41,16 +42,69 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Create notification channel
         createNotificationChannel();
 
         Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("Notes");
         setSupportActionBar(myToolbar);
 
+        final ArrayList<Note> noteList; // Declare Notes ArrayList
+        /*
+        noteList.add(new Note("Test", "Test"));
+        util.saveNotes(noteList, "notes");
+        ArrayList<Note> test = util.getNotes("notes");
+        Log.d("array_test", test.get(0).getText());
+        *util.saveArrayList(noteList, "notes");
+        */
+        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        final LinearLayout linear = findViewById(R.id.linear);
+        final Intent notesActivity = new Intent();
+
+
+        if (prefs.contains("notes")) { // Checks if user has notes already
+            Log.d("myTag", "notes is valid.");
+            noteList = util.getNotes("notes");
+        } // Otherwise just make the new ArrayList
+        else noteList = new ArrayList<>();
+
+        // Information from edited note activity
+        Intent caller = getIntent();
+        final String editedText = caller.getStringExtra("note");
+
+        if (editedText != null){ // if the user has input text already, add new note with that text
+            noteList.add(new Note("",editedText));
+            util.saveNotes(noteList, "notes");
+        }
+
+        if (noteList.size() != 0){ // Makes sure user has already notes, loads them on entering app
+            for (int i = 0; i < noteList.size(); i++) {
+                final TextView text = new TextView(this);
+                initializeText(text);
+                text.setText(noteList.get(i).getText());
+                linear.addView(text);
+
+                // Make the text clickable
+                final int index = i; // Index of ArrayList
+                text.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) { // clicked text sends user to edit the note
+                        notesActivity.setClass(getApplicationContext(), NoteEditActivity.class);
+                        notesActivity.putExtra("savedText", noteList.get(index).getText()); // pass current text
+                        notesActivity.putExtra("index", index); // pass index to next activity to change content later
+                        notesActivity.putExtra("caller", "MainActivity");
+                        startActivity(notesActivity);
+                    }
+                });
+            }
+        }
+
+        /*
         final ArrayList<String> textList; // Declare ArrayList for the strings of the text on each note
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         final LinearLayout linear = findViewById(R.id.linear);
         final Intent notesActivity = new Intent();
+
 
         if (prefs.contains("textStrings")) { // Checks if user has notes already
             Log.d("myTag", "textStrings is valid.");
@@ -88,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
-        }
+        }*/
     }
 
     // Set attributes for TextView depending on dpi

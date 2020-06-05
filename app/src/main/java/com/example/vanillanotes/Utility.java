@@ -36,6 +36,23 @@ public class Utility extends ContextWrapper {
         editor.apply();
     }
 
+    public void saveNotes(ArrayList<Note> list, String key){ // saves the arraylist using json
+        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+        editor.putString(key, json);
+        editor.apply();
+    }
+
+    public ArrayList<Note> getNotes(String key){ //returns the arraylist from sharedprefs
+        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = prefs.getString(key, null);
+        Type type = new TypeToken<ArrayList<Note>>() {}.getType();
+        return gson.fromJson(json, type);
+    }
+
     // retrieves the string array list from sharedprefs using gson
     public ArrayList<String> getArrayList(String key){ //returns the arraylist from sharedprefs
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
