@@ -4,7 +4,7 @@ Vanilla Notes is a free, open source android application that lets users take no
 </p>
 <p align = 'center'>
   <a href="https://android-arsenal.com/api?level=16"><img alt="API" src="https://img.shields.io/badge/API-16%2B-brightgreen.svg?style=flat"/></a>
-The minimum Android version required is Android 4.1 (SDK 16); Target version is Android 9 (SDK 28)
+
 </p>
 <br/>
 
@@ -25,7 +25,7 @@ The final application will have the following features:
 - Widgets (?)
 
 ## Technologies
-
+The minimum Android version required is Android 4.1 (SDK 16); Target version is Android 9 (SDK 28)
 Project is created with and uses:
 
 - [Android Studio v4.0](https://developer.android.com/studio/install) using [Java](https://www.java.com/en/)
