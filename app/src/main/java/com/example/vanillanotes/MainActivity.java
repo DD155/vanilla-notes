@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
@@ -22,6 +23,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -100,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
                 // Make the title larger than the description
                 SpannableString str = new SpannableString(title + "\n" + description);
                 str.setSpan(new RelativeSizeSpan(1.3f), 0, title.length(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                str.setSpan(new StyleSpan(Typeface.BOLD), 0, title.length(),
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
                 initializeText(text);

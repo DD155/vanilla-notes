@@ -21,7 +21,7 @@
         android:gravity="top"
         android:hint="@string/enter_your_title"
         android:inputType="text"
-        android:maxLength="35"
+        android:maxLength="31"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.333"
         app:layout_constraintStart_toStartOf="parent"
