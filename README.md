@@ -4,8 +4,6 @@ Vanilla Notes is a free, open source android application that lets users take no
 </p>
 <p align = 'center'>
   <a href="https://android-arsenal.com/api?level=16"><img alt="API" src="https://img.shields.io/badge/API-16%2B-brightgreen.svg?style=flat"/></a>
-  [![star this repo](https://githubbadges.com/star.svg?user=DD155&repo=vanilla-notes&style=default)](https://github.com/DD155/vanilla-notes)
-[![fork this repo](https://githubbadges.com/fork.svg?user=DD155&repo=vanilla-notes&style=default)](https://github.com/DD155/vanilla-notes/fork)
 
 </p>
 <br/>
