@@ -19,5 +19,8 @@ The final application will have the following features:
 - Themes / Dark Mode
 - Widgets (?)
 
-### Launch
+## Launch
 
+The release for this application will hopefully be in late July or August.
+
+Planning on releasing to F-Droid and Google Play
