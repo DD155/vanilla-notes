@@ -44,7 +44,7 @@ Planning on releasing to F-Droid and Google Play
 
 ## License
 ```
-Copyright 2020 Daniel Dong (DD155)
+Copyright 2020 DD155
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
