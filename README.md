@@ -1,8 +1,8 @@
 <h1 align = 'center'> Vanilla Notes </h1> 
 <p align = 'center'>
-Vanilla Notes is a free, open source android application that lets users take notes. The focus is to have a clean, simple, yet functional interface while still having the essentials. 
+Vanilla Notes is a free, open source android application that lets users take notes. The focus is to have a clean, simple, yet functional interface while still having the essentials. It is fully offline, and does not save your notes to anywhere other than on your device.
 </p>
-<p align = 'center'; font-size = 'small'>
+<p align = 'center'>
 The minimum Android version required is Android 4.1 (SDK 16); Target version is Android 9 (SDK 28)
 </p>
 <br/>
@@ -20,7 +20,17 @@ The final application will have the following features:
 - Sort by Title or Date Created
 - Undo changes in case you made a mistake in a note
 - Themes / Dark Mode
+- Import/Export Backup
 - Widgets (?)
+
+## Technologies
+
+Project is created with and uses:
+
+- [Android Studio v4.0](https://developer.android.com/studio/install) using [Java](https://www.java.com/en/)
+- [Gson](https://github.com/google/gson) - A JSON library for Java
+- [material.io](https://material.io/) - Material guidelines with resources such as components and icons
+
 
 ## Launch
 
