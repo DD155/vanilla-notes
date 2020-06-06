@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.example.vanillanotes.MainActivity;
-import com.example.vanillanotes.NoteEditActivity;
 import com.example.vanillanotes.R;
 import com.example.vanillanotes.TrashActivity;
 
@@ -32,6 +31,7 @@ public class SettingsActivity extends AppCompatActivity {
         //adds setting fragment
         getSupportFragmentManager().beginTransaction().replace(R.id.settings_content,
                 new SettingsFragment()).commit();
+
     }
 
     // determines which activity to go back to
