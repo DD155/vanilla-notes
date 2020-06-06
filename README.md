@@ -2,9 +2,10 @@
 <p align = 'center'>
 Vanilla Notes is a free, open source android application that lets users take notes. The focus is to have a clean, simple, yet functional interface while still having the essentials. 
 </p>
-<p align = 'center'; font-size = '10px'>
+<p align = 'center'; font-size = 'small'>
 The minimum Android version required is Android 4.1 (SDK 16); Target version is Android 9 (SDK 28)
 </p>
+<br/>
 
 ## Main Features
 
