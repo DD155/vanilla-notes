@@ -109,6 +109,7 @@ public class NoteEditActivity extends AppCompatActivity {
 
     private void deleteNote(){
         String text = getIntent().getStringExtra("savedText");
+        String title = getIntent().getStringExtra("savedTitle");
         String caller = getIntent().getStringExtra("caller");
         ArrayList<Note> trashList;
 
@@ -124,7 +125,7 @@ public class NoteEditActivity extends AppCompatActivity {
             if (caller.equals("TrashActivity")) {
                 trashList.remove(getIntent().getIntExtra("index", 0)); //remove from trash can
             } else {
-                trashList.add(new Note(text));
+                trashList.add(new Note(title, text));
                 list.remove(getIntent().getIntExtra("index", 0));
             }
             util.saveNotes(list, "notes");
