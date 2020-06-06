@@ -11,6 +11,8 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 // utility class for other activities
 public class Utility extends ContextWrapper {
@@ -68,5 +70,29 @@ public class Utility extends ContextWrapper {
         return s;
     }
 
+    public String currentDate(){
+        Calendar instance = Calendar.getInstance();
+        String dayOfWeek = Integer.toString(instance.get(Calendar.DAY_OF_MONTH));
+        String hour;
+        String minutes;
 
+        if (instance.get(Calendar.MINUTE) / 10 == 0){
+            minutes = "0" + (instance.get(Calendar.MINUTE));
+        } else
+        {
+            minutes = Integer.toString(instance.get(Calendar.MINUTE));
+        }
+
+        if (instance.get(Calendar.HOUR_OF_DAY) >= 12){
+            hour = Integer.toString(instance.get(Calendar.HOUR_OF_DAY) - 12);
+            minutes += " PM";
+        } else
+        {
+            hour = Integer.toString(instance.get(Calendar.HOUR_OF_DAY));
+            minutes = "AM";
+        }
+        String month = Integer.toString(instance.get(Calendar.MONTH) + 1);
+        String year = Integer.toString(instance.get(Calendar.YEAR));
+        return month + "/" + dayOfWeek + "/" + year + " " + hour + ":" + minutes;
+    }
 }

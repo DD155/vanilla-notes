@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
         final LinearLayout linear = findViewById(R.id.linear);
         final Intent notesActivity = new Intent();
 
-
         if (prefs.contains("notes")) { // Checks if user has notes already
             noteList = util.getNotes("notes");
         } // Otherwise just make the new ArrayList
@@ -73,10 +72,17 @@ public class MainActivity extends AppCompatActivity {
         Intent caller = getIntent();
         final String editedText = caller.getStringExtra("note");
         final String titleText = caller.getStringExtra("title");
+        final String date = caller.getStringExtra("date");
+        if (date != null)
+        Log.d("date_log", date);
 
         if (editedText != null){ // If the user has input text already, add new note with that text
-            noteList.add(new Note(editedText));
-            if (titleText != null) noteList.get(noteList.size() - 1).setTitle(titleText); // Check if there is a title
+            Note newNote = new Note(editedText);
+            newNote.setDate(date);
+            Log.d("date_log", newNote.getDate());
+            if (titleText != null) newNote.setTitle(titleText); // Check if there is a title
+            noteList.add(newNote);
+
             util.saveNotes(noteList, "notes");
         }
 
@@ -120,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
                         notesActivity.putExtra("savedTitle", noteList.get(index).getTitle());
                         notesActivity.putExtra("index", index); // pass index to next activity to change content later
                         notesActivity.putExtra("caller", "MainActivity");
+                        notesActivity.putExtra("date", noteList.get(index).getDate());
                         startActivity(notesActivity);
                     }
                 });

@@ -1,17 +1,22 @@
 package com.example.vanillanotes;
 
+import java.util.Calendar;
+
 public class Note {
     private String title;
     private String text;
+    private String date;
 
     public Note(String title, String text){
         this.title = title;
         this.text = text;
+        this.date = "";
     }
 
     public Note(String text){
         this.title = "";
         this.text = text;
+        this.date = "";
     }
 
     public String getTitle(){
@@ -22,6 +27,8 @@ public class Note {
         return text;
     }
 
+    public String getDate() { return date; }
+
     public void setTitle(String title){
         this.title = title;
     }
@@ -29,4 +36,9 @@ public class Note {
     public void setText(String text){
         this.text = text;
     }
+
+    public void setDate(String date){
+        this.date = date;
+    }
+
 }

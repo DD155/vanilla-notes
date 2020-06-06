@@ -29,6 +29,8 @@ import com.example.vanillanotes.settings.SettingsActivity;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.w3c.dom.Text;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
@@ -46,23 +48,33 @@ public class NoteEditActivity extends AppCompatActivity {
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        TextView dateView = findViewById(R.id.date);
+
         // Set attributes of EditTexts
         String text = getIntent().getStringExtra("savedText");
         String title = getIntent().getStringExtra("savedTitle");
         EditText titleView = findViewById(R.id.titleText);
         EditText textView = findViewById(R.id.editText);
+        Log.d("date_time_0", util.currentDate());
         titleView.setPadding(50, 50, 50, 0);
         textView.setPadding(50, 50, 50, 50);
 
         if (text != null) { // Case where user is editing old note
+            Note currentNote = util.getNotes("notes")
+                    .get(getIntent().getIntExtra("index", 0));
+            dateView.setText(getString(R.string.date_created, currentNote.getDate()));
+            //dateView.setText("Date Created: " + currentNote.getDate());
             if (title != null) titleView.setText(title);
             textView.setText(text); // Set the text on the note page as the old string
             textView.setSelection(textView.getText().length()); // Set cursor to the end
             textView.requestFocus(); // Set cursor to this View specifically
+        } else {
+            dateView.setText(getString(R.string.date_created, util.currentDate()));
         }
 
         textView.setBackgroundResource(R.drawable.shadow_border);
         titleView.setBackgroundResource(R.drawable.shadow_border);
+
     }
 
     // Save the text of the note to the previous activity
@@ -75,7 +87,6 @@ public class NoteEditActivity extends AppCompatActivity {
         String caller = getIntent().getStringExtra("caller");
         EditText textView = findViewById(R.id.editText);
         EditText titleView = findViewById(R.id.titleText);
-
         // Determine if previous activity was trash activity or not
         if (caller.equals("MainActivity")) prev = new Intent(getApplicationContext(), MainActivity.class);
         else {
@@ -91,6 +102,7 @@ public class NoteEditActivity extends AppCompatActivity {
         if (text == null) { // Case where the note is new
             prev.putExtra("note", textView.getText().toString());
             prev.putExtra("title", titleView.getText().toString());
+            prev.putExtra("date", util.currentDate());
         } else { // Case where the note is being edited
             // Determine which list to use
             if (isTrash) {
