@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NotificationCompat;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -26,8 +27,10 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -42,10 +45,10 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
     private static final String CHANNEL_ID = "NoteChannel";
     private Utility util = new Utility(this);
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,6 +121,49 @@ public class MainActivity extends AppCompatActivity {
 
                 // Make the text clickable
                 final int index = i; // Index of ArrayList
+
+                text.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+
+                        int x = (int)event.getX();
+                        int y = (int)event.getY();
+
+                        switch (event.getAction()){
+                            case MotionEvent.ACTION_OUTSIDE:
+                                Log.d("outside_action", "outside action");
+                                text.setBackgroundResource(R.drawable.shadow_border);
+                                return true;
+
+                            case MotionEvent.ACTION_CANCEL:
+                                Log.d("cancel_action", "Cancel action");
+                                text.setBackgroundResource(R.drawable.shadow_border);
+                                return true;
+
+                            case MotionEvent.ACTION_DOWN:
+                                text.setBackgroundResource(R.drawable.shadow_border_hold);
+                                return true;
+
+                            case MotionEvent.ACTION_UP:
+                                text.setBackgroundResource(R.drawable.shadow_border);
+                                notesActivity.setClass(getApplicationContext(), NoteEditActivity.class);
+                                notesActivity.putExtra("savedText", noteList.get(index).getText()); // pass current text
+                                notesActivity.putExtra("savedTitle", noteList.get(index).getTitle());
+                                notesActivity.putExtra("index", index); // pass index to next activity to change content later
+                                notesActivity.putExtra("caller", "MainActivity");
+                                notesActivity.putExtra("date", noteList.get(index).getDate());
+                                text.setBackgroundResource(R.drawable.shadow_border);
+                                startActivity(notesActivity);
+
+                                return true;
+
+                        }
+                        return false;
+                    }
+                });
+
+
+                /*
                 text.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) { // clicked text sends user to edit the note
@@ -130,6 +176,10 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(notesActivity);
                     }
                 });
+                 */
+
+
+
             }
         }
     }
