@@ -17,6 +17,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Html;
 import android.text.InputFilter;
 import android.text.Spannable;
@@ -123,25 +124,32 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
                         switch (event.getAction()){
-                            case MotionEvent.ACTION_OUTSIDE:
-                                Log.d("outside_action", "outside action");
-                                text.setBackgroundResource(R.drawable.shadow_border);
-                                return true;
-
                             case MotionEvent.ACTION_CANCEL:
                                 Log.d("cancel_action", "Cancel action");
                                 text.setBackgroundResource(R.drawable.shadow_border);
                                 return true;
 
                             case MotionEvent.ACTION_DOWN:
-                                Log.d("t_p", "Current TextView (X,Y): (" + text.getX() + ", " + text.getY() + ")");
-                                Log.d("t_p","Touch coordinates : (" +
-                                        (int)event.getX() + "," + (int)event.getY() + ")");
                                 text.setBackgroundResource(R.drawable.shadow_border_hold);
+                                /*
+                                final Handler handler = new Handler();
+
+                                final Runnable r = new Runnable() {
+                                    public void run() {
+                                        //tv.append("Hello World");
+                                        Log.d("Handler_msg", "Msg");
+                                        handler.postDelayed(this, 1000);
+                                    }
+                                };
+
+                                handler.postDelayed(r, 1000);
+                                
+                                 */
+
                                 return true;
 
                             case MotionEvent.ACTION_UP:
-
+                                // Check if location of user touch is still within the TextView
                                 if ((int)event.getX() >= 0 && (int)event.getX() <= 1360
                                         && (int)event.getY() >= 0 && (int)event.getY() <= 300){
                                     notesActivity.setClass(getApplicationContext(), NoteEditActivity.class);
@@ -156,15 +164,10 @@ public class MainActivity extends AppCompatActivity {
                                     text.setBackgroundResource(R.drawable.shadow_border);
                                 }
                                 return true;
-
                         }
                         return false;
                     }
                 });
-
-
-
-
                 /*
                 text.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -180,9 +183,6 @@ public class MainActivity extends AppCompatActivity {
                 });
 
                  */
-
-
-
             }
         }
     }
