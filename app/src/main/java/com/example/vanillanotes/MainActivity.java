@@ -37,14 +37,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.vanillanotes.settings.SettingsActivity;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    private GestureDetector detector;
     private static final String CHANNEL_ID = "NoteChannel";
     private Utility util = new Utility(this);
 
@@ -125,10 +122,6 @@ public class MainActivity extends AppCompatActivity {
                 text.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
-
-                        int x = (int)event.getX();
-                        int y = (int)event.getY();
-
                         switch (event.getAction()){
                             case MotionEvent.ACTION_OUTSIDE:
                                 Log.d("outside_action", "outside action");
@@ -141,26 +134,35 @@ public class MainActivity extends AppCompatActivity {
                                 return true;
 
                             case MotionEvent.ACTION_DOWN:
+                                Log.d("t_p", "Current TextView (X,Y): (" + text.getX() + ", " + text.getY() + ")");
+                                Log.d("t_p","Touch coordinates : (" +
+                                        (int)event.getX() + "," + (int)event.getY() + ")");
                                 text.setBackgroundResource(R.drawable.shadow_border_hold);
                                 return true;
 
                             case MotionEvent.ACTION_UP:
-                                text.setBackgroundResource(R.drawable.shadow_border);
-                                notesActivity.setClass(getApplicationContext(), NoteEditActivity.class);
-                                notesActivity.putExtra("savedText", noteList.get(index).getText()); // pass current text
-                                notesActivity.putExtra("savedTitle", noteList.get(index).getTitle());
-                                notesActivity.putExtra("index", index); // pass index to next activity to change content later
-                                notesActivity.putExtra("caller", "MainActivity");
-                                notesActivity.putExtra("date", noteList.get(index).getDate());
-                                text.setBackgroundResource(R.drawable.shadow_border);
-                                startActivity(notesActivity);
 
+                                if ((int)event.getX() >= 0 && (int)event.getX() <= 1360
+                                        && (int)event.getY() >= 0 && (int)event.getY() <= 300){
+                                    notesActivity.setClass(getApplicationContext(), NoteEditActivity.class);
+                                    notesActivity.putExtra("savedText", noteList.get(index).getText()); // pass current text
+                                    notesActivity.putExtra("savedTitle", noteList.get(index).getTitle());
+                                    notesActivity.putExtra("index", index); // pass index to next activity to change content later
+                                    notesActivity.putExtra("caller", "MainActivity");
+                                    notesActivity.putExtra("date", noteList.get(index).getDate());
+                                    text.setBackgroundResource(R.drawable.shadow_border);
+                                    startActivity(notesActivity);
+                                } else {
+                                    text.setBackgroundResource(R.drawable.shadow_border);
+                                }
                                 return true;
 
                         }
                         return false;
                     }
                 });
+
+
 
 
                 /*
@@ -176,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(notesActivity);
                     }
                 });
+
                  */
 
 
@@ -183,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 
     // Set attributes for TextView depending on dpi
     private void initializeText(TextView text){
