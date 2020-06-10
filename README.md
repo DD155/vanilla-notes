@@ -27,7 +27,7 @@ The final application will have the following features:
 - Widgets (?)
 
 ## Technologies
-The minimum Android version required is Android 4.1 (SDK 16); Target version is Android 9 (SDK 28)
+The minimum Android version required is Android 4.1 (SDK 16); Target version is Android 10 (SDK 29)
 
 Project is created with and uses:
 
