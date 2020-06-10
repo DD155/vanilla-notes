@@ -1,7 +1,6 @@
 <resources>
-
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -10,6 +9,12 @@
         <item name="android:actionMenuTextColor">@color/white</item>
         <item name="actionMenuTextColor">@color/white</item>
         <item name="android:itemTextAppearance">@color/white</item>
+
+        <!--  It should be true otherwise action mode will not overlay toolbar -->
+        <item name="windowActionModeOverlay">true</item>
+
+        <!--  For Custom Action Mode Background Color/Drawable -->
+        <item name="actionModeBackground">@color/white</item>
     </style>
 
 

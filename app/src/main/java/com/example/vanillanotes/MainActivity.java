@@ -1,8 +1,8 @@
 package com.example.vanillanotes;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.NotificationCompat;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -12,18 +12,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.text.Html;
 import android.text.InputFilter;
-import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
@@ -33,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,9 +38,13 @@ import com.example.vanillanotes.settings.SettingsActivity;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private GestureDetector detector;
+    //private GestureDetector detector;
     private static final String CHANNEL_ID = "NoteChannel";
     private Utility util = new Utility(this);
+    private ArrayList<Note> deleteNotes;
+    private ArrayAdapter<Note> adapter;
+    private ActionMode actionMode;
+    private boolean isHeld = false;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         final LinearLayout linear = findViewById(R.id.linear);
         final Intent notesActivity = new Intent();
+
 
         if (prefs.contains("notes")) { // Checks if user has notes already
             noteList = util.getNotes("notes");
@@ -142,9 +143,7 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 };
 
-                                handler.postDelayed(r, 1000);
-                                
-                                 */
+                                handler.postDelayed(r, 1000);*/
 
                                 return true;
 
@@ -168,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                 });
+
                 /*
                 text.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -182,10 +182,50 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                 */
+                text.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        if (actionMode != null){
+                            return false;
+                        }
+                        actionMode = startSupportActionMode(callback);
+
+                        return true;
+                    }
+                });*/
             }
         }
     }
+
+    private ActionMode.Callback callback = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.hold_notes_actions, menu);
+            mode.setTitle("Choose your notes");
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            //getSupportActionBar().hide();
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            if (item.getItemId() == R.id.action_delete) {
+                Toast.makeText(util, "Clicked", Toast.LENGTH_SHORT).show();
+                mode.finish();
+                return true;
+            }
+                return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            actionMode = null;
+        }
+    };
 
 
     // Set attributes for TextView depending on dpi
@@ -243,7 +283,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.toolbar_actions, menu);
+        if (isHeld)
+            getMenuInflater().inflate(R.menu.hold_notes_actions, menu);
+        else
+            getMenuInflater().inflate(R.menu.toolbar_actions, menu);
         return true;
     }
 
