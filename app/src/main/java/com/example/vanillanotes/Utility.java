@@ -17,6 +17,10 @@ import java.util.Date;
 // utility class for other activities
 public class Utility extends ContextWrapper {
 
+    public final int FONT_SMALL = 12;
+    public final int FONT_MEDIUM = 15;
+    public final int FONT_LARGE = 17;
+
     public Utility(Context base) {
         super(base);
     }
@@ -53,6 +57,14 @@ public class Utility extends ContextWrapper {
             return resources.getDimensionPixelSize(resourceId);
         }
         return 0;
+    }
+
+    public int getFontSize(String pref){
+        if (pref.equals("Small")){
+            return FONT_SMALL;
+        } else if (pref.equals("Large")){
+            return FONT_LARGE;
+        } else return FONT_MEDIUM;
     }
 
     public int countLines(String str){

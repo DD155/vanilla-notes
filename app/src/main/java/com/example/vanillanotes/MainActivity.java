@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private ActionMode actionMode;
     private boolean isHeld = false;
 
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         if (prefs.contains("font_size")){
             Toast.makeText(util, prefs.getString("font_size", ""), Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(util, "medium", Toast.LENGTH_SHORT).show();
+            Toast.makeText(util, "Not Found", Toast.LENGTH_SHORT).show();
         }
 
 
@@ -237,6 +238,7 @@ public class MainActivity extends AppCompatActivity {
     // Set attributes for TextView depending on dpi
     private void initializeText(TextView text){
         float density = getResources().getDisplayMetrics().density;
+        int fontSize = util.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
         int height;
         Log.d("density", Float.toString(density));
         // Set height based on dpi
@@ -261,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         params.setMargins(0, 25, 0, 25);
-        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
         text.setFilters(new InputFilter[] { new InputFilter.LengthFilter(82) });
         text.setBackgroundResource(R.drawable.shadow_border);
         text.setHeight(height);
