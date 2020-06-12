@@ -10,8 +10,8 @@
             app:entryValues="@array/font_values"
             app:iconSpaceReserved="false"
             app:key="font_size"
-            app:title="@string/font_size_title"
-            app:summary="@string/font_size_summary" />
+            app:title="@string/font_size_title" />
+            <!--app:summary="@string/font_size_summary"-->
 
         <SwitchPreferenceCompat
             app:iconSpaceReserved="false"

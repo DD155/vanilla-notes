@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         // Create notification channel
         createNotificationChannel();
 
@@ -63,6 +62,13 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         final LinearLayout linear = findViewById(R.id.linear);
         final Intent notesActivity = new Intent();
+
+        // Retrieve font size from sharedprefs
+        if (prefs.contains("font_size")){
+            Toast.makeText(util, prefs.getString("font_size", ""), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(util, "medium", Toast.LENGTH_SHORT).show();
+        }
 
 
         if (prefs.contains("notes")) { // Checks if user has notes already

@@ -17,5 +17,18 @@
         <item name="actionModeBackground">@color/white</item>
     </style>
 
+    <!-- Settings for Font Size -->
+    <style name="FontSmall">
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <style name="FontMedium">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="FontLarge">
+        <item name="android:textSize">18sp</item>
+    </style>
+
 
 </resources>
