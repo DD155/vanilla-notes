@@ -278,6 +278,7 @@ public class NoteEditActivity extends AppCompatActivity {
 
     private void createNotification(){
         EditText text = findViewById(R.id.editText);
+        EditText title = findViewById(R.id.titleText);
         String message = text.getText().toString();
 
         // Create an Intent for the activity
@@ -295,7 +296,7 @@ public class NoteEditActivity extends AppCompatActivity {
         // Build the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "NoteChannel")
                 .setSmallIcon(R.drawable.ic_baseline_event_note_24)
-                .setContentTitle("Pinned Note")
+                .setContentTitle(title.getText())
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .setAutoCancel(true)
                 .setContentText(message)
