@@ -38,8 +38,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle("Clear Data");
-                builder.setMessage("Would you like to clear ALL data? Your settings will still be saved.");
+                builder.setTitle(getString(R.string.clear_data_dialog_title));
+                builder.setMessage(getString(R.string.clear_data_dialog_text));
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -49,7 +49,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                         trash.clear();
                         saveNotes(note, "notes");
                         saveNotes(trash, "trash");
-                        Toast.makeText(getActivity(), "All data cleared", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), getString(R.string.clear_data_summary), Toast.LENGTH_LONG).show();
                     }
                 });
 

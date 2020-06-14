@@ -28,8 +28,8 @@
         <Preference
             app:iconSpaceReserved="false"
             app:key="clear"
-            app:title="@string/clear_title"
-            app:summary="@string/clear_summary" />
+            app:title="@string/clear_data_title"
+            app:summary="@string/clear_data_summary" />
 
     </PreferenceCategory>
 
@@ -40,9 +40,9 @@
         <SwitchPreferenceCompat
             app:iconSpaceReserved="false"
             app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
+            app:summaryOff=""
+            app:summaryOn=""
+            app:title="" />
 
     </PreferenceCategory>
 

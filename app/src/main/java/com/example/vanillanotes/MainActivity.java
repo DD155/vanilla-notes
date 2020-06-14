@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
         text.setHeight(height);
         text.setPadding(50, 20, 50, 30);
         text.setLayoutParams(params);
-        text.setTextColor(Color.parseColor("#434343"));
+        text.setTextColor(getResources().getColor(R.color.textColor));
     }
 
     // Remove notes by clearing note ArrayList and resetting linear layout.
@@ -285,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout ll = findViewById(R.id.linear);
         ll.removeAllViews();
 
-        Toast.makeText(getApplicationContext(), "Notes cleared", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), getString(R.string.clear_notes_toast), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -325,8 +325,8 @@ public class MainActivity extends AppCompatActivity {
     // Creates dialog for the clear
     private void createDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Clear All Notes");
-        builder.setMessage("Would you like to clear all the notes?");
+        builder.setTitle(getString(R.string.clear_notes_title));
+        builder.setMessage(getString(R.string.clear_notes_text));
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
