@@ -6,17 +6,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.example.vanillanotes.Note;
 import com.example.vanillanotes.R;
 
-import androidx.annotation.Nullable;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import com.example.vanillanotes.Utility;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -65,23 +62,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 return true;
             }
         });
-        // Initialize Font Size Preference
-        /*
-        ListPreference listPreference = findPreference("font_size");
-        String currValue = listPreference.getValue();
-        Log.d("curr_val", currValue);
-        SharedPreferences prefs = this.getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
 
-        if (currValue.equals("small")){
-            editor.putString("font_size","small");
-        } else if (currValue.equals("medium")){
-            editor.putString("font_size","medium");
-        } else {
-            editor.putString("font_size","large");
-        }
-        editor.apply();
-         */
         ListPreference lp = findPreference(KEY_FONT);
         lp.setSummary(lp.getValue());
 
