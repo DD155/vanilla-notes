@@ -18,6 +18,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,12 +50,14 @@ public class NoteEditActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         TextView dateView = findViewById(R.id.date);
+        int fontSize = util.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
 
         // Set attributes of EditTexts
         String text = getIntent().getStringExtra("savedText");
         String title = getIntent().getStringExtra("savedTitle");
         EditText titleView = findViewById(R.id.titleText);
         EditText textView = findViewById(R.id.editText);
+
         Log.d("date_time_0", util.currentDate());
         titleView.setPadding(50, 50, 50, 0);
         textView.setPadding(50, 50, 50, 50);
@@ -72,6 +75,8 @@ public class NoteEditActivity extends AppCompatActivity {
             dateView.setText(getString(R.string.date_created, util.currentDate()));
         }
 
+        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
         textView.setBackgroundResource(R.drawable.shadow_border);
         titleView.setBackgroundResource(R.drawable.shadow_border);
 
@@ -185,6 +190,28 @@ public class NoteEditActivity extends AppCompatActivity {
         alert.show();
     }
 
+    private void confirmDiscardDialog(final Class<?> activity){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Discard changes");
+        builder.setMessage("Are you sure you want to discard your changes?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                util.goToActivity(activity,"NoteEditActivity", getApplicationContext());
+            }
+        });
+
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
     private void confirmDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Delete Note");
@@ -225,34 +252,18 @@ public class NoteEditActivity extends AppCompatActivity {
             case android.R.id.home:
                 Intent intent = new Intent();
                 if (getIntent().getStringExtra("caller").equals("MainActivity"))
-                    intent.setClass(getApplicationContext(), MainActivity.class);
+                    confirmDiscardDialog(MainActivity.class);
+                    //intent.setClass(getApplicationContext(), MainActivity.class);
                 else
-                    intent.setClass(getApplicationContext(), TrashActivity.class);
+                    confirmDiscardDialog(TrashActivity.class);
+                    //intent.setClass(getApplicationContext(), TrashActivity.class);
 
-                startActivityForResult(intent, 0);
+                //startActivityForResult(intent, 0);
                 return true;
 
             case R.id.action_settings:
                 // Create dialog if user wants to continue to settings, discarding the current note.
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Discard changes");
-                builder.setMessage("Are you sure you want to discard your changes?");
-                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        util.goToActivity(SettingsActivity.class,"NoteEditActivity", getApplicationContext());
-                    }
-                });
-
-                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-
-                AlertDialog alert = builder.create();
-                alert.show();
+                confirmDiscardDialog(SettingsActivity.class);
                 return true;
 
             case R.id.action_save:
@@ -306,4 +317,14 @@ public class NoteEditActivity extends AppCompatActivity {
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManagerCompat.notify(100, builder.build());
     }
+
+    @Override
+    public void onBackPressed() {
+        if (getIntent().getStringExtra("caller").equals("MainActivity"))
+            confirmDiscardDialog(MainActivity.class);
+        else
+            confirmDiscardDialog(TrashActivity.class);
+    }
+
+
 }
