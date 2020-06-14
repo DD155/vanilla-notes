@@ -66,9 +66,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Retrieve font size from sharedprefs
         if (prefs.contains("font_size")){
-            Toast.makeText(util, prefs.getString("font_size", ""), Toast.LENGTH_SHORT).show();
+            Log.d("Font_Pref", prefs.getString("font_size", ""));
         } else {
-            Toast.makeText(util, "Not Found", Toast.LENGTH_SHORT).show();
+            Log.d("Font_Pref", "Not Found");
         }
 
 

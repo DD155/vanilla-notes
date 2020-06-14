@@ -134,6 +134,7 @@ public class TrashActivity extends AppCompatActivity {
 
     private void initializeText(TextView text){
         float density = getResources().getDisplayMetrics().density;
+        int fontSize = utility.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
         int height;
         Log.d("density", Float.toString(density));
         // Set height based on dpi
@@ -158,7 +159,7 @@ public class TrashActivity extends AppCompatActivity {
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         params.setMargins(0, 25, 0, 25);
-        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
         text.setFilters(new InputFilter[] { new InputFilter.LengthFilter(82) });
         text.setBackgroundResource(R.drawable.shadow_border);
         text.setHeight(height);
