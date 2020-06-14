@@ -148,7 +148,7 @@ public class NoteEditActivity extends AppCompatActivity {
             util.saveNotes(list, "notes");
             util.saveNotes(trashList, "trash");
         }
-        Toast.makeText(getApplicationContext(), "Note deleted", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), getString(R.string.delete_toast), Toast.LENGTH_LONG).show();
 
         // Load previously called activity
         if (caller.equals("TrashActivity")){
@@ -171,14 +171,14 @@ public class NoteEditActivity extends AppCompatActivity {
         util.saveNotes(trash, "trash");
         util.saveNotes(list, "notes");
 
-        Toast.makeText(getApplicationContext(), "Note restored", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), getString(R.string.restore_toast), Toast.LENGTH_LONG).show();
     }
 
     // Creates dialog for empty notes
     private void warningDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Error");
-        builder.setMessage("Your note is currently blank. Please enter text to save it.");
+        builder.setTitle(getString(R.string.warning_title));
+        builder.setMessage(getString(R.string.warning_confirm));
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -192,8 +192,8 @@ public class NoteEditActivity extends AppCompatActivity {
 
     private void confirmDiscardDialog(final Class<?> activity){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Discard changes");
-        builder.setMessage("Are you sure you want to discard your changes?");
+        builder.setTitle(getString(R.string.discard_title));
+        builder.setMessage(getString(R.string.discard_confirm));
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -214,8 +214,8 @@ public class NoteEditActivity extends AppCompatActivity {
 
     private void confirmDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Delete Note");
-        builder.setMessage("Are you sure you want to delete this note?");
+        builder.setTitle(getString(R.string.delete_title));
+        builder.setMessage(getString(R.string.delete_confirm));
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
