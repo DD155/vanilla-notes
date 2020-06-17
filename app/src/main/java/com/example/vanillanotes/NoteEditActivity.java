@@ -316,15 +316,17 @@ public class NoteEditActivity extends AppCompatActivity {
         new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int yr, int mon, int day) {
-                mon += 1;
-                Toast.makeText(util, yr + " " + mon + " " + day, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(util, yr + " " + mon + " " + day, Toast.LENGTH_SHORT).show();
                 // After selecting date, open up time dialog
+                final int y = yr;
+                final int m = mon;
+                final int d = day;
                 TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hr, int min) {
                         pickedTime = hr + ":" + min;
-                        createScheduledNotification(hr, min);
-                        Toast.makeText(util, pickedTime, Toast.LENGTH_SHORT).show();
+                        createScheduledNotification(hr, min, y, m, d);
+                        //Toast.makeText(util, pickedTime, Toast.LENGTH_SHORT).show();
                     }
                 }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
 
@@ -368,20 +370,39 @@ public class NoteEditActivity extends AppCompatActivity {
         notificationManagerCompat.notify(100, builder.build());
     }
 
-    private void createScheduledNotification(int hour, int min){
+    private void createScheduledNotification(int hour, int min, int year, int month, int day){
         Intent intent = new Intent(this, BroadcastReminder.class);
         PendingIntent pending = PendingIntent.getBroadcast(this, 0, intent, 0);
-
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
-
+        int[] days = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
         Calendar calendar = Calendar.getInstance();
+        if (calendar.get(Calendar.YEAR) % 4 == 0) days[1] = 29;
 
         calendar.setTimeInMillis(System.currentTimeMillis());
         /*
         if (am) calendar.set(Calendar.HOUR_OF_DAY, hour);
         else calendar.set(Calendar.HOUR_OF_DAY, hour - 12);
         */
+        Log.d("year_test", "Selected Year is: " + year);
+        Log.d("year_test", "Selected Month is: " + month);
+        Log.d("year_test", "Selected Day is: " + day);
+        Log.d("year_test", "Current Year is: " + calendar.get(Calendar.YEAR));
+        Log.d("year_test", "Current Month is: " + calendar.get(Calendar.MONTH));
+        Log.d("year_test", "Current Day is: " + calendar.get(Calendar.DAY_OF_MONTH));
+
+
+        int amtOfDays = ((year - calendar.get(Calendar.YEAR)) * 365) + Math.abs(day - calendar.get(Calendar.DAY_OF_MONTH));
+        //Toast.makeText(util, Integer.toString(amtOfDays), Toast.LENGTH_LONG).show();
+        for (int i = month; i < calendar.get(Calendar.MONTH); ++i) amtOfDays += days[i];
+
+        Log.d("year_test", "Calculated amount of days: " + amtOfDays);
+
+        //Toast.makeText(util, Integer.toString(amtOfDays), Toast.LENGTH_LONG).show();
+        //calendar.add(Calendar.DATE, amtOfDays);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.YEAR, year);
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, min);
         calendar.set(Calendar.SECOND, 0);
@@ -391,8 +412,8 @@ public class NoteEditActivity extends AppCompatActivity {
 
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pending);
 
-        Toast.makeText(util, "Reminder created for " + hour + ":" + min + " " +
-                "", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(util, "Reminder created for " + hour + ":" + min + " " +
+        //        "", Toast.LENGTH_SHORT).show();
     }
 
     @Override
