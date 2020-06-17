@@ -8,6 +8,7 @@ import androidx.core.app.TaskStackBuilder;
 
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -18,6 +19,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +28,7 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -303,17 +307,34 @@ public class NoteEditActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         final int hour = calendar.get(Calendar.HOUR_OF_DAY);
         final int minute = calendar.get(Calendar.MINUTE);
+        final int year = calendar.get(Calendar.YEAR);
+        final int month = calendar.get(Calendar.MONTH);
+        final int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
+        // Create Date Dialog
+        DatePickerDialog datePickerDialog = new DatePickerDialog(mContext, android.R.style.Theme_DeviceDefault_Light_Dialog,
+        new DatePickerDialog.OnDateSetListener() {
             @Override
-            public void onTimeSet(TimePicker timePicker, int hr, int min) {
-                pickedTime = hr + ":" + min;
-                createScheduledNotification(hr, min);
-                Toast.makeText(util, pickedTime, Toast.LENGTH_SHORT).show();
-            }
-        }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
+            public void onDateSet(DatePicker datePicker, int yr, int mon, int day) {
+                mon += 1;
+                Toast.makeText(util, yr + " " + mon + " " + day, Toast.LENGTH_SHORT).show();
+                // After selecting date, open up time dialog
+                TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker timePicker, int hr, int min) {
+                        pickedTime = hr + ":" + min;
+                        createScheduledNotification(hr, min);
+                        Toast.makeText(util, pickedTime, Toast.LENGTH_SHORT).show();
+                    }
+                }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
 
-        timePickerDialog.show();
+                timePickerDialog.show();
+            }
+        }, year, month, day);
+        //datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable((Color.TRANSPARENT)));
+        datePickerDialog.show();
+
+
     }
 
     private void createNotification(){
