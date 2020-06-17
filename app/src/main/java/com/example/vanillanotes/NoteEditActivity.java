@@ -23,6 +23,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -46,7 +47,6 @@ import java.util.Calendar;
 
 public class NoteEditActivity extends AppCompatActivity {
     private Utility util = new Utility(this);
-    private String pickedTime;
     private Context mContext = this;
 
     @Override
@@ -185,6 +185,65 @@ public class NoteEditActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), getString(R.string.restore_toast), Toast.LENGTH_LONG).show();
     }
 
+    // Toolbar Functions
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        if (getIntent().getStringExtra("caller").equals("TrashActivity")) {
+            getMenuInflater().inflate(R.menu.trash_note_actions, menu);
+        } else
+            getMenuInflater().inflate(R.menu.notes_actions, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent();
+                if (getIntent().getStringExtra("caller").equals("MainActivity"))
+                    confirmDiscardDialog(MainActivity.class);
+                    //intent.setClass(getApplicationContext(), MainActivity.class);
+                else
+                    confirmDiscardDialog(TrashActivity.class);
+                //intent.setClass(getApplicationContext(), TrashActivity.class);
+
+                //startActivityForResult(intent, 0);
+                return true;
+
+            case R.id.action_settings:
+                // Create dialog if user wants to continue to settings, discarding the current note.
+                confirmDiscardDialog(SettingsActivity.class);
+                return true;
+
+            case R.id.action_save:
+                saveText();
+                return true;
+
+            case R.id.action_restore:
+                restoreNote();
+                return true;
+
+            case R.id.action_delete:
+                confirmDialog();
+                return true;
+
+            case R.id.action_pin:
+                showNotification();
+                return true;
+
+            case R.id.action_reminder:
+                createReminderDialog();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    // Dialog Functions
+
     // Creates dialog for empty notes
     private void warningDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -245,107 +304,17 @@ public class NoteEditActivity extends AppCompatActivity {
         alert.show();
     }
 
-    //functions for toolbar
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        if (getIntent().getStringExtra("caller").equals("TrashActivity")) {
-            getMenuInflater().inflate(R.menu.trash_note_actions, menu);
-        } else
-            getMenuInflater().inflate(R.menu.notes_actions, menu);
+    // Notification Functions
 
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                Intent intent = new Intent();
-                if (getIntent().getStringExtra("caller").equals("MainActivity"))
-                    confirmDiscardDialog(MainActivity.class);
-                    //intent.setClass(getApplicationContext(), MainActivity.class);
-                else
-                    confirmDiscardDialog(TrashActivity.class);
-                    //intent.setClass(getApplicationContext(), TrashActivity.class);
-
-                //startActivityForResult(intent, 0);
-                return true;
-
-            case R.id.action_settings:
-                // Create dialog if user wants to continue to settings, discarding the current note.
-                confirmDiscardDialog(SettingsActivity.class);
-                return true;
-
-            case R.id.action_save:
-                saveText();
-                return true;
-
-            case R.id.action_restore:
-                restoreNote();
-                return true;
-
-            case R.id.action_delete:
-                confirmDialog();
-                return true;
-
-            case R.id.action_pin:
-                createNotification();
-                return true;
-
-            case R.id.action_reminder:
-                createReminderDialog();
-                //createScheduledNotification((int) System.currentTimeMillis(),12, 16, false);
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void createReminderDialog() {
-        Calendar calendar = Calendar.getInstance();
-        final int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        final int minute = calendar.get(Calendar.MINUTE);
-        final int year = calendar.get(Calendar.YEAR);
-        final int month = calendar.get(Calendar.MONTH);
-        final int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        // Create Date Dialog
-        DatePickerDialog datePickerDialog = new DatePickerDialog(mContext, android.R.style.Theme_DeviceDefault_Light_Dialog,
-        new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int yr, int mon, int day) {
-                //Toast.makeText(util, yr + " " + mon + " " + day, Toast.LENGTH_SHORT).show();
-                // After selecting date, open up time dialog
-                final int y = yr;
-                final int m = mon;
-                final int d = day;
-                TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int hr, int min) {
-                        pickedTime = hr + ":" + min;
-                        createScheduledNotification(hr, min, y, m, d);
-                        //Toast.makeText(util, pickedTime, Toast.LENGTH_SHORT).show();
-                    }
-                }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
-
-                timePickerDialog.show();
-            }
-        }, year, month, day);
-        //datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable((Color.TRANSPARENT)));
-        datePickerDialog.show();
-
-
-    }
-
-    private void createNotification(){
+    private Notification buildNotification() {
         EditText text = findViewById(R.id.editText);
         EditText title = findViewById(R.id.titleText);
         String message = text.getText().toString();
+        String titleMessage = title.getText().toString();
 
         // Create an Intent for the activity
         Intent intent = new Intent(this, NoteEditActivity.class);
+        intent.putExtra("savedTitle", titleMessage);
         intent.putExtra("savedText", message);
         intent.putExtra("caller", getIntent().getStringExtra("caller"));
         intent.putExtra("index", getIntent().getIntExtra("index", 0));
@@ -354,7 +323,7 @@ public class NoteEditActivity extends AppCompatActivity {
         stackBuilder.addNextIntentWithParentStack(intent);
         // Get the PendingIntent containing the entire back stack
         PendingIntent resultPendingIntent =
-        stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Build the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "NoteChannel")
@@ -366,40 +335,61 @@ public class NoteEditActivity extends AppCompatActivity {
                 .setContentIntent(resultPendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
-        notificationManagerCompat.notify(100, builder.build());
+        return builder.build();
     }
 
-    private void createScheduledNotification(int hour, int min, int year, int month, int day){
-        Intent intent = new Intent(this, BroadcastReminder.class);
-        PendingIntent pending = PendingIntent.getBroadcast(this, 0, intent, 0);
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+    // Calls notify on the made notification
+    private void showNotification(){
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
+        notificationManagerCompat.notify(100, buildNotification());
+    }
 
-        int[] days = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    // Creates the dialog for the scheduled notification. First opens up date dialog then time dialog.
+    private void createReminderDialog() {
         Calendar calendar = Calendar.getInstance();
-        if (calendar.get(Calendar.YEAR) % 4 == 0) days[1] = 29;
+        // Set as final to be used in inner functions
+        final int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        final int minute = calendar.get(Calendar.MINUTE);
+        final int year = calendar.get(Calendar.YEAR);
+        final int month = calendar.get(Calendar.MONTH);
+        final int day = calendar.get(Calendar.DAY_OF_MONTH);
 
+        // Create Date Dialog
+        DatePickerDialog datePickerDialog = new DatePickerDialog(mContext, android.R.style.Theme_DeviceDefault_Light_Dialog,
+        new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int yr, int mon, int day) {
+                // After selecting date, open up time dialog
+                final int y = yr;
+                final int m = mon;
+                final int d = day;
+                TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker timePicker, int hr, int min) {
+                        createScheduledNotification(buildNotification(), hr, min, y, m, d);
+                        //Toast.makeText(util, pickedTime, Toast.LENGTH_SHORT).show();
+                    }
+                }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
+                timePickerDialog.show();
+            }
+        }, year, month, day);
+        //datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable((Color.TRANSPARENT)));
+        datePickerDialog.show();
+    }
+
+    // Create a scheduled notification based on user input from previous dialogs
+    private void createScheduledNotification(Notification notification, int hour, int min, int year, int month, int day){
+        // Create Alarm Manager for Notification
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent notificationIntent = new Intent( this, BroadcastReminder. class );
+        notificationIntent.putExtra("notification", notification);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
+
+        // Create calendar for scheduled event
+        Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        /*
-        if (am) calendar.set(Calendar.HOUR_OF_DAY, hour);
-        else calendar.set(Calendar.HOUR_OF_DAY, hour - 12);
-        */
-        Log.d("year_test", "Selected Year is: " + year);
-        Log.d("year_test", "Selected Month is: " + month);
-        Log.d("year_test", "Selected Day is: " + day);
-        Log.d("year_test", "Current Year is: " + calendar.get(Calendar.YEAR));
-        Log.d("year_test", "Current Month is: " + calendar.get(Calendar.MONTH));
-        Log.d("year_test", "Current Day is: " + calendar.get(Calendar.DAY_OF_MONTH));
 
-
-        int amtOfDays = ((year - calendar.get(Calendar.YEAR)) * 365) + Math.abs(day - calendar.get(Calendar.DAY_OF_MONTH));
-        //Toast.makeText(util, Integer.toString(amtOfDays), Toast.LENGTH_LONG).show();
-        for (int i = month; i < calendar.get(Calendar.MONTH); ++i) amtOfDays += days[i];
-
-        Log.d("year_test", "Calculated amount of days: " + amtOfDays);
-
-        //Toast.makeText(util, Integer.toString(amtOfDays), Toast.LENGTH_LONG).show();
-        //calendar.add(Calendar.DATE, amtOfDays);
+        // Set schedule based on user selection
         calendar.set(Calendar.DAY_OF_MONTH, day);
         calendar.set(Calendar.MONTH, month);
         calendar.set(Calendar.YEAR, year);
@@ -407,15 +397,10 @@ public class NoteEditActivity extends AppCompatActivity {
         calendar.set(Calendar.MINUTE, min);
         calendar.set(Calendar.SECOND, 0);
 
-        long timeAtClick = System.currentTimeMillis();
-        long lenSeconds = 1000 * 5;
-
-        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pending);
-
-        //Toast.makeText(util, "Reminder created for " + hour + ":" + min + " " +
-        //        "", Toast.LENGTH_SHORT).show();
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
     }
 
+    // Shows a dialog when the user presses back while editing a note
     @Override
     public void onBackPressed() {
         if (getIntent().getStringExtra("caller").equals("MainActivity"))
@@ -423,6 +408,4 @@ public class NoteEditActivity extends AppCompatActivity {
         else
             confirmDiscardDialog(TrashActivity.class);
     }
-
-
 }
