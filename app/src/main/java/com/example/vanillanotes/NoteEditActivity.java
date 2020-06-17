@@ -10,25 +10,16 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -36,12 +27,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.vanillanotes.settings.SettingsActivity;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import org.w3c.dom.Text;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -103,6 +89,9 @@ public class NoteEditActivity extends AppCompatActivity {
         String caller = getIntent().getStringExtra("caller");
         EditText textView = findViewById(R.id.editText);
         EditText titleView = findViewById(R.id.titleText);
+        // Make sure future calls do not return null pointer
+        if (caller == null) return;
+
         // Determine if previous activity was trash activity or not
         if (caller.equals("MainActivity")) prev = new Intent(getApplicationContext(), MainActivity.class);
         else {
@@ -140,6 +129,9 @@ public class NoteEditActivity extends AppCompatActivity {
         String title = getIntent().getStringExtra("savedTitle");
         String caller = getIntent().getStringExtra("caller");
         ArrayList<Note> trashList;
+
+        // Make sure future calls do not return null pointer
+        if (caller == null) return;
 
         if (util.getNotes("trash") != null) // check if trash can list is valid
             trashList = util.getNotes("trash");
@@ -188,12 +180,13 @@ public class NoteEditActivity extends AppCompatActivity {
     // Toolbar Functions
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // Make sure future calls do not return null pointer
         // Inflate the menu; this adds items to the action bar if it is present.
-        if (getIntent().getStringExtra("caller").equals("TrashActivity")) {
+        if (getIntent().getStringExtra("caller") != null &&
+                getIntent().getStringExtra("caller").equals("TrashActivity")) {
             getMenuInflater().inflate(R.menu.trash_note_actions, menu);
         } else
             getMenuInflater().inflate(R.menu.notes_actions, menu);
-
         return true;
     }
 
@@ -201,15 +194,12 @@ public class NoteEditActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent intent = new Intent();
-                if (getIntent().getStringExtra("caller").equals("MainActivity"))
+                if (getIntent().getStringExtra("caller") != null &&
+                        getIntent().getStringExtra("caller").equals("MainActivity"))
                     confirmDiscardDialog(MainActivity.class);
                     //intent.setClass(getApplicationContext(), MainActivity.class);
                 else
                     confirmDiscardDialog(TrashActivity.class);
-                //intent.setClass(getApplicationContext(), TrashActivity.class);
-
-                //startActivityForResult(intent, 0);
                 return true;
 
             case R.id.action_settings:
@@ -403,7 +393,9 @@ public class NoteEditActivity extends AppCompatActivity {
     // Shows a dialog when the user presses back while editing a note
     @Override
     public void onBackPressed() {
-        if (getIntent().getStringExtra("caller").equals("MainActivity"))
+        // Make sure future calls do not return null pointer
+        if (getIntent().getStringExtra("caller") != null &&
+                getIntent().getStringExtra("caller").equals("MainActivity"))
             confirmDiscardDialog(MainActivity.class);
         else
             confirmDiscardDialog(TrashActivity.class);
