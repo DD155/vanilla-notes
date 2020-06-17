@@ -5,9 +5,11 @@ import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -68,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.d("Font_Pref", "Not Found");
         }
-
 
         if (prefs.contains("notes")) { // Checks if user has notes already
             noteList = util.getNotes("notes");

@@ -6,11 +6,14 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.TaskStackBuilder;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.vanillanotes.settings.SettingsActivity;
@@ -34,9 +38,12 @@ import org.w3c.dom.Text;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class NoteEditActivity extends AppCompatActivity {
     private Utility util = new Utility(this);
+    private String pickedTime;
+    private Context mContext = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -282,9 +289,31 @@ public class NoteEditActivity extends AppCompatActivity {
                 createNotification();
                 return true;
 
+            case R.id.action_reminder:
+                createReminderDialog();
+                //createScheduledNotification((int) System.currentTimeMillis(),12, 16, false);
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void createReminderDialog() {
+        Calendar calendar = Calendar.getInstance();
+        final int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        final int minute = calendar.get(Calendar.MINUTE);
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int hr, int min) {
+                pickedTime = hr + ":" + min;
+                createScheduledNotification(hr, min);
+                Toast.makeText(util, pickedTime, Toast.LENGTH_SHORT).show();
+            }
+        }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
+
+        timePickerDialog.show();
     }
 
     private void createNotification(){
@@ -316,6 +345,33 @@ public class NoteEditActivity extends AppCompatActivity {
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManagerCompat.notify(100, builder.build());
+    }
+
+    private void createScheduledNotification(int hour, int min){
+        Intent intent = new Intent(this, BroadcastReminder.class);
+        PendingIntent pending = PendingIntent.getBroadcast(this, 0, intent, 0);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        /*
+        if (am) calendar.set(Calendar.HOUR_OF_DAY, hour);
+        else calendar.set(Calendar.HOUR_OF_DAY, hour - 12);
+        */
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, min);
+        calendar.set(Calendar.SECOND, 0);
+
+        long timeAtClick = System.currentTimeMillis();
+        long lenSeconds = 1000 * 5;
+
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pending);
+
+        Toast.makeText(util, "Reminder created for " + hour + ":" + min + " " +
+                "", Toast.LENGTH_SHORT).show();
     }
 
     @Override

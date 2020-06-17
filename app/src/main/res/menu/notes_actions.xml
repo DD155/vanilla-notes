@@ -17,6 +17,11 @@
         android:icon="@drawable/ic_more_vert_black_24dp"
         app:showAsAction="never" />
 
+    <item android:id="@+id/action_reminder"
+        android:title="@string/action_reminder"
+        android:icon="@drawable/ic_more_vert_black_24dp"
+        app:showAsAction="never" />
+
     <!-- Settings -->
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
