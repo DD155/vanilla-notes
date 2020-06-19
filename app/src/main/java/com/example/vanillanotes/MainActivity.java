@@ -69,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Font_Pref", "Not Found");
         }
 
+        int v = R.color.white;
+
         if (prefs.contains("notes")) { // Checks if user has notes already
             noteList = util.getNotes("notes");
         } // Otherwise just make the new ArrayList

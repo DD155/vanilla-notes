@@ -5,6 +5,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.TaskStackBuilder;
+import petrov.kristiyan.colorpicker.ColorPicker;
+//import eltos.simpledialogfragment.color.SimpleColorDialog;
 
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -15,11 +17,13 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -227,12 +231,52 @@ public class NoteEditActivity extends AppCompatActivity {
                 createReminderDialog();
                 return true;
 
+            case R.id.action_color:
+                /*
+                SimpleColorDialog.build()
+                        .title("Choose a color")
+                        .colorPreset(Color.RED)
+                        .allowCustom(true)
+                        .show(this);
+
+                 */
+                colorDialog();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
     // Dialog Functions
+
+    private void colorDialog(){
+        final ColorPicker colorPicker = new ColorPicker(NoteEditActivity.this);
+        colorPicker.setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
+            @Override
+            public void onChooseColor(int position, int color) {
+                // put code
+                TextView title = findViewById(R.id.titleText);
+                //getResources().getDrawable
+                title.setBackgroundColor(color);
+            }
+
+            @Override
+            public void onCancel(){
+                // put code
+            }
+        })
+            .disableDefaultButtons(false)
+            .setColors(getResources().getIntArray(R.array.color_array))
+            .setDefaultColorButton(getResources().getColor(R.color.white))
+            //.setDefaultColor(Color.parseColor("#f84c44"))
+            .setColumns(5)
+            .setRoundColorButton(true)
+            .setTitle("Select your color")
+            .show();
+
+
+    }
 
     // Creates dialog for empty notes
     private void warningDialog(){

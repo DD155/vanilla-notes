@@ -6,11 +6,13 @@ public class Note {
     private String title;
     private String text;
     private String date;
+    private int color;
 
     public Note(String title, String text){
         this.title = title;
         this.text = text;
         this.date = "";
+        this.color = R.color.white;
     }
 
     public Note(String text){
@@ -29,6 +31,8 @@ public class Note {
 
     public String getDate() { return date; }
 
+    public int getColor() { return color; }
+
     public void setTitle(String title){
         this.title = title;
     }
@@ -40,5 +44,11 @@ public class Note {
     public void setDate(String date){
         this.date = date;
     }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+
 
 }

@@ -14,12 +14,14 @@
     <!-- Pin current note -->
     <item android:id="@+id/action_pin"
         android:title="@string/action_pin"
-        android:icon="@drawable/ic_more_vert_black_24dp"
         app:showAsAction="never" />
 
     <item android:id="@+id/action_reminder"
         android:title="@string/action_reminder"
-        android:icon="@drawable/ic_more_vert_black_24dp"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/action_color"
+        android:title="@string/action_color"
         app:showAsAction="never" />
 
     <!-- Settings -->

@@ -65,4 +65,5 @@
     <string name="channel_name">Notifications</string>
     <string name="channel_description">Channel for pinned notes</string>
     <string name="action_reminder">Set reminder</string>
+    <string name="action_color">Set color</string>
 </resources>
