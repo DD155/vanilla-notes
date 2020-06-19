@@ -5,6 +5,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.TaskStackBuilder;
+import androidx.core.content.ContextCompat;
 import petrov.kristiyan.colorpicker.ColorPicker;
 //import eltos.simpledialogfragment.color.SimpleColorDialog;
 
@@ -18,6 +19,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.LightingColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -38,6 +45,7 @@ import java.util.Calendar;
 public class NoteEditActivity extends AppCompatActivity {
     private Utility util = new Utility(this);
     private Context mContext = this;
+    private int colorPicked = R.color.white;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +72,7 @@ public class NoteEditActivity extends AppCompatActivity {
         textView.setPadding(50, 50, 50, 50);
 
         if (text != null) { // Case where user is editing old note
+            //index = getIntent().getIntExtra("index", 0);
             Note currentNote = util.getNotes("notes")
                     .get(getIntent().getIntExtra("index", 0));
             dateView.setText(getString(R.string.date_created, currentNote.getDate()));
@@ -96,6 +105,7 @@ public class NoteEditActivity extends AppCompatActivity {
         // Make sure future calls do not return null pointer
         if (caller == null) return;
 
+
         // Determine if previous activity was trash activity or not
         if (caller.equals("MainActivity")) prev = new Intent(getApplicationContext(), MainActivity.class);
         else {
@@ -112,6 +122,7 @@ public class NoteEditActivity extends AppCompatActivity {
             prev.putExtra("note", textView.getText().toString());
             prev.putExtra("title", titleView.getText().toString());
             prev.putExtra("date", util.currentDate());
+            prev.putExtra("color", colorPicked);
         } else { // Case where the note is being edited
             // Determine which list to use
             if (isTrash) {
@@ -121,6 +132,7 @@ public class NoteEditActivity extends AppCompatActivity {
             else list = util.getNotes("notes");
 
             // Replace old strings with new strings in the ArrayList
+            list.get(getIntent().getIntExtra("index", 0)).setColor(colorPicked);
             list.get(getIntent().getIntExtra("index", 0)).setText(textView.getText().toString());
             list.get(getIntent().getIntExtra("index", 0)).setTitle(titleView.getText().toString());
             util.saveNotes(list, key);
@@ -232,14 +244,6 @@ public class NoteEditActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_color:
-                /*
-                SimpleColorDialog.build()
-                        .title("Choose a color")
-                        .colorPreset(Color.RED)
-                        .allowCustom(true)
-                        .show(this);
-
-                 */
                 colorDialog();
                 return true;
 
@@ -255,10 +259,16 @@ public class NoteEditActivity extends AppCompatActivity {
         colorPicker.setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
             @Override
             public void onChooseColor(int position, int color) {
+                colorPicked = color;
+                //ArrayList<Note> notes = util.getNotes("notes");
                 // put code
                 TextView title = findViewById(R.id.titleText);
-                //getResources().getDrawable
-                title.setBackgroundColor(color);
+                TextView text = findViewById(R.id.editText);
+                Drawable drawable = util.changeDrawableColor(R.drawable.shadow_border, color);
+
+                title.setBackground(drawable);
+                text.setBackground(drawable);
+
             }
 
             @Override
@@ -270,7 +280,7 @@ public class NoteEditActivity extends AppCompatActivity {
             .setColors(getResources().getIntArray(R.array.color_array))
             .setDefaultColorButton(getResources().getColor(R.color.white))
             //.setDefaultColor(Color.parseColor("#f84c44"))
-            .setColumns(5)
+            .setColumns(4)
             .setRoundColorButton(true)
             .setTitle("Select your color")
             .show();

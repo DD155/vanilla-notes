@@ -1,24 +1,30 @@
 package com.example.vanillanotes;
 
-import java.util.Calendar;
-
 public class Note {
     private String title;
     private String text;
     private String date;
     private int color;
 
+    public Note(String title, String text, int color){
+        this.title = title;
+        this.text = text;
+        this.date = "";
+        this.color = color;
+    }
+
     public Note(String title, String text){
         this.title = title;
         this.text = text;
         this.date = "";
-        this.color = R.color.white;
+        this.color = -1;
     }
 
     public Note(String text){
         this.title = "";
         this.text = text;
         this.date = "";
+        this.color = -1;
     }
 
     public String getTitle(){

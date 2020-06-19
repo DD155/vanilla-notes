@@ -10,11 +10,29 @@
     <color name="white">#ffffff</color>
     <color name="red">#ff0000</color>
     <color name="light_blue">#7fe5f0</color>
+    <color name="light_green">#bada55</color>
+    <color name="light_red">#f08080</color>
+    <color name="green">#008000</color>
+    <color name="pink">#ff80ed</color>
+    <color name="blue">#0000ff</color>
+    <color name="purple">#660066</color>
+    <color name="yellow">#ffff00</color>
+    <color name="mint">#b4eeb4</color>
+    <color name="peach">#ffdab9</color>
 
     <array name="color_array">
         <item>@color/white</item>
         <item>@color/red</item>
+        <item>@color/blue</item>
+        <item>@color/yellow</item>
+        <item>@color/green</item>
+        <item>@color/purple</item>
         <item>@color/light_blue</item>
+        <item>@color/light_green</item>
+        <item>@color/light_red</item>
+        <item>@color/mint</item>
+        <item>@color/peach</item>
+        <item>@color/pink</item>
     </array>
 
 

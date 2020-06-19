@@ -5,6 +5,9 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -65,6 +68,14 @@ public class Utility extends ContextWrapper {
         } else if (pref.equals("Large")){
             return FONT_LARGE;
         } else return FONT_MEDIUM;
+    }
+
+    public Drawable changeDrawableColor(int drawableID, int color){
+        Drawable d = getResources().getDrawable(drawableID);
+        d.setColorFilter(new
+                PorterDuffColorFilter(color, PorterDuff.Mode.MULTIPLY));
+
+        return d;
     }
 
     public int countLines(String str){

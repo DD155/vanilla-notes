@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -62,14 +63,6 @@ public class MainActivity extends AppCompatActivity {
         final LinearLayout linear = findViewById(R.id.linear);
         final Intent notesActivity = new Intent();
 
-        // Retrieve font size from sharedprefs
-        if (prefs.contains("font_size")){
-            Log.d("Font_Pref", prefs.getString("font_size", ""));
-        } else {
-            Log.d("Font_Pref", "Not Found");
-        }
-
-        int v = R.color.white;
 
         if (prefs.contains("notes")) { // Checks if user has notes already
             noteList = util.getNotes("notes");
@@ -81,14 +74,15 @@ public class MainActivity extends AppCompatActivity {
         final String editedText = caller.getStringExtra("note");
         final String titleText = caller.getStringExtra("title");
         final String date = caller.getStringExtra("date");
+        final int color = caller.getIntExtra("color", 0);
         if (date != null)
         Log.d("date_log", date);
 
         if (editedText != null){ // If the user has input text already, add new note with that text
             Note newNote = new Note(editedText);
             newNote.setDate(date);
-            Log.d("date_log", newNote.getDate());
             if (titleText != null) newNote.setTitle(titleText); // Check if there is a title
+            if (color != -1) newNote.setColor(color);
             noteList.add(newNote);
 
             util.saveNotes(noteList, "notes");
@@ -100,6 +94,10 @@ public class MainActivity extends AppCompatActivity {
                 Note currNote = noteList.get(i);
                 String title = currNote.getTitle();
                 String description = currNote.getText();
+                Log.d("color_picked", ""+currNote.getColor());
+                Drawable drawable = util.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
+                text.setBackground(drawable);
+
                 /*
                 String[] strParts = description.split("\\r?\\n|\\r");
 
@@ -264,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
         params.setMargins(0, 25, 0, 25);
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
         text.setFilters(new InputFilter[] { new InputFilter.LengthFilter(82) });
-        text.setBackgroundResource(R.drawable.shadow_border);
+        //text.setBackgroundResource(R.drawable.shadow_border);
         text.setHeight(height);
         text.setPadding(50, 20, 50, 30);
         text.setLayoutParams(params);
