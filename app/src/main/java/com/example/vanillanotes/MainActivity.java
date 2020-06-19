@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         if (noteList.size() != 0){ // Makes sure user has already notes, loads them on entering app
             for (int i = 0; i < noteList.size(); i++) {
                 final TextView text = new TextView(this);
-                Note currNote = noteList.get(i);
+                final Note currNote = noteList.get(i);
                 String title = currNote.getTitle();
                 String description = currNote.getText();
                 Log.d("color_picked", ""+currNote.getColor());
@@ -161,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
                                     notesActivity.putExtra("index", index); // pass index to next activity to change content later
                                     notesActivity.putExtra("caller", "MainActivity");
                                     notesActivity.putExtra("date", noteList.get(index).getDate());
+                                    notesActivity.putExtra("color", currNote.getColor());
                                     text.setBackgroundResource(R.drawable.shadow_border);
                                     startActivity(notesActivity);
                                 } else {

@@ -45,7 +45,7 @@ import java.util.Calendar;
 public class NoteEditActivity extends AppCompatActivity {
     private Utility util = new Utility(this);
     private Context mContext = this;
-    private int colorPicked = R.color.white;
+    private int colorPicked = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,8 +87,18 @@ public class NoteEditActivity extends AppCompatActivity {
 
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
-        textView.setBackgroundResource(R.drawable.shadow_border);
-        titleView.setBackgroundResource(R.drawable.shadow_border);
+
+        if (getIntent().getIntExtra("color", 0) != -1){
+            colorPicked = getIntent().getIntExtra("color", 0);
+            Drawable drawable = util.changeDrawableColor(R.drawable.shadow_border, getIntent().getIntExtra("color", 0));
+            titleView.setBackground(drawable);
+            textView.setBackground(drawable);
+        } else {
+            textView.setBackgroundResource(R.drawable.shadow_border);
+            titleView.setBackgroundResource(R.drawable.shadow_border);
+        }
+
+
 
     }
 
@@ -131,10 +141,12 @@ public class NoteEditActivity extends AppCompatActivity {
             }
             else list = util.getNotes("notes");
 
+            Note current = list.get(getIntent().getIntExtra("index", 0));
             // Replace old strings with new strings in the ArrayList
-            list.get(getIntent().getIntExtra("index", 0)).setColor(colorPicked);
-            list.get(getIntent().getIntExtra("index", 0)).setText(textView.getText().toString());
-            list.get(getIntent().getIntExtra("index", 0)).setTitle(titleView.getText().toString());
+            if (colorPicked != -1)
+                current.setColor(colorPicked);
+            current.setText(textView.getText().toString());
+            current.setTitle(titleView.getText().toString());
             util.saveNotes(list, key);
         }
         startActivity(prev);
