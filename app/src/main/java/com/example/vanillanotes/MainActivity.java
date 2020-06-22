@@ -12,6 +12,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -95,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 String title = currNote.getTitle();
                 String description = currNote.getText();
                 Log.d("color_picked", ""+currNote.getColor());
-                Drawable drawable = util.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
+                final Drawable drawable = util.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
                 text.setBackground(drawable);
 
                 /*
@@ -131,10 +134,14 @@ public class MainActivity extends AppCompatActivity {
                         switch (event.getAction()){
                             case MotionEvent.ACTION_CANCEL:
                                 Log.d("cancel_action", "Cancel action");
-                                text.setBackgroundResource(R.drawable.shadow_border);
+                                text.setBackground(drawable);
                                 return true;
 
                             case MotionEvent.ACTION_DOWN:
+                                //drawable.setColorFilter(new
+                                //        PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY));
+                                //Drawable holdDrawable = drawable;
+                                //text.setBackground(holdDrawable);
                                 text.setBackgroundResource(R.drawable.shadow_border_hold);
                                 /*
                                 final Handler handler = new Handler();
@@ -162,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
                                     notesActivity.putExtra("caller", "MainActivity");
                                     notesActivity.putExtra("date", noteList.get(index).getDate());
                                     notesActivity.putExtra("color", currNote.getColor());
-                                    text.setBackgroundResource(R.drawable.shadow_border);
+                                    text.setBackground(drawable);
                                     startActivity(notesActivity);
                                 } else {
                                     text.setBackgroundResource(R.drawable.shadow_border);
