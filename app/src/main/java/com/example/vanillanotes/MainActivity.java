@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
                                     text.setBackground(drawable);
                                     startActivity(notesActivity);
                                 } else {
-                                    text.setBackgroundResource(R.drawable.shadow_border);
+                                    text.setBackground(drawable);
                                 }
                                 return true;
                         }
