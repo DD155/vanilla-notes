@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.SpannableString;
@@ -60,12 +61,20 @@ public class TrashActivity extends AppCompatActivity {
         Intent caller = getIntent();
         final String editedText = caller.getStringExtra("note");
         final String titleText = caller.getStringExtra("title");
+        final String date = caller.getStringExtra("date");
+        final int color = caller.getIntExtra("color", 0);
+        if (date != null)
+            Log.d("date_log", date);
 
         Log.d("trash", "clear 3");
 
         if (editedText != null){ // If the user has input text already, add new note with that text
-            noteList.add(new Note(editedText));
-            if (titleText != null) noteList.get(noteList.size() - 1).setTitle(titleText); // Check if there is a title
+            Note newNote = new Note(editedText);
+            newNote.setDate(date);
+            if (titleText != null) newNote.setTitle(titleText); // Check if there is a title
+            if (color != -1) newNote.setColor(color);
+            noteList.add(newNote);
+
             utility.saveNotes(noteList, "trash");
         }
 
@@ -74,11 +83,12 @@ public class TrashActivity extends AppCompatActivity {
         if (noteList.size() != 0){ // Makes sure user has already notes, loads them on entering app
             for (int i = 0; i < noteList.size(); i++) {
                 final TextView text = new TextView(this);
-                Note currNote = noteList.get(i);
+                final Note currNote = noteList.get(i);
                 String title = currNote.getTitle();
                 String description = currNote.getText();
-
-                Log.d("trash", "clear 5");
+                Log.d("color_picked", ""+currNote.getColor());
+                Drawable drawable = utility.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
+                text.setBackground(drawable);
                 /*
                 String[] strParts = description.split("\\r?\\n|\\r");
 
@@ -101,13 +111,9 @@ public class TrashActivity extends AppCompatActivity {
                 str.setSpan(new StyleSpan(Typeface.BOLD), 0, title.length(),
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                Log.d("trash", "clear 6");
-
                 initializeText(text);
                 text.setText(str);
                 linear.addView(text);
-
-                Log.d("trash", "clear 7");
 
                 // Make the text clickable
                 final int index = i; // Index of ArrayList
@@ -119,6 +125,8 @@ public class TrashActivity extends AppCompatActivity {
                         notesActivity.putExtra("savedTitle", noteList.get(index).getTitle());
                         notesActivity.putExtra("index", index); // pass index to next activity to change content later
                         notesActivity.putExtra("caller", "TrashActivity");
+                        notesActivity.putExtra("date", noteList.get(index).getDate());
+                        notesActivity.putExtra("color", currNote.getColor());
                         startActivity(notesActivity);
                     }
                 });
@@ -161,7 +169,7 @@ public class TrashActivity extends AppCompatActivity {
         params.setMargins(0, 25, 0, 25);
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
         text.setFilters(new InputFilter[] { new InputFilter.LengthFilter(82) });
-        text.setBackgroundResource(R.drawable.shadow_border);
+        //text.setBackgroundResource(R.drawable.shadow_border);
         text.setHeight(height);
         text.setPadding(50, 20, 50, 30);
         text.setLayoutParams(params);

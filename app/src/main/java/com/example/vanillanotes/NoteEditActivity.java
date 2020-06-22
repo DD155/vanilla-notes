@@ -158,6 +158,9 @@ public class NoteEditActivity extends AppCompatActivity {
         String caller = getIntent().getStringExtra("caller");
         ArrayList<Note> trashList;
 
+        //getIntent().putExtra("color", colorPicked);
+
+
         // Make sure future calls do not return null pointer
         if (caller == null) return;
 
@@ -173,10 +176,11 @@ public class NoteEditActivity extends AppCompatActivity {
             if (caller.equals("TrashActivity")) {
                 trashList.remove(getIntent().getIntExtra("index", 0)); //remove from trash can
             } else {
-                trashList.add(new Note(title, text));
+                trashList.add(new Note(title, text, colorPicked));
                 list.remove(getIntent().getIntExtra("index", 0));
             }
             util.saveNotes(list, "notes");
+
             util.saveNotes(trashList, "trash");
         }
         Toast.makeText(getApplicationContext(), getString(R.string.delete_toast), Toast.LENGTH_LONG).show();
