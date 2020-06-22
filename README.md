@@ -34,6 +34,7 @@ Project is created with and uses:
 - [Android Studio v4.0](https://developer.android.com/studio/install) using [Java](https://www.java.com/en/)
 - [Gson](https://github.com/google/gson) - A JSON library for Java
 - [material.io](https://material.io/) - Material guidelines with resources such as components and icons
+- [Color Picker Library](https://github.com/kristiyanP/colorpicker) - Material Color Picker asset created by [Kristiyan Petrov](https://github.com/kristiyanP)
 
 
 ## Launch
