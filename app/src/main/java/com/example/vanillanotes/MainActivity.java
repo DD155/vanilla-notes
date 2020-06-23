@@ -139,19 +139,21 @@ public class MainActivity extends AppCompatActivity {
 
                             case MotionEvent.ACTION_DOWN:
                                 if (currNote.getColor() != -1) {
-                                    Log.d("Debug_color", "1");
+                                    // Logic for making pressed down color a darker shade
                                     String[] rgbStr = {(util.hexFromColorInt(currNote.getColor())).substring(0, 2),
                                             (util.hexFromColorInt(currNote.getColor())).substring(2, 4),
                                             (util.hexFromColorInt(currNote.getColor())).substring(4)
                                     };
-                                    double[] rgb = {
+                                    double[] rgb = { // Divide RGB value to make the result darker
                                             Math.round(Integer.valueOf(rgbStr[0], 16) * 0.75),
                                             Math.round(Integer.valueOf(rgbStr[1], 16) * 0.75),
                                             Math.round(Integer.valueOf(rgbStr[2], 16) * 0.75)
                                     };
+                                    // Format string in #RRGGBB style
                                     String newHex = String.format("#%02X%02X%02X", (int)rgb[0], (int)rgb[1], (int)rgb[2]);
 
-                                    Drawable holdDrawable = drawable.getConstantState().newDrawable();
+                                    // Create new drawable to replace
+                                    Drawable holdDrawable = util.returnDrawable(R.drawable.shadow_border);
                                     holdDrawable.setColorFilter(new
                                             PorterDuffColorFilter(Color.parseColor(newHex), PorterDuff.Mode.MULTIPLY));
 
@@ -160,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
                                     Log.d("shade", "New Hex: " + newHex);
                                 } else
                                     text.setBackgroundResource(R.drawable.shadow_border_hold);
-                                
+
                                 return true;
 
                             case MotionEvent.ACTION_UP:

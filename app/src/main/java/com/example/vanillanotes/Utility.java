@@ -77,6 +77,17 @@ public class Utility extends ContextWrapper {
         return d;
     }
 
+    public Drawable returnDrawable(int id){
+        Drawable d;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            d = getResources().getDrawable(id, null);
+        } else
+        {
+            d = getResources().getDrawable(id);
+        }
+        return d;
+    }
+
     public String hexFromColorInt(int color){
         return String.format("#%06X", (0xFFFFFF & color)).substring(1);
     }
