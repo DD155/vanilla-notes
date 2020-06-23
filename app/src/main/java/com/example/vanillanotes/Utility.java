@@ -5,6 +5,7 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
@@ -74,8 +75,11 @@ public class Utility extends ContextWrapper {
         Drawable d = getResources().getDrawable(drawableID);
         d.setColorFilter(new
                 PorterDuffColorFilter(color, PorterDuff.Mode.MULTIPLY));
-
         return d;
+    }
+
+    public String hexFromColorInt(int color){
+        return String.format("#%06X", (0xFFFFFF & color)).substring(1);
     }
 
     public int countLines(String str){
