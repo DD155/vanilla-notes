@@ -138,32 +138,29 @@ public class MainActivity extends AppCompatActivity {
                                 return true;
 
                             case MotionEvent.ACTION_DOWN:
-                                //drawable.setColorFilter(new
-                                //        PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY));
-                                //Drawable holdDrawable = drawable;
-                                //text.setBackground(holdDrawable);
-                                Log.d("rgb_value", "test");
-                                Log.d("rgb_value", "RGB VALUE: " + Color.parseColor("#"+util.hexFromColorInt(currNote.getColor())));
-                                String[] rgb = {(util.hexFromColorInt(currNote.getColor())).substring(0, 2),
-                                        (util.hexFromColorInt(currNote.getColor())).substring(2, 4),
-                                        (util.hexFromColorInt(currNote.getColor())).substring(4)
-                                };
-                                Log.d("string_arr", "Red Values: " + rgb[0] + "\t Green Values: "
-                                        + rgb[1] + "\t Blue Values: " + rgb[2]);
-                                text.setBackgroundResource(R.drawable.shadow_border_hold);
-                                /*
-                                final Handler handler = new Handler();
+                                if (currNote.getColor() != -1) {
+                                    Log.d("Debug_color", "1");
+                                    String[] rgbStr = {(util.hexFromColorInt(currNote.getColor())).substring(0, 2),
+                                            (util.hexFromColorInt(currNote.getColor())).substring(2, 4),
+                                            (util.hexFromColorInt(currNote.getColor())).substring(4)
+                                    };
+                                    double[] rgb = {
+                                            Math.round(Integer.valueOf(rgbStr[0], 16) * 0.75),
+                                            Math.round(Integer.valueOf(rgbStr[1], 16) * 0.75),
+                                            Math.round(Integer.valueOf(rgbStr[2], 16) * 0.75)
+                                    };
+                                    String newHex = String.format("#%02X%02X%02X", (int)rgb[0], (int)rgb[1], (int)rgb[2]);
 
-                                final Runnable r = new Runnable() {
-                                    public void run() {
-                                        //tv.append("Hello World");
-                                        Log.d("Handler_msg", "Msg");
-                                        handler.postDelayed(this, 1000);
-                                    }
-                                };
+                                    Drawable holdDrawable = drawable.getConstantState().newDrawable();
+                                    holdDrawable.setColorFilter(new
+                                            PorterDuffColorFilter(Color.parseColor(newHex), PorterDuff.Mode.MULTIPLY));
 
-                                handler.postDelayed(r, 1000);*/
+                                    text.setBackground(holdDrawable);
 
+                                    Log.d("shade", "New Hex: " + newHex);
+                                } else
+                                    text.setBackgroundResource(R.drawable.shadow_border_hold);
+                                
                                 return true;
 
                             case MotionEvent.ACTION_UP:
@@ -320,6 +317,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_add:
+
                 util.goToActivity(NoteEditActivity.class, "MainActivity", getApplicationContext());
                 return true;
 

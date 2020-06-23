@@ -26,6 +26,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -87,8 +88,9 @@ public class NoteEditActivity extends AppCompatActivity {
 
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
+        titleView.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
 
-        if (getIntent().getIntExtra("color", 0) != -1){
+        if (getIntent().getIntExtra("color", 0) != -1 && getIntent().getIntExtra("color", 0) != 0){
             colorPicked = getIntent().getIntExtra("color", 0);
             Drawable drawable = util.changeDrawableColor(R.drawable.shadow_border, getIntent().getIntExtra("color", 0));
             titleView.setBackground(drawable);

@@ -73,8 +73,7 @@ public class Utility extends ContextWrapper {
 
     public Drawable changeDrawableColor(int drawableID, int color){
         Drawable d = getResources().getDrawable(drawableID);
-        d.setColorFilter(new
-                PorterDuffColorFilter(color, PorterDuff.Mode.MULTIPLY));
+        d.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.MULTIPLY));
         return d;
     }
 
