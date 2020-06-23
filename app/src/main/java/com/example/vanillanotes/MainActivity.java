@@ -142,12 +142,14 @@ public class MainActivity extends AppCompatActivity {
                                 //        PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY));
                                 //Drawable holdDrawable = drawable;
                                 //text.setBackground(holdDrawable);
+                                Log.d("rgb_value", "test");
+                                Log.d("rgb_value", "RGB VALUE: " + Color.parseColor("#"+util.hexFromColorInt(currNote.getColor())));
                                 String[] rgb = {(util.hexFromColorInt(currNote.getColor())).substring(0, 2),
                                         (util.hexFromColorInt(currNote.getColor())).substring(2, 4),
                                         (util.hexFromColorInt(currNote.getColor())).substring(4)
                                 };
-                                Log.d("string_arr", "Red Values: " + rgb[0] + "\n Green Values: "
-                                        + rgb[1] + "\n Blue Values: " + rgb[2]);
+                                Log.d("string_arr", "Red Values: " + rgb[0] + "\t Green Values: "
+                                        + rgb[1] + "\t Blue Values: " + rgb[2]);
                                 text.setBackgroundResource(R.drawable.shadow_border_hold);
                                 /*
                                 final Handler handler = new Handler();
