@@ -92,6 +92,12 @@ public class Utility extends ContextWrapper {
         return String.format("#%06X", (0xFFFFFF & color)).substring(1);
     }
 
+    
+    public boolean isDarkColor(int color){
+        return color == getResources().getColor(R.color.red) || color == getResources().getColor(R.color.blue) ||
+                color == getResources().getColor(R.color.purple) || color == getResources().getColor(R.color.green);
+    }
+
     public int countLines(String str){
         String[] lines = str.split("\r\n|\r|\n");
         return lines.length;

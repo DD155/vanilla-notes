@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 str.setSpan(new StyleSpan(Typeface.BOLD), 0, title.length(),
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                initializeText(text);
+                initializeText(text, currNote.getColor());
                 text.setText(str);
                 linear.addView(text);
 
@@ -249,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     // Set attributes for TextView depending on dpi
-    private void initializeText(TextView text){
+    private void initializeText(TextView text, int color){
         float density = getResources().getDisplayMetrics().density;
         int fontSize = util.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
         int height;
@@ -282,7 +282,9 @@ public class MainActivity extends AppCompatActivity {
         text.setHeight(height);
         text.setPadding(50, 20, 50, 30);
         text.setLayoutParams(params);
-        text.setTextColor(getResources().getColor(R.color.textColor));
+        if (util.isDarkColor(color))
+            text.setTextColor(getResources().getColor(R.color.white));
+        else text.setTextColor(getResources().getColor(R.color.textColor));
     }
 
     // Remove notes by clearing note ArrayList and resetting linear layout.
