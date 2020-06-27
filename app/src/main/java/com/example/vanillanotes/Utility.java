@@ -141,6 +141,9 @@ public class Utility extends ContextWrapper {
             hour = Integer.toString(instance.get(Calendar.HOUR_OF_DAY));
             minutes = "AM";
         }
+
+        if (hour.equals("0")) hour = "12";
+
         String month = Integer.toString(instance.get(Calendar.MONTH) + 1);
         String year = Integer.toString(instance.get(Calendar.YEAR));
         return month + "/" + dayOfWeek + "/" + year + " " + hour + ":" + minutes;
