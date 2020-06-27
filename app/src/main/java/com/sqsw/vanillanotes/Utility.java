@@ -65,9 +65,9 @@ public class Utility extends ContextWrapper {
 
     // Returns the size of the font depending on what user setting is
     public int getFontSize(String pref){
-        if (pref.equals("Small")){
+        if ("Small".equals(pref)){
             return FONT_SMALL;
-        } else if (pref.equals("Large")){
+        } else if ("Large".equals(pref)){
             return FONT_LARGE;
         } else return FONT_MEDIUM;
     }

@@ -34,6 +34,7 @@ import com.sqsw.vanillanotes.settings.SettingsActivity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Objects;
 
 public class NoteEditActivity extends AppCompatActivity {
     private Utility util = new Utility(this);
@@ -111,7 +112,7 @@ public class NoteEditActivity extends AppCompatActivity {
 
 
         // Determine if previous activity was trash activity or not
-        if (caller.equals("MainActivity")) prev = new Intent(getApplicationContext(), MainActivity.class);
+        if ("MainActivity".equals(caller)) prev = new Intent(getApplicationContext(), MainActivity.class);
         else {
             prev = new Intent(getApplicationContext(), TrashActivity.class);
             isTrash = true;
@@ -208,11 +209,14 @@ public class NoteEditActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Make sure future calls do not return null pointer
         // Inflate the menu; this adds items to the action bar if it is present.
-        if (getIntent().getStringExtra("caller") != null &&
-                getIntent().getStringExtra("caller").equals("TrashActivity")) {
-            getMenuInflater().inflate(R.menu.trash_note_actions, menu);
-        } else
-            getMenuInflater().inflate(R.menu.notes_actions, menu);
+        if (getIntent().getStringExtra("caller") != null) {
+            if ("TrashActivity".equals(getIntent().getStringExtra("caller"))) {
+                getMenuInflater().inflate(R.menu.trash_note_actions, menu);
+            } else
+                getMenuInflater().inflate(R.menu.notes_actions, menu);
+        } else {
+            Log.e("NoteActivity", "Caller is null");
+        }
         return true;
     }
 
@@ -221,7 +225,7 @@ public class NoteEditActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 if (getIntent().getStringExtra("caller") != null &&
-                        getIntent().getStringExtra("caller").equals("MainActivity"))
+                        "MainActivity".equals(getIntent().getStringExtra("caller")))
                     confirmDiscardDialog(MainActivity.class);
                     //intent.setClass(getApplicationContext(), MainActivity.class);
                 else
@@ -458,10 +462,13 @@ public class NoteEditActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         // Make sure future calls do not return null pointer
-        if (getIntent().getStringExtra("caller") != null &&
-                getIntent().getStringExtra("caller").equals("MainActivity"))
-            confirmDiscardDialog(MainActivity.class);
-        else
-            confirmDiscardDialog(TrashActivity.class);
+        if (getIntent().getStringExtra("caller") != null) {
+            if ("MainActivity".equals(getIntent().getStringExtra("caller")))
+                confirmDiscardDialog(MainActivity.class);
+            else
+                confirmDiscardDialog(TrashActivity.class);
+        } else {
+            Log.e("NoteActivity", "Caller is null");
+        }
     }
 }
