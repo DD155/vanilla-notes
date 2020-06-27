@@ -1,4 +1,4 @@
-package com.example.vanillanotes;
+package com.sqsw.vanillanotes;
 
 import org.junit.Test;
 

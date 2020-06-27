@@ -14,6 +14,11 @@
             android:icon="@drawable/ic_delete_black_24dp"
             app:showAsAction="ifRoom" />
 
+        <!-- Sort -->
+        <item android:id="@+id/action_sort"
+            android:title="@string/action_sort"
+            app:showAsAction="never" />
+
         <!-- Clear -->
         <item android:id="@+id/action_clear"
             android:title="@string/action_clear"

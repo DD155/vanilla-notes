@@ -12,4 +12,13 @@
         <item>Large</item>
     </string-array>
 
+    <!-- Sort Dialog -->
+    <string-array name="sort_values">
+        <item>Title (Ascending)</item>
+        <item>Title (Descending)</item>
+        <item>Date Created (Ascending)</item>
+        <item>Date Created (Descending)</item>
+        <item>Custom</item>
+    </string-array>
+
 </resources>

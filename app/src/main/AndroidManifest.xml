@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.vanillanotes">
+    package="com.sqsw.vanillanotes">
 
     <supports-screens
         android:largeScreens="true"
@@ -15,11 +15,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".settings.ContextActionBar"/>
-        <activity android:name=".TrashActivity" />
-        <activity android:name=".settings.SettingsActivity" />
-        <activity android:name=".NoteEditActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name="com.sqsw.vanillanotes.settings.ContextActionBar"/>
+        <activity android:name="com.sqsw.vanillanotes.TrashActivity" />
+        <activity android:name="com.sqsw.vanillanotes.settings.SettingsActivity" />
+        <activity android:name="com.sqsw.vanillanotes.NoteEditActivity" />
+        <activity android:name="com.sqsw.vanillanotes.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         
-        <receiver android:name=".BroadcastReminder"/>
+        <receiver android:name="com.sqsw.vanillanotes.BroadcastReminder"/>
     </application>
 
 

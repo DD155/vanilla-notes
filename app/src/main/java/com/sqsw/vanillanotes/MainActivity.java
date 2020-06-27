@@ -1,4 +1,4 @@
-package com.example.vanillanotes;
+package com.sqsw.vanillanotes;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
@@ -35,7 +35,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.vanillanotes.settings.SettingsActivity;
+import com.sqsw.vanillanotes.settings.SettingsActivity;
 
 import java.util.ArrayList;
 
@@ -321,12 +321,15 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_add:
-
                 util.goToActivity(NoteEditActivity.class, "MainActivity", getApplicationContext());
                 return true;
 
             case R.id.action_remove:
                 util.goToActivity(TrashActivity.class,"MainActivity", getApplicationContext());
+                return true;
+
+            case R.id.action_sort:
+                sortDialog();
                 return true;
 
             case R.id.action_clear:
@@ -336,6 +339,14 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void sortDialog() {
+        String[] items = getResources().getStringArray(R.array.sort_values);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Sort");
+        builder.setMessage("Choose your sort");
+
     }
 
     // Creates dialog for the clear

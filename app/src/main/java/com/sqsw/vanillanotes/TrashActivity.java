@@ -1,4 +1,4 @@
-package com.example.vanillanotes;
+package com.sqsw.vanillanotes;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -27,7 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.vanillanotes.settings.SettingsActivity;
+import com.sqsw.vanillanotes.settings.SettingsActivity;
 
 import java.util.ArrayList;
 

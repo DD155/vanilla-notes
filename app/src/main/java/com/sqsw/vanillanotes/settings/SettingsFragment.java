@@ -1,4 +1,4 @@
-package com.example.vanillanotes.settings;
+package com.sqsw.vanillanotes.settings;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -8,9 +8,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.example.vanillanotes.Note;
-import com.example.vanillanotes.R;
+import com.sqsw.vanillanotes.Note;
+import com.sqsw.vanillanotes.R;
 
+import androidx.annotation.NonNull;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -100,7 +101,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     // Prevent retrieving null from getActivity()
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
         if (context instanceof Activity){

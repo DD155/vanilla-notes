@@ -1,10 +1,11 @@
-package com.example.vanillanotes;
+package com.sqsw.vanillanotes;
 
 public class Note {
     private String title;
     private String text;
     private String date;
     private int color;
+    private int index;
 
     public Note(String title, String text, int color){
         this.title = title;

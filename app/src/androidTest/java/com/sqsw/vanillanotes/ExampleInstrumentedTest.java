@@ -1,4 +1,4 @@
-package com.example.vanillanotes;
+package com.sqsw.vanillanotes;
 
 import android.content.Context;
 

@@ -1,18 +1,17 @@
-package com.example.vanillanotes.settings;
+package com.sqsw.vanillanotes.settings;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceFragmentCompat;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.vanillanotes.MainActivity;
-import com.example.vanillanotes.R;
-import com.example.vanillanotes.TrashActivity;
+import com.sqsw.vanillanotes.MainActivity;
+import com.sqsw.vanillanotes.R;
+import com.sqsw.vanillanotes.TrashActivity;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -35,7 +34,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     // determines which activity to go back to
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(@NonNull MenuItem item){
         Intent intent;
         if (getIntent().getStringExtra("caller").equals("TrashActivity"))
             intent = new Intent(getApplicationContext(), TrashActivity.class);

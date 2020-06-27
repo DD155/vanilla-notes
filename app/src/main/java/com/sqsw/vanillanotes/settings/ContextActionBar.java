@@ -1,12 +1,11 @@
-package com.example.vanillanotes.settings;
+package com.sqsw.vanillanotes.settings;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.os.Build;
 import android.os.Bundle;
 
-import com.example.vanillanotes.R;
+import com.sqsw.vanillanotes.R;
 
 public class ContextActionBar extends AppCompatActivity {
 
