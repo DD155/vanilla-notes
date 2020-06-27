@@ -81,7 +81,7 @@ public class NoteEditActivity extends AppCompatActivity {
             if (title != null) titleView.setText(title);
             textView.setText(text); // Set the text on the note page as the old string
             textView.setSelection(textView.getText().length()); // Set cursor to the end
-            textView.requestFocus(); // Set cursor to this View specifically
+            textView.requestFocus();
         } else {
             dateView.setText(getString(R.string.date_created, util.currentDate()));
         }
@@ -131,8 +131,8 @@ public class NoteEditActivity extends AppCompatActivity {
         }
 
         if (text == null) { // Case where the note is new
-            prev.putExtra("note", textView.getText().toString());
-            prev.putExtra("title", titleView.getText().toString());
+            prev.putExtra("note", textView.getText().toString().trim());
+            prev.putExtra("title", titleView.getText().toString().trim());
             prev.putExtra("date", util.currentDate());
             prev.putExtra("color", colorPicked);
         } else { // Case where the note is being edited
@@ -147,8 +147,8 @@ public class NoteEditActivity extends AppCompatActivity {
             // Replace old strings with new strings in the ArrayList
             if (colorPicked != -1)
                 current.setColor(colorPicked);
-            current.setText(textView.getText().toString());
-            current.setTitle(titleView.getText().toString());
+            current.setText(textView.getText().toString().trim());
+            current.setTitle(titleView.getText().toString().trim());
             util.saveNotes(list, key);
         }
         startActivity(prev);
@@ -371,8 +371,8 @@ public class NoteEditActivity extends AppCompatActivity {
     private Notification buildNotification() {
         EditText text = findViewById(R.id.editText);
         EditText title = findViewById(R.id.titleText);
-        String message = text.getText().toString();
-        String titleMessage = title.getText().toString();
+        String message = text.getText().toString().trim();
+        String titleMessage = title.getText().toString().trim();
 
         // Create an Intent for the activity
         Intent intent = new Intent(this, NoteEditActivity.class);
