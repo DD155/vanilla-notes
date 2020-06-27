@@ -42,11 +42,11 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     //private GestureDetector detector;
     private static final String CHANNEL_ID = "NoteChannel";
-    private Utility util = new Utility(this);
-    private ArrayList<Note> deleteNotes;
-    private ArrayAdapter<Note> adapter;
-    private ActionMode actionMode;
-    private boolean isHeld = false;
+    private final Utility UTIL = new Utility(this);
+    //private ArrayList<Note> deleteNotes;
+    //private ArrayAdapter<Note> adapter;
+    //private ActionMode actionMode;
+    //private boolean isHeld = false;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (prefs.contains("notes")) { // Checks if user has notes already
-            noteList = util.getNotes("notes");
+            noteList = UTIL.getNotes("notes");
         } // Otherwise just make the new ArrayList
         else noteList = new ArrayList<>();
 
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
             if (color != -1) newNote.setColor(color);
             noteList.add(newNote);
 
-            util.saveNotes(noteList, "notes");
+            UTIL.saveNotes(noteList, "notes");
         }
 
         if (noteList.size() != 0){ // Makes sure user has already notes, loads them on entering app
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 String title = currNote.getTitle();
                 String description = currNote.getText();
                 Log.d("color_picked", ""+currNote.getColor());
-                final Drawable drawable = util.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
+                final Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
                 text.setBackground(drawable);
 
                 /*
@@ -140,9 +140,9 @@ public class MainActivity extends AppCompatActivity {
                             case MotionEvent.ACTION_DOWN:
                                 if (currNote.getColor() != -1) {
                                     // Logic for making pressed down color a darker shade
-                                    String[] rgbStr = {(util.hexFromColorInt(currNote.getColor())).substring(0, 2),
-                                            (util.hexFromColorInt(currNote.getColor())).substring(2, 4),
-                                            (util.hexFromColorInt(currNote.getColor())).substring(4)
+                                    String[] rgbStr = {(UTIL.hexFromColorInt(currNote.getColor())).substring(0, 2),
+                                            (UTIL.hexFromColorInt(currNote.getColor())).substring(2, 4),
+                                            (UTIL.hexFromColorInt(currNote.getColor())).substring(4)
                                     };
                                     double[] rgb = { // Divide RGB value to make the result darker
                                             Math.round(Integer.valueOf(rgbStr[0], 16) * 0.75),
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                                     String newHex = String.format("#%02X%02X%02X", (int)rgb[0], (int)rgb[1], (int)rgb[2]);
 
                                     // Create new drawable to replace
-                                    Drawable holdDrawable = util.returnDrawable(R.drawable.shadow_border);
+                                    Drawable holdDrawable = UTIL.returnDrawable(R.drawable.shadow_border);
                                     holdDrawable.setColorFilter(new
                                             PorterDuffColorFilter(Color.parseColor(newHex), PorterDuff.Mode.MULTIPLY));
 
@@ -217,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /*
     private ActionMode.Callback callback = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -234,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             if (item.getItemId() == R.id.action_delete) {
-                Toast.makeText(util, "Clicked", Toast.LENGTH_SHORT).show();
+                Toast.makeText(UTIL, "Clicked", Toast.LENGTH_SHORT).show();
                 mode.finish();
                 return true;
             }
@@ -245,13 +246,13 @@ public class MainActivity extends AppCompatActivity {
         public void onDestroyActionMode(ActionMode mode) {
             actionMode = null;
         }
-    };
+    }; */
 
 
     // Set attributes for TextView depending on dpi
     private void initializeText(TextView text, int color){
         float density = getResources().getDisplayMetrics().density;
-        int fontSize = util.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
+        int fontSize = UTIL.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
         int height;
         Log.d("density", Float.toString(density));
         // Set height based on dpi
@@ -282,20 +283,20 @@ public class MainActivity extends AppCompatActivity {
         text.setHeight(height);
         text.setPadding(50, 20, 50, 30);
         text.setLayoutParams(params);
-        if (util.isDarkColor(color))
+        if (UTIL.isDarkColor(color))
             text.setTextColor(getResources().getColor(R.color.white));
         else text.setTextColor(getResources().getColor(R.color.textColor));
     }
 
     // Remove notes by clearing note ArrayList and resetting linear layout.
     private void clearNotes(){
-        ArrayList<Note> list = util.getNotes("notes");
-        ArrayList<Note> trash = util.getNotes("trash");
+        ArrayList<Note> list = UTIL.getNotes("notes");
+        ArrayList<Note> trash = UTIL.getNotes("trash");
         trash.addAll(list);
         list.clear();
 
-        util.saveNotes(list, "notes");
-        util.saveNotes(trash, "trash");
+        UTIL.saveNotes(list, "notes");
+        UTIL.saveNotes(trash, "trash");
         // Remove notes from layout
         LinearLayout ll = findViewById(R.id.linear);
         ll.removeAllViews();
@@ -306,9 +307,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        if (isHeld)
-            getMenuInflater().inflate(R.menu.hold_notes_actions, menu);
-        else
+        //if (isHeld)
+        //    getMenuInflater().inflate(R.menu.hold_notes_actions, menu);
+        //else
             getMenuInflater().inflate(R.menu.toolbar_actions, menu);
         return true;
     }
@@ -317,15 +318,15 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                util.goToActivity(SettingsActivity.class, "MainActivity", getApplicationContext());
+                UTIL.goToActivity(SettingsActivity.class, "MainActivity", getApplicationContext());
                 return true;
 
             case R.id.action_add:
-                util.goToActivity(NoteEditActivity.class, "MainActivity", getApplicationContext());
+                UTIL.goToActivity(NoteEditActivity.class, "MainActivity", getApplicationContext());
                 return true;
 
             case R.id.action_remove:
-                util.goToActivity(TrashActivity.class,"MainActivity", getApplicationContext());
+                UTIL.goToActivity(TrashActivity.class,"MainActivity", getApplicationContext());
                 return true;
 
             case R.id.action_sort:

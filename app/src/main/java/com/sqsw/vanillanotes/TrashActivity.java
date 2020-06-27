@@ -32,7 +32,7 @@ import com.sqsw.vanillanotes.settings.SettingsActivity;
 import java.util.ArrayList;
 
 public class TrashActivity extends AppCompatActivity {
-    private Utility utility = new Utility(this);
+    private final Utility UTIL = new Utility(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +51,7 @@ public class TrashActivity extends AppCompatActivity {
         Log.d("trash", "clear 1");
 
         if (prefs.contains("trash")) { // Checks if user has notes already
-            noteList = utility.getNotes("trash");
+            noteList = UTIL.getNotes("trash");
         } // Otherwise just make the new ArrayList
         else noteList = new ArrayList<>();
 
@@ -75,7 +75,7 @@ public class TrashActivity extends AppCompatActivity {
             if (color != -1) newNote.setColor(color);
             noteList.add(newNote);
 
-            utility.saveNotes(noteList, "trash");
+            UTIL.saveNotes(noteList, "trash");
         }
 
         Log.d("trash", "clear 4");
@@ -87,7 +87,7 @@ public class TrashActivity extends AppCompatActivity {
                 String title = currNote.getTitle();
                 String description = currNote.getText();
                 Log.d("color_picked", ""+currNote.getColor());
-                Drawable drawable = utility.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
+                Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
                 text.setBackground(drawable);
                 /*
                 String[] strParts = description.split("\\r?\\n|\\r");
@@ -142,7 +142,7 @@ public class TrashActivity extends AppCompatActivity {
 
     private void initializeText(TextView text){
         float density = getResources().getDisplayMetrics().density;
-        int fontSize = utility.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
+        int fontSize = UTIL.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
         int height;
         Log.d("density", Float.toString(density));
         // Set height based on dpi
@@ -187,15 +187,15 @@ public class TrashActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                utility.goToActivity(SettingsActivity.class, "TrashActivity", getApplicationContext());
+                UTIL.goToActivity(SettingsActivity.class, "TrashActivity", getApplicationContext());
                 return true;
 
             case R.id.action_home:
-                utility.goToActivity(MainActivity.class, "TrashActivity", getApplicationContext());
+                UTIL.goToActivity(MainActivity.class, "TrashActivity", getApplicationContext());
                 return true;
 
             case R.id.action_empty:
-                if (utility.getNotes("trash").size() != 0)
+                if (UTIL.getNotes("trash").size() != 0)
                     confirmDialog();
                 else {  // Case where the trash is already empty
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -240,9 +240,9 @@ public class TrashActivity extends AppCompatActivity {
     }
 
     private void clearNotes(){
-        ArrayList<Note> list = utility.getNotes("trash");
+        ArrayList<Note> list = UTIL.getNotes("trash");
         list.clear();
-        utility.saveNotes(list, "trash");
+        UTIL.saveNotes(list, "trash");
 
         LinearLayout ll = findViewById(R.id.linear);
         ll.removeAllViews();

@@ -34,10 +34,9 @@ import com.sqsw.vanillanotes.settings.SettingsActivity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Objects;
 
 public class NoteEditActivity extends AppCompatActivity {
-    private Utility util = new Utility(this);
+    private final Utility UTIL = new Utility(this);
     private Context mContext = this;
     private int colorPicked = -1;
 
@@ -53,7 +52,7 @@ public class NoteEditActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         TextView dateView = findViewById(R.id.date);
-        int fontSize = util.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
+        int fontSize = UTIL.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
 
         // Set attributes of EditTexts
         String text = getIntent().getStringExtra("savedText");
@@ -61,13 +60,13 @@ public class NoteEditActivity extends AppCompatActivity {
         EditText titleView = findViewById(R.id.titleText);
         EditText textView = findViewById(R.id.editText);
 
-        Log.d("date_time_0", util.currentDate());
+        Log.d("date_time_0", UTIL.currentDate());
         titleView.setPadding(50, 50, 50, 0);
         textView.setPadding(50, 50, 50, 50);
 
         if (text != null) { // Case where user is editing old note
             //index = getIntent().getIntExtra("index", 0);
-            Note currentNote = util.getNotes("notes")
+            Note currentNote = UTIL.getNotes("notes")
                     .get(getIntent().getIntExtra("index", 0));
             dateView.setText(getString(R.string.date_created, currentNote.getDate()));
             //dateView.setText("Date Created: " + currentNote.getDate());
@@ -76,7 +75,7 @@ public class NoteEditActivity extends AppCompatActivity {
             textView.setSelection(textView.getText().length()); // Set cursor to the end
             textView.requestFocus();
         } else {
-            dateView.setText(getString(R.string.date_created, util.currentDate()));
+            dateView.setText(getString(R.string.date_created, UTIL.currentDate()));
         }
 
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
@@ -85,7 +84,7 @@ public class NoteEditActivity extends AppCompatActivity {
 
         if (getIntent().getIntExtra("color", 0) != -1 && getIntent().getIntExtra("color", 0) != 0){
             colorPicked = getIntent().getIntExtra("color", 0);
-            Drawable drawable = util.changeDrawableColor(R.drawable.shadow_border, getIntent().getIntExtra("color", 0));
+            Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, getIntent().getIntExtra("color", 0));
             titleView.setBackground(drawable);
             textView.setBackground(drawable);
         } else {
@@ -126,15 +125,15 @@ public class NoteEditActivity extends AppCompatActivity {
         if (text == null) { // Case where the note is new
             prev.putExtra("note", textView.getText().toString().trim());
             prev.putExtra("title", titleView.getText().toString().trim());
-            prev.putExtra("date", util.currentDate());
+            prev.putExtra("date", UTIL.currentDate());
             prev.putExtra("color", colorPicked);
         } else { // Case where the note is being edited
             // Determine which list to use
             if (isTrash) {
-                list = util.getNotes("trash");
+                list = UTIL.getNotes("trash");
                 key = "trash";
             }
-            else list = util.getNotes("notes");
+            else list = UTIL.getNotes("notes");
 
             Note current = list.get(getIntent().getIntExtra("index", 0));
             // Replace old strings with new strings in the ArrayList
@@ -142,7 +141,7 @@ public class NoteEditActivity extends AppCompatActivity {
                 current.setColor(colorPicked);
             current.setText(textView.getText().toString().trim());
             current.setTitle(titleView.getText().toString().trim());
-            util.saveNotes(list, key);
+            UTIL.saveNotes(list, key);
         }
         startActivity(prev);
     }
@@ -159,12 +158,12 @@ public class NoteEditActivity extends AppCompatActivity {
         // Make sure future calls do not return null pointer
         if (caller == null) return;
 
-        if (util.getNotes("trash") != null) // check if trash can list is valid
-            trashList = util.getNotes("trash");
+        if (UTIL.getNotes("trash") != null) // check if trash can list is valid
+            trashList = UTIL.getNotes("trash");
         else {
             trashList = new ArrayList<>();
         }
-        ArrayList<Note> list  = util.getNotes("notes");
+        ArrayList<Note> list  = UTIL.getNotes("notes");
 
 
         if (text != null) { // save the note to trash while deleting from main notes
@@ -174,17 +173,17 @@ public class NoteEditActivity extends AppCompatActivity {
                 trashList.add(new Note(title, text, colorPicked));
                 list.remove(getIntent().getIntExtra("index", 0));
             }
-            util.saveNotes(list, "notes");
+            UTIL.saveNotes(list, "notes");
 
-            util.saveNotes(trashList, "trash");
+            UTIL.saveNotes(trashList, "trash");
         }
         Toast.makeText(getApplicationContext(), getString(R.string.delete_toast), Toast.LENGTH_LONG).show();
 
         // Load previously called activity
         if (caller.equals("TrashActivity")){
-            util.goToActivity(TrashActivity.class, "NoteEditActivity", getApplicationContext());
+            UTIL.goToActivity(TrashActivity.class, "NoteEditActivity", getApplicationContext());
         } else {
-            util.goToActivity(MainActivity.class, "NoteEditActivity", getApplicationContext());
+            UTIL.goToActivity(MainActivity.class, "NoteEditActivity", getApplicationContext());
         }
     }
 
@@ -192,14 +191,14 @@ public class NoteEditActivity extends AppCompatActivity {
     private void restoreNote(){
         int index = getIntent().getIntExtra("index", 0);
         ArrayList<Note> trash, list;
-        trash = util.getNotes("trash");
-        list = util.getNotes("notes");
+        trash = UTIL.getNotes("trash");
+        list = UTIL.getNotes("notes");
 
         list.add(trash.get(index));
         trash.remove(index);
 
-        util.saveNotes(trash, "trash");
-        util.saveNotes(list, "notes");
+        UTIL.saveNotes(trash, "trash");
+        UTIL.saveNotes(list, "notes");
 
         Toast.makeText(getApplicationContext(), getString(R.string.restore_toast), Toast.LENGTH_LONG).show();
     }
@@ -278,7 +277,7 @@ public class NoteEditActivity extends AppCompatActivity {
                 // put code
                 TextView title = findViewById(R.id.titleText);
                 TextView text = findViewById(R.id.editText);
-                Drawable drawable = util.changeDrawableColor(R.drawable.shadow_border, color);
+                Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, color);
 
                 title.setBackground(drawable);
                 text.setBackground(drawable);
@@ -325,7 +324,7 @@ public class NoteEditActivity extends AppCompatActivity {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                util.goToActivity(activity,"NoteEditActivity", getApplicationContext());
+                UTIL.goToActivity(activity,"NoteEditActivity", getApplicationContext());
             }
         });
 

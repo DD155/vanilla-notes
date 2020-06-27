@@ -6,7 +6,6 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.sqsw.vanillanotes.MainActivity;
@@ -36,7 +35,7 @@ public class SettingsActivity extends AppCompatActivity {
     // determines which activity to go back to
     public boolean onOptionsItemSelected(@NonNull MenuItem item){
         Intent intent;
-        if (getIntent().getStringExtra("caller").equals("TrashActivity"))
+        if ("TrashActivity".equals(getIntent().getStringExtra("caller")))
             intent = new Intent(getApplicationContext(), TrashActivity.class);
         else {
             intent = new Intent(getApplicationContext(), MainActivity.class);
