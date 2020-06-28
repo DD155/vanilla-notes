@@ -7,6 +7,13 @@ public class Note {
     private int color;
     private int index;
 
+    public Note(String title, String text, int color, String date){
+        this.title = title;
+        this.text = text;
+        this.date = date;
+        this.color = color;
+    }
+
     public Note(String title, String text, int color){
         this.title = title;
         this.text = text;

@@ -54,6 +54,10 @@ public class NoteEditActivity extends AppCompatActivity {
         TextView dateView = findViewById(R.id.date);
         int fontSize = UTIL.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
 
+        // Check previous activity's caller
+        boolean isTrash = false;
+        if ("TrashActivity".equals(getIntent().getStringExtra("caller"))) isTrash = true;
+
         // Set attributes of EditTexts
         String text = getIntent().getStringExtra("savedText");
         String title = getIntent().getStringExtra("savedTitle");
@@ -64,19 +68,29 @@ public class NoteEditActivity extends AppCompatActivity {
         titleView.setPadding(50, 50, 50, 0);
         textView.setPadding(50, 50, 50, 50);
 
+        Log.d("trash_debug", "1");
+
         if (text != null) { // Case where user is editing old note
-            //index = getIntent().getIntExtra("index", 0);
-            Note currentNote = UTIL.getNotes("notes")
-                    .get(getIntent().getIntExtra("index", 0));
+            Log.d("trash_debug", "in if statement");
+
+            Note currentNote;
+            // Retrive ArrayList depending on if user entered from activity trash or home
+            if (!isTrash)
+                currentNote = UTIL.getNotes("notes")
+                        .get(getIntent().getIntExtra("index", 0));
+            else
+                currentNote = UTIL.getNotes("trash")
+                        .get(getIntent().getIntExtra("index", 0));
+
             dateView.setText(getString(R.string.date_created, currentNote.getDate()));
+
             //dateView.setText("Date Created: " + currentNote.getDate());
             if (title != null) titleView.setText(title);
             textView.setText(text); // Set the text on the note page as the old string
             textView.setSelection(textView.getText().length()); // Set cursor to the end
             textView.requestFocus();
-        } else {
+        } else
             dateView.setText(getString(R.string.date_created, UTIL.currentDate()));
-        }
 
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
@@ -150,10 +164,10 @@ public class NoteEditActivity extends AppCompatActivity {
         String text = getIntent().getStringExtra("savedText");
         String title = getIntent().getStringExtra("savedTitle");
         String caller = getIntent().getStringExtra("caller");
+        int index = getIntent().getIntExtra("index", 0);
         ArrayList<Note> trashList;
 
         //getIntent().putExtra("color", colorPicked);
-
 
         // Make sure future calls do not return null pointer
         if (caller == null) return;
@@ -165,13 +179,15 @@ public class NoteEditActivity extends AppCompatActivity {
         }
         ArrayList<Note> list  = UTIL.getNotes("notes");
 
+        String date = list.get(index).getDate();
+
 
         if (text != null) { // save the note to trash while deleting from main notes
             if (caller.equals("TrashActivity")) {
                 trashList.remove(getIntent().getIntExtra("index", 0)); //remove from trash can
             } else {
-                trashList.add(new Note(title, text, colorPicked));
-                list.remove(getIntent().getIntExtra("index", 0));
+                trashList.add(new Note(title, text, colorPicked, list.get(index).getDate()));
+                list.remove(index);
             }
             UTIL.saveNotes(list, "notes");
 
@@ -194,8 +210,12 @@ public class NoteEditActivity extends AppCompatActivity {
         trash = UTIL.getNotes("trash");
         list = UTIL.getNotes("notes");
 
+        Log.d("date_test", "Date: " + trash.get(index).getDate());
+
         list.add(trash.get(index));
         trash.remove(index);
+
+        Log.d("date_test", list.get(list.size() - 1).getDate());
 
         UTIL.saveNotes(trash, "trash");
         UTIL.saveNotes(list, "notes");

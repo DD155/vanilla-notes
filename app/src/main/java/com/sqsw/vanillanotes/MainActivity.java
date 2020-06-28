@@ -344,9 +344,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void sortDialog() {
         String[] items = getResources().getStringArray(R.array.sort_values);
+        CharSequence[] item = {"Test", "test2"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Sort");
-        builder.setMessage("Choose your sort");
+        builder.setCancelable(true);
+        builder.setSingleChoiceItems(items, 0, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int index) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setCanceledOnTouchOutside(true);
+        alertDialog.show();
 
     }
 
