@@ -35,6 +35,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.sqsw.vanillanotes.settings.SettingsActivity;
 
 import java.util.ArrayList;
@@ -351,6 +352,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sortDialog() {
+        final SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        if (selectedSortItem != prefs.getInt("sort_index", 0)){
+            selectedSortItem = prefs.getInt("sort_index", 0);
+        }
+
         String[] items = getResources().getStringArray(R.array.sort_values);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Sort");
@@ -359,6 +365,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int index) {
                 selectedSortItem = index;
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt("sort_index", index);
+                editor.apply();
             }
         });
 
@@ -384,39 +393,34 @@ public class MainActivity extends AppCompatActivity {
     // Type 4 = Custom Sort (User created sort)
     private void sortNotes(int type){
         ArrayList<Note> notes = UTIL.getNotes("notes");
-        ArrayList<Note> sorted;
         switch (type){
             case 0:
                 Log.d("selected_index", "case 0");
                 Collections.sort(notes, new NoteComparator());
-                sorted = notes;
-                UTIL.saveNotes(sorted, "notes");
+                UTIL.saveNotes(notes, "notes");
                 refreshActivity();
                 break;
             case 1:
                 Log.d("selected_index", "case 1");
                 Collections.sort(notes, new NoteComparator());
                 Collections.reverse(notes);
-                sorted = notes;
-                UTIL.saveNotes(sorted, "notes");
+                UTIL.saveNotes(notes, "notes");
                 refreshActivity();
                 break;
             case 2:
                 Collections.sort(notes, new DateComparator());
-                sorted = notes;
-                UTIL.saveNotes(sorted, "notes");
+                UTIL.saveNotes(notes, "notes");
                 refreshActivity();
                 break;
             case 3:
                 Collections.sort(notes, new DateComparator());
                 Collections.reverse(notes);
-                sorted = notes;
-                UTIL.saveNotes(sorted, "notes");
+                UTIL.saveNotes(notes, "notes");
                 refreshActivity();
                 break;
 
             case 4:
-
+                // TODO: Custom sort
                 break;
         }
     }
