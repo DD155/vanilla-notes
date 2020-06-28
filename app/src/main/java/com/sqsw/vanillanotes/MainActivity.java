@@ -38,6 +38,8 @@ import android.widget.Toast;
 import com.sqsw.vanillanotes.settings.SettingsActivity;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
     //private GestureDetector detector;
@@ -57,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         // Create notification channel
         createNotificationChannel();
+
+        sortByTitle();
 
         Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("Notes");
@@ -345,7 +349,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void sortDialog() {
         String[] items = getResources().getStringArray(R.array.sort_values);
-        CharSequence[] item = {"Test", "test2"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Sort");
         builder.setCancelable(true);
@@ -360,12 +363,52 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.dismiss();
+                sortNotes(selectedSortItem);
             }
         });
 
         AlertDialog alertDialog = builder.create();
         alertDialog.setCanceledOnTouchOutside(true);
         alertDialog.show();
+    }
+
+    // Function for sort based on user selection of previous dialog above
+    // Type 0 = Sort by Title (Ascending)
+    // Type 1 = Sort by Title (Descending)
+    // Type 2 = Sort by Date Created (Ascending)
+    // Type 3 = Sort by Date Created (Descending)
+    // Type 4 = Custom Sort (User created sort)
+    private void sortNotes(int type){
+        ArrayList<Note> notes = UTIL.getNotes("notes");
+        switch (type){
+            case 0:
+                Collections.sort(notes, new SortTitleAscending());
+                UTIL.saveNotes(notes, "notes");
+                finish();
+                startActivity(getIntent());
+            case 1:
+                Collections.sort(notes, new SortTitleAscending());
+                Collections.reverse(notes);
+                UTIL.saveNotes(notes, "notes");
+                finish();
+                startActivity(getIntent());
+
+            case 2:
+
+            case 3:
+
+            case 4:
+
+        }
+    }
+
+    private void sortByTitle(){
+        ArrayList<Note> notes = UTIL.getNotes("notes");
+        for (int i = 0; i < notes.size(); i++) Log.d("sort_test", "Unsorted: " + notes.get(i).getTitle());
+
+        Collections.sort(notes, new SortTitleAscending());
+
+        for (int i = 0; i < notes.size(); i++) Log.d("sort_test", "Sorted: " + notes.get(i).getTitle());
 
     }
 
