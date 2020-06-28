@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     //private GestureDetector detector;
     private static final String CHANNEL_ID = "NoteChannel";
     private final Utility UTIL = new Utility(this);
+    private int selectedSortItem = 0;
     //private ArrayList<Note> deleteNotes;
     //private ArrayAdapter<Note> adapter;
     //private ActionMode actionMode;
@@ -348,9 +349,16 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Sort");
         builder.setCancelable(true);
-        builder.setSingleChoiceItems(items, 0, new DialogInterface.OnClickListener() {
+        builder.setSingleChoiceItems(items, selectedSortItem, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int index) {
+                selectedSortItem = index;
+            }
+        });
+
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.dismiss();
             }
         });
