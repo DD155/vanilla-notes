@@ -362,6 +362,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                Log.d("selected_index", selectedSortItem + "");
                 dialogInterface.dismiss();
                 sortNotes(selectedSortItem);
             }
@@ -382,34 +383,41 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Note> notes = UTIL.getNotes("notes");
         switch (type){
             case 0:
-                Collections.sort(notes, new SortTitleAscending());
+                Log.d("selected_index", "case 0");
+                Collections.sort(notes, new NoteComparator());
                 UTIL.saveNotes(notes, "notes");
-                finish();
-                startActivity(getIntent());
+                refreshActivity();
+                break;
             case 1:
-                Collections.sort(notes, new SortTitleAscending());
+                Log.d("selected_index", "case 1");
+                Collections.sort(notes, new NoteComparator());
                 Collections.reverse(notes);
                 UTIL.saveNotes(notes, "notes");
-                finish();
-                startActivity(getIntent());
-
+                refreshActivity();
+                break;
             case 2:
+
+                break;
 
             case 3:
 
+                break;
+
             case 4:
 
+                break;
         }
     }
 
     private void sortByTitle(){
+        /*
         ArrayList<Note> notes = UTIL.getNotes("notes");
         for (int i = 0; i < notes.size(); i++) Log.d("sort_test", "Unsorted: " + notes.get(i).getTitle());
 
         Collections.sort(notes, new SortTitleAscending());
 
         for (int i = 0; i < notes.size(); i++) Log.d("sort_test", "Sorted: " + notes.get(i).getTitle());
-
+           */
     }
 
     // Creates dialog for the clear
@@ -448,6 +456,13 @@ public class MainActivity extends AppCompatActivity {
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
+    }
+
+    private void refreshActivity(){
+        finish();
+        overridePendingTransition(0, 0);
+        startActivity(getIntent());
+        overridePendingTransition(0, 0);
     }
 }
 
