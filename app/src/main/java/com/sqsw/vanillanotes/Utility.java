@@ -19,8 +19,8 @@ import java.util.Calendar;
 // utility class for other activities
 public class Utility extends ContextWrapper {
 
-    public final int FONT_SMALL = 12;
-    public final int FONT_MEDIUM = 15;
+    public final int FONT_SMALL = 11;
+    public final int FONT_MEDIUM = 14;
     public final int FONT_LARGE = 17;
 
     public Utility(Context base) {

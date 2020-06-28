@@ -62,19 +62,15 @@ public class MainActivity extends AppCompatActivity {
         // Create notification channel
         createNotificationChannel();
 
-        sortByTitle();
-
-        Log.d("amount_db", UTIL.getNotes("notes").size() + "" );
-
         Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("Notes");
         setSupportActionBar(myToolbar);
+
 
         final ArrayList<Note> noteList; // Declare Notes ArrayList
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         final LinearLayout linear = findViewById(R.id.linear);
         final Intent notesActivity = new Intent();
-
 
         if (prefs.contains("notes")) { // Checks if user has notes already
             noteList = UTIL.getNotes("notes");
@@ -351,6 +347,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Create dialog for sorting notes
     private void sortDialog() {
         final SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         if (selectedSortItem != prefs.getInt("sort_index", 0)){
@@ -423,17 +420,6 @@ public class MainActivity extends AppCompatActivity {
                 // TODO: Custom sort
                 break;
         }
-    }
-
-    private void sortByTitle(){
-        /*
-        ArrayList<Note> notes = UTIL.getNotes("notes");
-        for (int i = 0; i < notes.size(); i++) Log.d("sort_test", "Unsorted: " + notes.get(i).getTitle());
-
-        Collections.sort(notes, new SortTitleAscending());
-
-        for (int i = 0; i < notes.size(); i++) Log.d("sort_test", "Sorted: " + notes.get(i).getTitle());
-           */
     }
 
     // Creates dialog for the clear

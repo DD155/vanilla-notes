@@ -67,4 +67,9 @@
     <string name="action_reminder">Set reminder</string>
     <string name="action_color">Set color</string>
     <string name="action_sort">Sort</string>
+    <string name="nav_header_title">Vanilla Notes</string>
+    <string name="nav_item_notes">Notes</string>
+    <string name="nav_item_trash">Trash Can</string>
+    <string name="nav_item_fav">Favorites</string>
+    <string name="nav_item_settings">Settings</string>
 </resources>

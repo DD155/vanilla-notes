@@ -5,7 +5,7 @@ public class Note {
     private String text;
     private String date;
     private int color;
-    private int index;
+    private int index; // TODO: Implement indexing for custom user sort
 
     public Note(String title, String text, int color, String date){
         this.title = title;
