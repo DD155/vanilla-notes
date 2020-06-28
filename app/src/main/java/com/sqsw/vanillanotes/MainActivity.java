@@ -40,6 +40,7 @@ import com.sqsw.vanillanotes.settings.SettingsActivity;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     //private GestureDetector detector;
@@ -61,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
         createNotificationChannel();
 
         sortByTitle();
+
+        Log.d("amount_db", UTIL.getNotes("notes").size() + "" );
 
         Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("Notes");
@@ -381,26 +384,35 @@ public class MainActivity extends AppCompatActivity {
     // Type 4 = Custom Sort (User created sort)
     private void sortNotes(int type){
         ArrayList<Note> notes = UTIL.getNotes("notes");
+        ArrayList<Note> sorted;
         switch (type){
             case 0:
                 Log.d("selected_index", "case 0");
                 Collections.sort(notes, new NoteComparator());
-                UTIL.saveNotes(notes, "notes");
+                sorted = notes;
+                UTIL.saveNotes(sorted, "notes");
                 refreshActivity();
                 break;
             case 1:
                 Log.d("selected_index", "case 1");
                 Collections.sort(notes, new NoteComparator());
                 Collections.reverse(notes);
-                UTIL.saveNotes(notes, "notes");
+                sorted = notes;
+                UTIL.saveNotes(sorted, "notes");
                 refreshActivity();
                 break;
             case 2:
-
+                Collections.sort(notes, new DateComparator());
+                sorted = notes;
+                UTIL.saveNotes(sorted, "notes");
+                refreshActivity();
                 break;
-
             case 3:
-
+                Collections.sort(notes, new DateComparator());
+                Collections.reverse(notes);
+                sorted = notes;
+                UTIL.saveNotes(sorted, "notes");
+                refreshActivity();
                 break;
 
             case 4:
@@ -461,7 +473,7 @@ public class MainActivity extends AppCompatActivity {
     private void refreshActivity(){
         finish();
         overridePendingTransition(0, 0);
-        startActivity(getIntent());
+        UTIL.goToActivity(MainActivity.class, "MainActivity", this);
         overridePendingTransition(0, 0);
     }
 }
