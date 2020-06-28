@@ -1,8 +1,12 @@
 package com.sqsw.vanillanotes;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -35,7 +39,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
+import com.sqsw.vanillanotes.nav_fragments.FavoritesFragment;
+import com.sqsw.vanillanotes.nav_fragments.NoteFragment;
+import com.sqsw.vanillanotes.nav_fragments.SettingFragment;
+import com.sqsw.vanillanotes.nav_fragments.TrashFragment;
 import com.sqsw.vanillanotes.settings.SettingsActivity;
 
 import java.util.ArrayList;
@@ -47,7 +56,9 @@ public class MainActivity extends AppCompatActivity {
     //private GestureDetector detector;
     private static final String CHANNEL_ID = "NoteChannel";
     private final Utility UTIL = new Utility(this);
-    private int selectedSortItem = 0;
+    private int selectedSortItem = 4;
+    private DrawerLayout drawerLayout;
+    private LinearLayout linear;
     //private ArrayList<Note> deleteNotes;
     //private ArrayAdapter<Note> adapter;
     //private ActionMode actionMode;
@@ -66,10 +77,47 @@ public class MainActivity extends AppCompatActivity {
         myToolbar.setTitle("Notes");
         setSupportActionBar(myToolbar);
 
+        // Set up navigation drawer
+        drawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.nav_notes:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout,
+                                new NoteFragment()).commit();
+                        break;
+
+                    case R.id.nav_trash:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout,
+                                new TrashFragment()).commit();
+                        break;
+
+                    case R.id.nav_fav:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout,
+                                new FavoritesFragment()).commit();
+                        break;
+
+                    case R.id.nav_settings:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout,
+                                new SettingFragment()).commit();
+                        break;
+                }
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, myToolbar,
+                R.string.nav_drawer_open, R.string.nav_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
 
         final ArrayList<Note> noteList; // Declare Notes ArrayList
         SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        final LinearLayout linear = findViewById(R.id.linear);
+        linear = findViewById(R.id.linear);
         final Intent notesActivity = new Intent();
 
         if (prefs.contains("notes")) { // Checks if user has notes already
@@ -465,6 +513,13 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
         UTIL.goToActivity(MainActivity.class, "MainActivity", this);
         overridePendingTransition(0, 0);
+    }
+
+    @Override
+    public void onBackPressed(){
+        if (drawerLayout.isDrawerOpen(GravityCompat.START))
+            drawerLayout.closeDrawer(GravityCompat.START);
+        else super.onBackPressed();
     }
 }
 
