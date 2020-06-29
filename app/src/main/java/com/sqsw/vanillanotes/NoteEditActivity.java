@@ -43,7 +43,7 @@ public class NoteEditActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_note_edit);
+        setContentView(R.layout.note_edit_layout);
 
         Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("Edit");

@@ -16,6 +16,6 @@ public class FavoritesFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.activity_note_edit, container, false);
+        return inflater.inflate(R.layout.note_edit_layout, container, false);
     }
 }

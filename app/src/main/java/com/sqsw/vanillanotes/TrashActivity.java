@@ -37,7 +37,7 @@ public class TrashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trash);
+        setContentView(R.layout.notes_layout);
 
         Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("Trash");

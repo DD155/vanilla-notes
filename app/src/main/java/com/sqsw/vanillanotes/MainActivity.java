@@ -7,6 +7,8 @@ import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -65,17 +67,37 @@ public class MainActivity extends AppCompatActivity {
     //private boolean isHeld = false;
 
 
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // Create notification channel
+        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         createNotificationChannel();
 
         Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("Notes");
         setSupportActionBar(myToolbar);
+
+        // Send information to fragments
+        final FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+
+        Bundle bundle = new Bundle();
+
+        final ArrayList<Note> noteList; // Declare Notes ArrayList
+
+        // Checks if user has notes already
+        if (prefs.contains("notes")) {
+            noteList = UTIL.getNotes("notes");
+        }
+        else { // Otherwise just make the new ArrayList
+            noteList = new ArrayList<>();
+        }
+
+        Fragment fragment = NoteFragment.newInstance(noteList);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, fragment).commit();
 
         // Set up navigation drawer
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -85,8 +107,8 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.nav_notes:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout,
-                                new NoteFragment()).commit();
+                        Fragment fragment = NoteFragment.newInstance(noteList);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, fragment).commit();
                         break;
 
                     case R.id.nav_trash:
@@ -100,8 +122,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
 
                     case R.id.nav_settings:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout,
-                                new SettingFragment()).commit();
+                        UTIL.goToActivity(SettingsActivity.class, "MainActivity", getApplicationContext());
                         break;
                 }
                 drawerLayout.closeDrawer(GravityCompat.START);
@@ -109,21 +130,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        navigationView.getMenu().getItem(0).setChecked(true);
+
+        // Set Navigation Button on Toolbar
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, myToolbar,
                 R.string.nav_drawer_open, R.string.nav_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
+    }
 
 
-        final ArrayList<Note> noteList; // Declare Notes ArrayList
-        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        /*
         linear = findViewById(R.id.linear);
         final Intent notesActivity = new Intent();
 
-        if (prefs.contains("notes")) { // Checks if user has notes already
-            noteList = UTIL.getNotes("notes");
-        } // Otherwise just make the new ArrayList
-        else noteList = new ArrayList<>();
+
+
+        //getSupportFragmentManager().beginTransaction().add(R.id.fragment_layout, fragobj);
+
 
         // Information from edited note activity
         Intent caller = getIntent();
@@ -165,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                     // Create array of the text without any new lines
                     description = strParts[0] + "\n" + util.addEllipsis(strParts[1]); // Concatenate everything
                 }
-                 */
+
 
                 // Make the title larger than the description
                 SpannableString str = new SpannableString(title + "\n" + description);
@@ -265,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
 
                         return true;
                     }
-                });*/
+                });
             }
         }
     }
@@ -299,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
         public void onDestroyActionMode(ActionMode mode) {
             actionMode = null;
         }
-    }; */
+    };
 
 
     // Set attributes for TextView depending on dpi
@@ -492,7 +516,7 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog alert = builder.create();
         alert.show();
     }
-
+       */
     // Create the NotificationChannel, but only on API 26+ because
     // the NotificationChannel class is new and not in the support library
     private void createNotificationChannel() {
