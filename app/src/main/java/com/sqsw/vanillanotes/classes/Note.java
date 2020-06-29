@@ -1,4 +1,4 @@
-package com.sqsw.vanillanotes;
+package com.sqsw.vanillanotes.classes;
 
 import java.io.Serializable;
 

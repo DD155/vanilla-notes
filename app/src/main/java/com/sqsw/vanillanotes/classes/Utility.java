@@ -1,4 +1,4 @@
-package com.sqsw.vanillanotes;
+package com.sqsw.vanillanotes.classes;
 
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -11,12 +11,13 @@ import android.graphics.drawable.Drawable;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.sqsw.vanillanotes.R;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-// utility class for other activities
+// utility class for other com.sqsw.vanillanotes.activities
 public class Utility extends ContextWrapper {
 
     public final int FONT_SMALL = 11;

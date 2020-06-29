@@ -44,7 +44,7 @@
     <string name="action_clear">Clear all notes</string>
     <string name="action_reminder">Set reminder</string>
     <string name="action_color">Set color</string>
-    <string name="action_sort">Sort</string>
+    <string name="action_sort">Sort notes</string>
 
     <!-- Preference Titles -->
     <string name="settings_notes">Notes</string>

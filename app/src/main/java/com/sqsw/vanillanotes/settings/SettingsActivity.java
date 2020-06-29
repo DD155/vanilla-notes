@@ -8,9 +8,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.sqsw.vanillanotes.MainActivity;
+import com.sqsw.vanillanotes.activities.MainActivity;
 import com.sqsw.vanillanotes.R;
-import com.sqsw.vanillanotes.TrashActivity;
+import com.sqsw.vanillanotes.activities.TrashActivity;
 
 public class SettingsActivity extends AppCompatActivity {
 

@@ -1,9 +1,9 @@
-package com.sqsw.vanillanotes;
+package com.sqsw.vanillanotes.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -11,48 +11,32 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.InputFilter;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
-import com.google.gson.Gson;
+import com.sqsw.vanillanotes.classes.DateComparator;
+import com.sqsw.vanillanotes.classes.Note;
+import com.sqsw.vanillanotes.R;
+import com.sqsw.vanillanotes.classes.NoteComparator;
+import com.sqsw.vanillanotes.classes.Utility;
 import com.sqsw.vanillanotes.nav_fragments.FavoritesFragment;
 import com.sqsw.vanillanotes.nav_fragments.NoteFragment;
-import com.sqsw.vanillanotes.nav_fragments.SettingFragment;
 import com.sqsw.vanillanotes.nav_fragments.TrashFragment;
 import com.sqsw.vanillanotes.settings.SettingsActivity;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     //private GestureDetector detector;
@@ -84,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         // Send information to fragments
         final FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
-        Bundle bundle = new Bundle();
+        final Bundle bundle = new Bundle();
 
         final ArrayList<Note> noteList; // Declare Notes ArrayList
 
@@ -96,8 +80,25 @@ public class MainActivity extends AppCompatActivity {
             noteList = new ArrayList<>();
         }
 
-        Fragment fragment = NoteFragment.newInstance(noteList);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, fragment).commit();
+        Intent caller = getIntent();
+        final String editedText = caller.getStringExtra("note");
+        final String titleText = caller.getStringExtra("title");
+        final String date = caller.getStringExtra("date");
+        final int color = caller.getIntExtra("color", 0);
+        if (date != null)
+            Log.d("date_log", date);
+
+        if (editedText != null){ // If the user has input text already, add new note with that text
+            Note newNote = new Note(editedText);
+            newNote.setDate(date);
+            if (titleText != null) newNote.setTitle(titleText); // Check if there is a title
+            if (color != -1) newNote.setColor(color);
+            noteList.add(newNote);
+
+            UTIL.saveNotes(noteList, "notes");
+        }
+
+
 
         // Set up navigation drawer
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -130,6 +131,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Default fragment
+        Fragment fragment = NoteFragment.newInstance(noteList);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, fragment).commit();
         navigationView.getMenu().getItem(0).setChecked(true);
 
         // Set Navigation Button on Toolbar
@@ -380,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
 
         Toast.makeText(getApplicationContext(), getString(R.string.clear_notes_toast), Toast.LENGTH_LONG).show();
     }
-
+    */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -411,7 +415,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_clear:
-                createDialog();
+                //createDialog();
                 return true;
 
             default:
@@ -454,6 +458,7 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+
     // Function for sort based on user selection of previous dialog above
     // Type 0 = Sort by Title (Ascending)
     // Type 1 = Sort by Title (Descending)
@@ -493,7 +498,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
     }
-
+    /*
     // Creates dialog for the clear
     private void createDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

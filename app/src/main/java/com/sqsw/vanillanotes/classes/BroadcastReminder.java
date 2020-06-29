@@ -1,4 +1,4 @@
-package com.sqsw.vanillanotes;
+package com.sqsw.vanillanotes.classes;
 
 import android.app.Notification;
 import android.app.NotificationManager;

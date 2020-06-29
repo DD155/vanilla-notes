@@ -2,7 +2,6 @@ package com.sqsw.vanillanotes.nav_fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -17,21 +16,25 @@ import android.text.style.StyleSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.sqsw.vanillanotes.Note;
-import com.sqsw.vanillanotes.NoteEditActivity;
+import com.sqsw.vanillanotes.classes.Note;
+import com.sqsw.vanillanotes.activities.NoteEditActivity;
 import com.sqsw.vanillanotes.R;
-import com.sqsw.vanillanotes.Utility;
+import com.sqsw.vanillanotes.classes.Utility;
 
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.solver.widgets.Helper;
 import androidx.fragment.app.Fragment;
 
@@ -64,7 +67,7 @@ public class NoteFragment extends Fragment {
         //SharedPreferences prefs = getContext().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         linear = view.findViewById(R.id.linear);
         UTIL = new Utility(getActivity().getApplicationContext());
-
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Notes");
         Bundle bundle = getArguments();
 
         Log.d("Frag_test", "clear 1");
@@ -79,11 +82,13 @@ public class NoteFragment extends Fragment {
         Log.d("Frag_test", "clear 2");
 
 
+
+        if (noteList == null) Log.d("frag_test", "notes are null");
         if (noteList.size() != 0) { // Makes sure user has already notes, loads them on entering app
             for (int i = 0; i < noteList.size(); i++) {
                 final TextView text = new TextView(getContext());
                 final Note currNote = noteList.get(i);
-                Log.d("Frag_test", "clear 3");
+
                 String title = currNote.getTitle();
                 String description = currNote.getText();
                 Log.d("Frag_test", "clear 4");
@@ -188,6 +193,7 @@ public class NoteFragment extends Fragment {
                 });
             }
         }
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -227,5 +233,15 @@ public class NoteFragment extends Fragment {
         if (UTIL.isDarkColor(color))
             text.setTextColor(getResources().getColor(R.color.white));
         else text.setTextColor(getResources().getColor(R.color.textColor));
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        return super.onOptionsItemSelected(item);
     }
 }

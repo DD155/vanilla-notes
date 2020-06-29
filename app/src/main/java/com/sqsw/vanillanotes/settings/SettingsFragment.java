@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.sqsw.vanillanotes.Note;
+import com.sqsw.vanillanotes.classes.Note;
 import com.sqsw.vanillanotes.R;
 
 import androidx.annotation.NonNull;

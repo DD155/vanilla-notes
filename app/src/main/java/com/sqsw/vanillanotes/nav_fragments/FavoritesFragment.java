@@ -9,6 +9,7 @@ import com.sqsw.vanillanotes.R;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 public class FavoritesFragment extends Fragment {
@@ -16,6 +17,7 @@ public class FavoritesFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.note_edit_layout, container, false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Favorites");
+        return inflater.inflate(R.layout.notes_layout, container, false);
     }
 }
