@@ -17,6 +17,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
@@ -38,16 +39,23 @@ import com.sqsw.vanillanotes.settings.SettingsActivity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 public class NoteEditActivity extends AppCompatActivity {
     private final Utility UTIL = new Utility(this);
     private Context mContext = this;
     private int colorPicked = -1;
+    private int id = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.note_edit_layout);
+
+        if (getSharedPreferences("ID", Context.MODE_PRIVATE).getInt("id", 0) != 0) {
+           id = getSharedPreferences("ID", Context.MODE_PRIVATE).getInt("id", 0);
+        }
+
 
         Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("Edit");
@@ -397,16 +405,18 @@ public class NoteEditActivity extends AppCompatActivity {
 
     // Notification Functions
 
-    private Notification buildNotification() {
-        EditText text = findViewById(R.id.editText);
-        EditText title = findViewById(R.id.titleText);
-        String message = text.getText().toString().trim();
-        String titleMessage = title.getText().toString().trim();
+    private Notification buildNotification(String title, String note) {
+        //EditText text = findViewById(R.id.editText);
+        //EditText title = findViewById(R.id.titleText);
+        //String message = text.getText().toString().trim();
+        //String titleMessage = title.getText().toString().trim();
+
+        Log.d("notif_test", title);
 
         // Create an Intent for the activity
         Intent intent = new Intent(this, NoteEditActivity.class);
-        intent.putExtra("savedTitle", titleMessage);
-        intent.putExtra("savedText", message);
+        intent.putExtra("savedTitle", title);
+        intent.putExtra("savedText", note);
         intent.putExtra("caller", getIntent().getStringExtra("caller"));
         intent.putExtra("index", getIntent().getIntExtra("index", 0));
         // Create the TaskStackBuilder and add the intent, which inflates the back stack
@@ -419,11 +429,12 @@ public class NoteEditActivity extends AppCompatActivity {
         // Build the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "NoteChannel")
                 .setSmallIcon(R.drawable.ic_baseline_event_note_24)
-                .setContentTitle(title.getText())
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                .setContentTitle(title)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(note))
                 .setAutoCancel(true)
-                .setContentText(message)
+                .setContentText(note)
                 .setContentIntent(resultPendingIntent)
+                .setGroupSummary(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         return builder.build();
@@ -431,8 +442,11 @@ public class NoteEditActivity extends AppCompatActivity {
 
     // Calls notify on the made notification
     private void showNotification(){
+        String title = ((EditText)(findViewById(R.id.titleText))).getText().toString();
+        String note = ((EditText)(findViewById(R.id.editText))).getText().toString();
+        int m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
-        notificationManagerCompat.notify(100, buildNotification());
+        notificationManagerCompat.notify(m, buildNotification(title, note));
         refreshDrawables(colorPicked);
     }
 
@@ -445,6 +459,8 @@ public class NoteEditActivity extends AppCompatActivity {
         final int year = calendar.get(Calendar.YEAR);
         final int month = calendar.get(Calendar.MONTH);
         final int day = calendar.get(Calendar.DAY_OF_MONTH);
+        final String title = ((EditText)(findViewById(R.id.titleText))).getText().toString();
+        final String note = ((EditText)(findViewById(R.id.editText))).getText().toString();
 
         // Create Date Dialog
         DatePickerDialog datePickerDialog = new DatePickerDialog(mContext, android.R.style.Theme_DeviceDefault_Light_Dialog,
@@ -458,7 +474,7 @@ public class NoteEditActivity extends AppCompatActivity {
                 TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hr, int min) {
-                        createScheduledNotification(buildNotification(), hr, min, y, m, d);
+                        createScheduledNotification(buildNotification(title, note), hr, min, y, m, d);
                         //Toast.makeText(util, pickedTime, Toast.LENGTH_SHORT).show();
                     }
                 }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
@@ -468,14 +484,22 @@ public class NoteEditActivity extends AppCompatActivity {
         //datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable((Color.TRANSPARENT)));
         datePickerDialog.show();
     }
-
     // Create a scheduled notification based on user input from previous dialogs
     private void createScheduledNotification(Notification notification, int hour, int min, int year, int month, int day){
         // Create Alarm Manager for Notification
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        Intent notificationIntent = new Intent( this, BroadcastReminder. class );
+        Intent notificationIntent = new Intent( this, BroadcastReminder.class);
+        Log.d("notif_test2", "Title: " + (((EditText)findViewById(R.id.titleText)).getText().toString().trim())
+        + "\nContent: " + (((EditText)findViewById(R.id.editText)).getText().toString().trim()));
+
         notificationIntent.putExtra("notification", notification);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
+
+        SharedPreferences.Editor editor = getSharedPreferences("ID", Context.MODE_PRIVATE).edit();
+        editor.putInt("id", id++);
+        editor.putString("curr_title", (((EditText)findViewById(R.id.titleText)).getText().toString().trim()));
+        editor.putString("curr_content", (((EditText)findViewById(R.id.editText)).getText().toString().trim()));
+        editor.apply();
 
         // Create calendar for scheduled event
         Calendar calendar = Calendar.getInstance();
@@ -487,7 +511,7 @@ public class NoteEditActivity extends AppCompatActivity {
         calendar.set(Calendar.YEAR, year);
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, min);
-        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.SECOND, 1);
 
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         refreshDrawables(colorPicked);
