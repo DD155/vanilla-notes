@@ -114,9 +114,6 @@ public class NoteEditActivity extends AppCompatActivity {
             textView.setBackgroundResource(R.drawable.shadow_border);
             titleView.setBackgroundResource(R.drawable.shadow_border);
         }
-
-
-
     }
 
     // Save the text of the note to the previous activity
@@ -436,6 +433,7 @@ public class NoteEditActivity extends AppCompatActivity {
     private void showNotification(){
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManagerCompat.notify(100, buildNotification());
+        refreshDrawables(colorPicked);
     }
 
     // Creates the dialog for the scheduled notification. First opens up date dialog then time dialog.
@@ -492,6 +490,8 @@ public class NoteEditActivity extends AppCompatActivity {
         calendar.set(Calendar.SECOND, 0);
 
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+        refreshDrawables(colorPicked);
+        Toast.makeText(mContext, "Reminder set", Toast.LENGTH_SHORT).show();
     }
 
     // Shows a dialog when the user presses back while editing a note
@@ -506,5 +506,11 @@ public class NoteEditActivity extends AppCompatActivity {
         } else {
             Log.e("NoteActivity", "Caller is null");
         }
+    }
+
+    // Refresh drawables when creating notifications because they change them for some reason
+    private void refreshDrawables(int color){
+        findViewById(R.id.titleText).setBackground(UTIL.changeDrawableColor(R.drawable.shadow_border, color));
+        findViewById(R.id.editText).setBackground(UTIL.changeDrawableColor(R.drawable.shadow_border, color));
     }
 }
