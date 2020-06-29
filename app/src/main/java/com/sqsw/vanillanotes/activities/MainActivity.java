@@ -17,6 +17,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -124,6 +125,10 @@ public class MainActivity extends AppCompatActivity {
 
                     case R.id.nav_settings:
                         UTIL.goToActivity(SettingsActivity.class, "MainActivity", getApplicationContext());
+                        break;
+
+                    case R.id.nav_about:
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/DD155/vanilla-notes")));
                         break;
                 }
                 drawerLayout.closeDrawer(GravityCompat.START);

@@ -100,11 +100,16 @@ public class NoteEditActivity extends AppCompatActivity {
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
         titleView.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
 
+        // Change color of the background depending on what the user chose
         if (getIntent().getIntExtra("color", 0) != -1 && getIntent().getIntExtra("color", 0) != 0){
             colorPicked = getIntent().getIntExtra("color", 0);
             Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, getIntent().getIntExtra("color", 0));
             titleView.setBackground(drawable);
             textView.setBackground(drawable);
+            if (UTIL.isDarkColor(colorPicked)) {
+                titleView.setTextColor(getResources().getColor(R.color.white));
+                textView.setTextColor(getResources().getColor(R.color.white));
+            }
         } else {
             textView.setBackgroundResource(R.drawable.shadow_border);
             titleView.setBackgroundResource(R.drawable.shadow_border);
@@ -305,6 +310,14 @@ public class NoteEditActivity extends AppCompatActivity {
 
                 title.setBackground(drawable);
                 text.setBackground(drawable);
+
+                if (UTIL.isDarkColor(color)){
+                    ((TextView)findViewById(R.id.editText)).setTextColor(getResources().getColor(R.color.white));
+                    ((TextView)findViewById(R.id.titleText)).setTextColor(getResources().getColor(R.color.white));
+                } else {
+                    ((TextView)findViewById(R.id.editText)).setTextColor(getResources().getColor(R.color.textColor));
+                    ((TextView)findViewById(R.id.titleText)).setTextColor(getResources().getColor(R.color.textColor));
+                }
 
             }
 
