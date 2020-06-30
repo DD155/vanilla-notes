@@ -501,18 +501,21 @@ public class NoteEditActivity extends AppCompatActivity {
     private void createScheduledNotification(Notification notification, int hour, int min, int year, int month, int day){
         // Create Alarm Manager for Notification
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        Intent notificationIntent = new Intent( this, BroadcastReminder.class);
-        Log.d("notif_test2", "Title: " + (((EditText)findViewById(R.id.titleText)).getText().toString().trim())
-        + "\nContent: " + (((EditText)findViewById(R.id.editText)).getText().toString().trim()));
 
-        notificationIntent.putExtra("notification", notification);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
+        int id = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
+        Log.d("notif_test2", "Generated ID: " + id);
 
         SharedPreferences.Editor editor = getSharedPreferences("ID", Context.MODE_PRIVATE).edit();
-        editor.putInt("id", (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE));
+        editor.putInt("id", id);
         editor.putString("curr_title", (((EditText)findViewById(R.id.titleText)).getText().toString().trim()));
         editor.putString("curr_content", (((EditText)findViewById(R.id.editText)).getText().toString().trim()));
         editor.apply();
+
+        Intent notificationIntent = new Intent( this, BroadcastReminder.class);
+
+        notificationIntent.putExtra("gen_id", id);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id, notificationIntent, 0);
 
         // Create calendar for scheduled event
         Calendar calendar = Calendar.getInstance();
@@ -524,7 +527,7 @@ public class NoteEditActivity extends AppCompatActivity {
         calendar.set(Calendar.YEAR, year);
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, min);
-        calendar.set(Calendar.SECOND, 1);
+        calendar.set(Calendar.SECOND, 0);
 
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         refreshDrawables(colorPicked);

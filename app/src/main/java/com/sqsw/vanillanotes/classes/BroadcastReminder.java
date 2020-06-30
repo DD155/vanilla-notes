@@ -18,14 +18,13 @@ import androidx.core.app.NotificationCompat;
 public class BroadcastReminder extends BroadcastReceiver {
     public void onReceive (Context context, Intent intent) {
         SharedPreferences pref = context.getSharedPreferences("ID", Context.MODE_PRIVATE);
-        int id = pref.getInt("id", 0);
+        int id = intent.getIntExtra("gen_id", 0);
 
         String title = pref.getString("curr_title", null);
         String content = pref.getString("curr_content", null);
 
-        Log.d("notif_test2", "ID: "+ id);
-        Log.d("notif_test2", title);
-        Log.d("notif_test2", content);
+        Log.d("notif_test2", "Retrieved ID: "+ id);
+
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "NoteChannel")
                 .setSmallIcon(R.drawable.ic_baseline_event_note_24)
