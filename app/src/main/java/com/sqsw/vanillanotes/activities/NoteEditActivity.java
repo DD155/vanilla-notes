@@ -25,6 +25,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -68,7 +69,7 @@ public class NoteEditActivity extends AppCompatActivity {
 
         // Check previous activity's caller
         boolean isTrash = false;
-        if ("TrashActivity".equals(getIntent().getStringExtra("caller"))) isTrash = true;
+        if ("Trash".equals(getIntent().getStringExtra("caller"))) isTrash = true;
 
         // Set attributes of EditTexts
         String text = getIntent().getStringExtra("savedText");
@@ -108,6 +109,14 @@ public class NoteEditActivity extends AppCompatActivity {
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
         titleView.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
 
+        // Refresh drawables when focused on editing title
+        titleView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                refreshDrawables(colorPicked);
+            }
+        });
+
         // Change color of the background depending on what the user chose
         if (getIntent().getIntExtra("color", 0) != -1 && getIntent().getIntExtra("color", 0) != 0){
             colorPicked = getIntent().getIntExtra("color", 0);
@@ -141,7 +150,7 @@ public class NoteEditActivity extends AppCompatActivity {
         // Determine if previous activity was trash activity or not
         if ("MainActivity".equals(caller)) prev = new Intent(getApplicationContext(), MainActivity.class);
         else {
-            prev = new Intent(getApplicationContext(), TrashActivity.class);
+            prev = new Intent(getApplicationContext(), MainActivity.class);
             isTrash = true;
         }
 
@@ -197,7 +206,7 @@ public class NoteEditActivity extends AppCompatActivity {
 
 
         if (text != null) { // save the note to trash while deleting from main notes
-            if (caller.equals("TrashActivity")) {
+            if (caller.equals("Trash")) {
                 trashList.remove(getIntent().getIntExtra("index", 0)); //remove from trash can
             } else {
                 trashList.add(new Note(title, text, colorPicked, list.get(index).getDate()));
@@ -210,10 +219,10 @@ public class NoteEditActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), getString(R.string.delete_toast), Toast.LENGTH_LONG).show();
 
         // Load previously called activity
-        if (caller.equals("TrashActivity")){
-            UTIL.goToActivity(TrashActivity.class, "NoteEditActivity", getApplicationContext());
+        if (caller.equals("Trash")){
+            UTIL.goToActivity(MainActivity.class, "Trash", getApplicationContext());
         } else {
-            UTIL.goToActivity(MainActivity.class, "NoteEditActivity", getApplicationContext());
+            UTIL.goToActivity(MainActivity.class, "Note", getApplicationContext());
         }
     }
 
@@ -243,7 +252,7 @@ public class NoteEditActivity extends AppCompatActivity {
         // Make sure future calls do not return null pointer
         // Inflate the menu; this adds items to the action bar if it is present.
         if (getIntent().getStringExtra("caller") != null) {
-            if ("TrashActivity".equals(getIntent().getStringExtra("caller"))) {
+            if ("Trash".equals(getIntent().getStringExtra("caller"))) {
                 getMenuInflater().inflate(R.menu.trash_note_actions, menu);
             } else
                 getMenuInflater().inflate(R.menu.notes_actions, menu);
@@ -257,12 +266,16 @@ public class NoteEditActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                /*
                 if (getIntent().getStringExtra("caller") != null &&
                         "MainActivity".equals(getIntent().getStringExtra("caller")))
                     confirmDiscardDialog(MainActivity.class);
                     //intent.setClass(getApplicationContext(), MainActivity.class);
                 else
                     confirmDiscardDialog(TrashActivity.class);
+
+                 */
+                confirmDiscardDialog(MainActivity.class);
                 return true;
 
             case R.id.action_settings:
@@ -496,7 +509,7 @@ public class NoteEditActivity extends AppCompatActivity {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
 
         SharedPreferences.Editor editor = getSharedPreferences("ID", Context.MODE_PRIVATE).edit();
-        editor.putInt("id", id++);
+        editor.putInt("id", (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE));
         editor.putString("curr_title", (((EditText)findViewById(R.id.titleText)).getText().toString().trim()));
         editor.putString("curr_content", (((EditText)findViewById(R.id.editText)).getText().toString().trim()));
         editor.apply();
@@ -523,10 +536,14 @@ public class NoteEditActivity extends AppCompatActivity {
     public void onBackPressed() {
         // Make sure future calls do not return null pointer
         if (getIntent().getStringExtra("caller") != null) {
+            /*
             if ("MainActivity".equals(getIntent().getStringExtra("caller")))
                 confirmDiscardDialog(MainActivity.class);
             else
                 confirmDiscardDialog(TrashActivity.class);
+
+             */
+            confirmDiscardDialog(MainActivity.class);
         } else {
             Log.e("NoteActivity", "Caller is null");
         }

@@ -51,6 +51,7 @@ public class Utility extends ContextWrapper {
         Gson gson = new Gson();
         String json = prefs.getString(key, null);
         Type type = new TypeToken<ArrayList<Note>>() {}.getType();
+        if (gson.fromJson(json, type) == null) return new ArrayList<>();
         return gson.fromJson(json, type);
     }
 

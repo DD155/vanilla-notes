@@ -1,7 +1,9 @@
 package com.sqsw.vanillanotes.nav_fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -24,16 +26,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.sqsw.vanillanotes.classes.Note;
 import com.sqsw.vanillanotes.activities.NoteEditActivity;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.classes.Utility;
+import com.sqsw.vanillanotes.settings.SettingsActivity;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.solver.widgets.Helper;
 import androidx.fragment.app.Fragment;
@@ -63,27 +71,15 @@ public class NoteFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.notes_layout, container, false);
-        final ArrayList<Note> noteList; // Declare Notes ArrayList
-        //SharedPreferences prefs = getContext().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        final ArrayList<Note> noteList;
         linear = view.findViewById(R.id.linear);
         UTIL = new Utility(getActivity().getApplicationContext());
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Notes");
-        Bundle bundle = getArguments();
+        //Bundle bundle = getArguments();
 
-        Log.d("Frag_test", "clear 1");
-        if (bundle != null){
-            Log.d("Frag_test", "received info");
-        } else {
-            Log.d("Frag_test", "bundle is null");
-        }
+        //noteList = (ArrayList<Note>)bundle.getSerializable(SERIALIZABLE_KEY);
+        noteList = getNotes("notes");
 
-        noteList = (ArrayList<Note>)bundle.getSerializable(SERIALIZABLE_KEY);
-
-        Log.d("Frag_test", "clear 2");
-
-
-
-        if (noteList == null) Log.d("frag_test", "notes are null");
         if (noteList.size() != 0) { // Makes sure user has already notes, loads them on entering app
             for (int i = 0; i < noteList.size(); i++) {
                 final TextView text = new TextView(getContext());
@@ -91,24 +87,9 @@ public class NoteFragment extends Fragment {
 
                 String title = currNote.getTitle();
                 String description = currNote.getText();
-                Log.d("Frag_test", "clear 4");
 
                 final Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
                 text.setBackground(drawable);
-                Log.d("Frag_test", "clear 5");
-
-                /*
-                String[] strParts = description.split("\\r?\\n|\\r");
-
-                Log.d("length", Integer.toString(strParts[0].length()));
-                if (strParts[0].length() >= 82){
-                    description = util.addEllipsis(strParts[0]);
-                    Log.d("length", Integer.toString(description.length()));
-                } else if (util.countLines(description) > 2){
-                    // Create array of the text without any new lines
-                    description = strParts[0] + "\n" + util.addEllipsis(strParts[1]); // Concatenate everything
-                } */
-
 
                 // Make the title larger than the description
                 SpannableString str = new SpannableString(title + "\n" + description);
@@ -123,11 +104,9 @@ public class NoteFragment extends Fragment {
                 text.setText(str);
                 linear.addView(text);
                 Log.d("Frag_test", "clear 7");
-                //final Intent notesActivity = new Intent();
 
                 // Make the text clickable
                 final int index = i; // Index of ArrayList as,dlas
-
 
                 text.setOnTouchListener(new View.OnTouchListener() {
                     @Override
@@ -235,13 +214,81 @@ public class NoteFragment extends Fragment {
         else text.setTextColor(getResources().getColor(R.color.textColor));
     }
 
+    // Creates dialog for the clear
+    private void createDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(getString(R.string.clear_notes_title));
+        builder.setMessage(getString(R.string.clear_notes_text));
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                clearNotes();
+            }
+        });
+
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    // Remove notes by clearing note ArrayList and resetting linear layout.
+    private void clearNotes(){
+        ArrayList<Note> list = UTIL.getNotes("notes");
+        ArrayList<Note> trash = UTIL.getNotes("trash");
+        trash.addAll(list);
+        list.clear();
+
+        UTIL.saveNotes(list, "notes");
+        UTIL.saveNotes(trash, "trash");
+        // Remove notes from layout
+        LinearLayout ll = view.findViewById(R.id.linear);
+        ll.removeAllViews();
+
+        Toast.makeText(getActivity(), getString(R.string.clear_notes_toast), Toast.LENGTH_LONG).show();
+    }
+
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
+    public void onCreateOptionsMenu(
+            Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.toolbar_actions, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                UTIL.goToActivity(SettingsActivity.class, "MainActivity", getActivity());
+                return true;
+
+            case R.id.action_add:
+                UTIL.goToActivity(NoteEditActivity.class, "MainActivity", getActivity());
+                return true;
+
+            case R.id.action_clear:
+                createDialog();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
+
+    // Returns the ArrayList from sharedprefs
+    public ArrayList<Note> getNotes(String key){
+        SharedPreferences prefs = getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = prefs.getString(key, null);
+        Type type = new TypeToken<ArrayList<Note>>() {}.getType();
+        if (gson.fromJson(json, type) == null) {
+            return new ArrayList<>();
+        }
+        return gson.fromJson(json, type);
+    }
+
 }

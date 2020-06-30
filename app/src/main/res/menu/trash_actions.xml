@@ -2,11 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <!-- Go back to home activity  -->
-        <item android:id="@+id/action_home"
-            android:title="@string/action_home"
-            android:icon="@drawable/ic_home_black_24dp"
-            app:showAsAction="ifRoom" />
 
         <!-- Empty trash can -->
         <item android:id="@+id/action_empty"

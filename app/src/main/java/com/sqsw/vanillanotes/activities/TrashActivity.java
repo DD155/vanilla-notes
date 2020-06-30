@@ -193,10 +193,6 @@ public class TrashActivity extends AppCompatActivity {
                 UTIL.goToActivity(SettingsActivity.class, "TrashActivity", getApplicationContext());
                 return true;
 
-            case R.id.action_home:
-                UTIL.goToActivity(MainActivity.class, "TrashActivity", getApplicationContext());
-                return true;
-
             case R.id.action_empty:
                 if (UTIL.getNotes("trash").size() != 0)
                     confirmDialog();
