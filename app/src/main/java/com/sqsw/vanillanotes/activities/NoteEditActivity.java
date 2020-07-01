@@ -46,17 +46,11 @@ public class NoteEditActivity extends AppCompatActivity {
     private final Utility UTIL = new Utility(this);
     private Context mContext = this;
     private int colorPicked = -1;
-    private int id = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.note_edit_layout);
-
-        if (getSharedPreferences("ID", Context.MODE_PRIVATE).getInt("id", 0) != 0) {
-           id = getSharedPreferences("ID", Context.MODE_PRIVATE).getInt("id", 0);
-        }
-
 
         Toolbar myToolbar = findViewById(R.id.toolbar);
         myToolbar.setTitle("Edit");
@@ -419,7 +413,6 @@ public class NoteEditActivity extends AppCompatActivity {
     }
 
     // Notification Functions
-
     private Notification buildNotification(String title, String note) {
         //EditText text = findViewById(R.id.editText);
         //EditText title = findViewById(R.id.titleText);
@@ -508,14 +501,15 @@ public class NoteEditActivity extends AppCompatActivity {
         Log.d("notif_test2", "Generated ID: " + id);
 
         SharedPreferences.Editor editor = getSharedPreferences("ID", Context.MODE_PRIVATE).edit();
-        editor.putInt("id", id);
-        editor.putString("curr_title", (((EditText)findViewById(R.id.titleText)).getText().toString().trim()));
-        editor.putString("curr_content", (((EditText)findViewById(R.id.editText)).getText().toString().trim()));
+        editor.putString("title"+id, (((EditText)findViewById(R.id.titleText)).getText().toString().trim()));
+        editor.putString("content"+id, (((EditText)findViewById(R.id.editText)).getText().toString().trim()));
         editor.apply();
 
         Intent notificationIntent = new Intent( this, BroadcastReminder.class);
 
         notificationIntent.putExtra("gen_id", id);
+        notificationIntent.putExtra("index", getIntent().getIntExtra("index", 0));
+        notificationIntent.putExtra("caller", getIntent().getStringExtra("caller"));
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id, notificationIntent, 0);
 
