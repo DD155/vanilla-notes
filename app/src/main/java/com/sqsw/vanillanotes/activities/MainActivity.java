@@ -113,12 +113,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if (getIntent().getStringExtra("caller") != null) Log.d("caller_test", getIntent().getStringExtra("caller"));
-
-        // Default fragment
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new NoteFragment()).commit();
-        navigationView.getMenu().getItem(0).setChecked(true);
-
+        if (getIntent().getStringExtra("caller") != null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new TrashFragment()).commit();
+            navigationView.getMenu().getItem(1).setChecked(true);
+        } else {
+            // Default fragment
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new NoteFragment()).commit();
+            navigationView.getMenu().getItem(0).setChecked(true);
+        }
         // Set Navigation Button on Toolbar
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, myToolbar,
                 R.string.nav_drawer_open, R.string.nav_drawer_close);

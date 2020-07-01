@@ -137,7 +137,7 @@ public class NoteEditActivity extends AppCompatActivity {
     private void saveText(){
         ArrayList<Note> list; // ArrayList for either main notes or trash notes
         String key = "notes";
-        Intent prev;
+        Intent prev = new Intent(getApplicationContext(), MainActivity.class);
         boolean isTrash = false;
         String text = getIntent().getStringExtra("savedText");
         String caller = getIntent().getStringExtra("caller");
@@ -146,11 +146,9 @@ public class NoteEditActivity extends AppCompatActivity {
         // Make sure future calls do not return null pointer
         if (caller == null) return;
 
-
         // Determine if previous activity was trash activity or not
-        if ("MainActivity".equals(caller)) prev = new Intent(getApplicationContext(), MainActivity.class);
-        else {
-            prev = new Intent(getApplicationContext(), MainActivity.class);
+        if ("Trash".equals(caller)) {
+            prev.putExtra("caller", "Trash");
             isTrash = true;
         }
 
@@ -222,7 +220,7 @@ public class NoteEditActivity extends AppCompatActivity {
         if (caller.equals("Trash")){
             UTIL.goToActivity(MainActivity.class, "Trash", getApplicationContext());
         } else {
-            UTIL.goToActivity(MainActivity.class, "Note", getApplicationContext());
+            UTIL.goToActivity(MainActivity.class, null, getApplicationContext());
         }
     }
 
@@ -379,7 +377,11 @@ public class NoteEditActivity extends AppCompatActivity {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                UTIL.goToActivity(activity,"NoteEditActivity", getApplicationContext());
+                Log.d("caller_test", "Edit Actiivty: " + getIntent().getStringExtra("caller"));
+                if ("Trash".equals(getIntent().getStringExtra("caller")))
+                    UTIL.goToActivity(activity,"Trash", getApplicationContext());
+                else
+                    UTIL.goToActivity(activity,null, getApplicationContext());
             }
         });
 
