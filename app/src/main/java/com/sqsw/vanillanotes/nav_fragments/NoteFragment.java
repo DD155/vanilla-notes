@@ -73,7 +73,7 @@ public class NoteFragment extends Fragment {
         view = inflater.inflate(R.layout.notes_layout, container, false);
         final ArrayList<Note> noteList;
         linear = view.findViewById(R.id.linear);
-        UTIL = new Utility(getActivity().getApplicationContext());
+        UTIL = new Utility(getActivity());
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Notes");
         //Bundle bundle = getArguments();
 
@@ -267,7 +267,8 @@ public class NoteFragment extends Fragment {
                 return true;
 
             case R.id.action_add:
-                UTIL.goToActivity(NoteEditActivity.class, "MainActivity", getActivity());
+                //UTIL.goToActivity(NoteEditActivity.class, "MainActivity", getActivity());
+                UTIL.goToActivity(NoteEditActivity.class, "Notes", getActivity());
                 return true;
 
             case R.id.action_clear:
