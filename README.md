@@ -26,7 +26,7 @@ The final application will have the following features:
 - Import/Export Backup
 - Widgets (?)
 
-## Technologies
+## Libraries and Tools
 The minimum Android version required is Android 4.1 (SDK 16); Target version is Android 10 (SDK 29)
 
 Project is created with and uses:
