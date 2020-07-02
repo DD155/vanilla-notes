@@ -1,43 +1,33 @@
 package com.sqsw.vanillanotes.activities;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.sqsw.vanillanotes.classes.DateComparator;
 import com.sqsw.vanillanotes.classes.Note;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.classes.NoteComparator;
 import com.sqsw.vanillanotes.classes.Utility;
-import com.sqsw.vanillanotes.nav_fragments.FavoritesFragment;
 import com.sqsw.vanillanotes.nav_fragments.NoteFragment;
 import com.sqsw.vanillanotes.nav_fragments.TrashFragment;
-import com.sqsw.vanillanotes.settings.SettingsActivity;
+import com.sqsw.vanillanotes.settings.SettingsFragmentCompat;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,7 +68,22 @@ public class MainActivity extends AppCompatActivity {
             UTIL.saveNotes(noteList, "notes");
         }
 
-        // Set up navigation drawer
+        BottomNavigationView navView = findViewById(R.id.bottom_nav);
+        navView.setItemIconTintList(null);
+
+        navView.setOnNavigationItemSelectedListener(navListener);
+
+        if (getIntent().getStringExtra("caller") != null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new TrashFragment()).commit();
+            navView.getMenu().getItem(1).setChecked(true);
+        } else {
+            // Default fragment
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new NoteFragment()).commit();
+            navView.getMenu().getItem(0).setChecked(true);
+        }
+
+
+        /* Set up navigation drawer
         drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -126,7 +131,38 @@ public class MainActivity extends AppCompatActivity {
                 R.string.nav_drawer_open, R.string.nav_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
+
+         */
     }
+
+
+    private BottomNavigationView.OnNavigationItemSelectedListener navListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    Fragment selectedFrag = null;
+
+                    switch (item.getItemId()){
+                        case R.id.nav_notes:
+                            selectedFrag = new NoteFragment();
+                            break;
+
+                        case R.id.nav_trash:
+                            selectedFrag = new TrashFragment();
+                            break;
+
+                        case R.id.nav_more:
+                            selectedFrag = new SettingsFragmentCompat();
+                            break;
+                    }
+
+                    if (selectedFrag == null) selectedFrag = new NoteFragment();
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_layout, selectedFrag).commit();
+
+                    return true;
+                }
+            };
 
 
     /*
@@ -266,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
     private void refreshActivity(){
         finish();
         overridePendingTransition(0, 0);
-        UTIL.goToActivity(MainActivity.class, "MainActivity", this);
+        UTIL.goToActivity(MainActivity.class, null, this);
         overridePendingTransition(0, 0);
     }
 

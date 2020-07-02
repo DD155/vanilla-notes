@@ -17,7 +17,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        setContentView(R.layout.settings_layout);
 
         //add toolbar
         Toolbar myToolbar = findViewById(R.id.toolbar);
@@ -28,7 +28,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         //adds setting fragment
         getSupportFragmentManager().beginTransaction().replace(R.id.settings_content,
-                new SettingsFragment()).commit();
+                new SettingsFragmentCompat()).commit();
 
     }
 

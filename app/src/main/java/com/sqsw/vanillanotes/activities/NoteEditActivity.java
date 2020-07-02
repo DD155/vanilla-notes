@@ -247,7 +247,7 @@ public class NoteEditActivity extends AppCompatActivity {
             if ("Trash".equals(getIntent().getStringExtra("caller"))) {
                 getMenuInflater().inflate(R.menu.trash_note_actions, menu);
             } else
-                getMenuInflater().inflate(R.menu.notes_actions, menu);
+                getMenuInflater().inflate(R.menu.edit_actions, menu);
         } else {
             Log.e("NoteActivity", "Caller is null");
         }

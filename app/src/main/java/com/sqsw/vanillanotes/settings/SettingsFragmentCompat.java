@@ -6,12 +6,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.sqsw.vanillanotes.classes.Note;
 import com.sqsw.vanillanotes.R;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -21,11 +26,17 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-public class SettingsFragment extends PreferenceFragmentCompat {
+public class SettingsFragmentCompat extends PreferenceFragmentCompat {
 
     Activity mActivity;
     private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
     private final String KEY_FONT = "font_size";
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("More");
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {

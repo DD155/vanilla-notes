@@ -26,7 +26,4 @@
             android:background="@drawable/toolbar_dropshadow"/>
 
     </FrameLayout>
-<!--
-</androidx.constraintlayout.widget.ConstraintLayout> -->
-
 </LinearLayout>

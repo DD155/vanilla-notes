@@ -34,7 +34,6 @@ import com.sqsw.vanillanotes.classes.Note;
 import com.sqsw.vanillanotes.activities.NoteEditActivity;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.classes.Utility;
-import com.sqsw.vanillanotes.settings.SettingsActivity;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -254,18 +253,13 @@ public class NoteFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(
-            Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.toolbar_actions, menu);
+    public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.notes_actions, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                UTIL.goToActivity(SettingsActivity.class, "MainActivity", getActivity());
-                return true;
-
             case R.id.action_add:
                 //UTIL.goToActivity(NoteEditActivity.class, "MainActivity", getActivity());
                 UTIL.goToActivity(NoteEditActivity.class, "Notes", getActivity());

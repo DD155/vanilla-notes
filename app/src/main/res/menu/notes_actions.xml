@@ -1,33 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <!-- Save Note -->
-    <item android:id="@+id/action_save"
-        android:title="@string/action_save"
-        app:showAsAction="ifRoom" />
 
-    <!-- Delete Current Note -->
-    <item android:id="@+id/action_delete"
-        android:title="@string/action_delete"
-        app:showAsAction="never" />
+        <!-- Add Note -->
+        <item android:id="@+id/action_add"
+            android:title="@string/action_add"
+            android:icon="@drawable/plus_icon"
+            app:showAsAction="ifRoom" />
 
-    <!-- Pin current note -->
-    <item android:id="@+id/action_pin"
-        android:title="@string/action_pin"
-        app:showAsAction="never" />
+        <!-- Sort -->
+        <item android:id="@+id/action_sort"
+            android:title="@string/action_sort"
+            app:showAsAction="never" />
 
-    <item android:id="@+id/action_reminder"
-        android:title="@string/action_reminder"
-        app:showAsAction="never" />
-
-    <item android:id="@+id/action_color"
-        android:title="@string/action_color"
-        app:showAsAction="never" />
-
-    <!-- Settings -->
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:icon="@drawable/ic_more_vert_black_24dp"
-        app:showAsAction="never" />
-
+        <!-- Clear -->
+        <item android:id="@+id/action_clear"
+            android:title="@string/action_clear"
+            android:icon="@drawable/more_vert_icon"
+            app:showAsAction="never" />
 </menu>

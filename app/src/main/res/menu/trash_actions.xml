@@ -9,10 +9,9 @@
             android:icon="@drawable/ic_delete_forever_black_24dp"
             app:showAsAction="ifRoom" />
 
-        <!-- Settings -->
-        <item android:id="@+id/action_settings"
-            android:title="@string/action_settings"
-            android:icon="@drawable/ic_more_vert_black_24dp"
+        <!-- Sort -->
+        <item android:id="@+id/action_sort"
+            android:title="@string/action_sort"
             app:showAsAction="never" />
 
 </menu>
