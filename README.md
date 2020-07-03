@@ -26,12 +26,13 @@ The final application will have the following features:
 - Import/Export Backup
 - Widgets (?)
 
-## Technologies
+## Libraries & Tools
 The minimum Android version required is Android 4.1 (SDK 16); Target version is Android 10 (SDK 29)
 
 Project is created with and uses:
 
 - [Android Studio v4.0](https://developer.android.com/studio/install) using [Java](https://www.java.com/en/)
+- [AndroidX](https://developer.android.com/jetpack/androidx) - AndroidX is a major improvement to the original Android Support Library, which is no longer maintained.
 - [Gson](https://github.com/google/gson) - A JSON library for Java
 - [material.io](https://material.io/) - Material guidelines with resources such as components and icons
 - [Color Picker Library](https://github.com/kristiyanP/colorpicker) - Material Color Picker asset created by [Kristiyan Petrov](https://github.com/kristiyanP)
