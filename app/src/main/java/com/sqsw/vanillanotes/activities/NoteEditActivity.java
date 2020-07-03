@@ -46,8 +46,8 @@ public class NoteEditActivity extends AppCompatActivity {
     private final Utility UTIL = new Utility(this);
     private Context mContext = this;
     private int colorPicked = -1;
+    private boolean isTrash = false;
     private boolean isNew = false;
-    private boolean onCreate = true;
     private boolean isStarred;
     private Menu mMenu;
 
@@ -66,7 +66,7 @@ public class NoteEditActivity extends AppCompatActivity {
         int fontSize = UTIL.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
 
         // Check previous activity's caller
-        boolean isTrash = false;
+        isTrash = false;
         if ("Trash".equals(getIntent().getStringExtra("caller"))) isTrash = true;
 
         // Set attributes of EditTexts
@@ -80,15 +80,9 @@ public class NoteEditActivity extends AppCompatActivity {
 
 
         if (text != null) { // Case where user is editing old note
-            Note currentNote;
-            // Retrive ArrayList depending on if user entered from activity trash or home
-            if (!isTrash)
-                currentNote = UTIL.getNotes("notes")
-                        .get(getIntent().getIntExtra("index", 0));
-            else
-                currentNote = UTIL.getNotes("trash")
-                        .get(getIntent().getIntExtra("index", 0));
+            Note currentNote = getCurrentNote();
 
+            colorPicked = currentNote.getColor();
             dateView.setText(getString(R.string.date_created, currentNote.getDate()));
 
             //dateView.setText("Date Created: " + currentNote.getDate());
@@ -118,14 +112,31 @@ public class NoteEditActivity extends AppCompatActivity {
             Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, getIntent().getIntExtra("color", 0));
             titleView.setBackground(drawable);
             textView.setBackground(drawable);
+
             if (UTIL.isDarkColor(colorPicked)) {
                 titleView.setTextColor(getResources().getColor(R.color.white));
                 textView.setTextColor(getResources().getColor(R.color.white));
             }
+
         } else {
             textView.setBackgroundResource(R.drawable.shadow_border);
             titleView.setBackgroundResource(R.drawable.shadow_border);
         }
+
+        Log.d("trash_debug", "reached end of oncreate");
+    }
+
+    // Retrive ArrayList depending on if user entered from activity trash or home
+    private Note getCurrentNote(){
+        Note currentNote;
+        if (!isTrash)
+            currentNote = UTIL.getNotes("notes")
+                    .get(getIntent().getIntExtra("index", 0));
+        else
+            currentNote = UTIL.getNotes("trash")
+                    .get(getIntent().getIntExtra("index", 0));
+
+        return currentNote;
     }
 
     // Save the text of the note to the previous activity
@@ -133,7 +144,6 @@ public class NoteEditActivity extends AppCompatActivity {
         ArrayList<Note> list; // ArrayList for either main notes or trash notes
         String key = "notes";
         Intent prev = new Intent(getApplicationContext(), MainActivity.class);
-        boolean isTrash = false;
         String text = getIntent().getStringExtra("savedText");
         String caller = getIntent().getStringExtra("caller");
         EditText textView = findViewById(R.id.editText);
@@ -184,8 +194,6 @@ public class NoteEditActivity extends AppCompatActivity {
         String caller = getIntent().getStringExtra("caller");
         int index = getIntent().getIntExtra("index", 0);
         ArrayList<Note> trashList;
-
-        //getIntent().putExtra("color", colorPicked);
 
         // Make sure future calls do not return null pointer
         if (caller == null) return;
@@ -245,6 +253,10 @@ public class NoteEditActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         mMenu = menu;
+        ArrayList<Note> list;
+        if (isTrash) list = UTIL.getNotes("trash");
+        else list = UTIL.getNotes("notes");
+
         // Make sure future calls do not return null pointer
         // Inflate the menu; this adds items to the action bar if it is present.
         if (getIntent().getStringExtra("caller") != null) {
@@ -256,12 +268,10 @@ public class NoteEditActivity extends AppCompatActivity {
             Log.e("NoteActivity", "Caller is null");
         }
 
-
         // If the note is not new, check if the current note has been starred and load menu item
         if (!isNew) {
             // Return boolean value for if the current note is starred or not
-            if (UTIL.getNotes("notes")
-                    .get(getIntent().getIntExtra("index", 0)).getStarred()) {
+            if (list.get(getIntent().getIntExtra("index", 0)).getStarred()) {
                 menu.findItem(R.id.action_star).setIcon(R.drawable.star_selected_icon);
                 isStarred = true;
                 //menu.findItem(R.id.action_starred).setVisible(true);
@@ -275,33 +285,8 @@ public class NoteEditActivity extends AppCompatActivity {
             menu.findItem(R.id.action_star).setIcon(R.drawable.star_icon);
         }
 
+        Log.d("trash_debug", "oncreateoptions end");
         return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-
-        /*
-        Intent intent = new Intent();
-
-        Log.d("icon_test", isStarred + "");
-
-        if (!onCreate) {
-            if (isStarred) {
-                intent.putExtra("star", false);
-                menu.findItem(R.id.action_star).setVisible(true);
-                menu.findItem(R.id.action_starred).setVisible(false);
-                isStarred = false;
-            } else {
-                intent.putExtra("star", true);
-                menu.findItem(R.id.action_star).setVisible(false);
-                menu.findItem(R.id.action_starred).setVisible(true);
-                isStarred = true;
-            }
-        }
-        onCreate = false;
-        */
-        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -360,25 +345,25 @@ public class NoteEditActivity extends AppCompatActivity {
         colorPicker.setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
             @Override
             public void onChooseColor(int position, int color) {
-                if (color == 0) color = Color.WHITE;
-                else colorPicked = color;
-                //ArrayList<Note> notes = util.getNotes("notes");
-                // put code
-                TextView title = findViewById(R.id.titleText);
-                TextView text = findViewById(R.id.editText);
-                Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, color);
+                if (color != 0) {
+                    colorPicked = color;
+                    //ArrayList<Note> notes = util.getNotes("notes");
+                    // put code
+                    TextView title = findViewById(R.id.titleText);
+                    TextView text = findViewById(R.id.editText);
+                    Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, color);
 
-                title.setBackground(drawable);
-                text.setBackground(drawable);
+                    title.setBackground(drawable);
+                    text.setBackground(drawable);
 
-                if (UTIL.isDarkColor(color)){
-                    ((TextView)findViewById(R.id.editText)).setTextColor(getResources().getColor(R.color.white));
-                    ((TextView)findViewById(R.id.titleText)).setTextColor(getResources().getColor(R.color.white));
-                } else {
-                    ((TextView)findViewById(R.id.editText)).setTextColor(getResources().getColor(R.color.textColor));
-                    ((TextView)findViewById(R.id.titleText)).setTextColor(getResources().getColor(R.color.textColor));
+                    if (UTIL.isDarkColor(color)) {
+                        ((TextView) findViewById(R.id.editText)).setTextColor(getResources().getColor(R.color.white));
+                        ((TextView) findViewById(R.id.titleText)).setTextColor(getResources().getColor(R.color.white));
+                    } else {
+                        ((TextView) findViewById(R.id.editText)).setTextColor(getResources().getColor(R.color.textColor));
+                        ((TextView) findViewById(R.id.titleText)).setTextColor(getResources().getColor(R.color.textColor));
+                    }
                 }
-
             }
 
             @Override
@@ -388,7 +373,7 @@ public class NoteEditActivity extends AppCompatActivity {
         })
             .disableDefaultButtons(false)
             .setColors(getResources().getIntArray(R.array.color_array))
-            .setDefaultColorButton(getResources().getColor(R.color.white))
+            .setDefaultColorButton(colorPicked)
             //.setDefaultColor(Color.parseColor("#f84c44"))
             .setColumns(4)
             .setRoundColorButton(true)

@@ -71,7 +71,6 @@ public class TrashFragment extends Fragment {
         view = inflater.inflate(R.layout.notes_layout, container, false);
         linear = view.findViewById(R.id.linear);
         UTIL = new Utility(getActivity().getApplicationContext());
-        Bundle bundle = getArguments();
 
         noteList = getNotes("trash");
 
