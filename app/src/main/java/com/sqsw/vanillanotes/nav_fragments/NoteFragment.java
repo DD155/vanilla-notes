@@ -1,5 +1,6 @@
 package com.sqsw.vanillanotes.nav_fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -66,6 +67,7 @@ public class NoteFragment extends Fragment {
         return fragment;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -261,7 +263,6 @@ public class NoteFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
-                //UTIL.goToActivity(NoteEditActivity.class, "MainActivity", getActivity());
                 UTIL.goToActivity(NoteEditActivity.class, "Notes", getActivity());
                 return true;
 

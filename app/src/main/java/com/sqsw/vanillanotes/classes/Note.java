@@ -6,6 +6,7 @@ public class Note implements Serializable {
     private String title;
     private String text;
     private String date;
+    private boolean starred;
     private int color;
     private int index; // TODO: Implement indexing for custom user sort
 
@@ -14,6 +15,7 @@ public class Note implements Serializable {
         this.text = text;
         this.date = date;
         this.color = color;
+        this.starred = false;
     }
 
     public Note(String title, String text, int color){
@@ -21,13 +23,16 @@ public class Note implements Serializable {
         this.text = text;
         this.date = "";
         this.color = color;
+        this.starred = false;
     }
+
 
     public Note(String title, String text){
         this.title = title;
         this.text = text;
         this.date = "";
         this.color = -1;
+        this.starred = false;
     }
 
     public Note(String text){
@@ -35,6 +40,7 @@ public class Note implements Serializable {
         this.text = text;
         this.date = "";
         this.color = -1;
+        this.starred = false;
     }
 
     public String getTitle(){
@@ -63,6 +69,14 @@ public class Note implements Serializable {
 
     public void setColor(int color) {
         this.color = color;
+    }
+
+    public void setStarred(boolean starred) {
+        this.starred = starred;
+    }
+
+    public boolean getStarred(){
+        return starred;
     }
 
 

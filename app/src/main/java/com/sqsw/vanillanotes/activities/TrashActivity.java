@@ -189,21 +189,17 @@ public class TrashActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                UTIL.goToActivity(SettingsActivity.class, "TrashActivity", getApplicationContext());
-                return true;
-
             case R.id.action_empty:
                 if (UTIL.getNotes("trash").size() != 0)
                     confirmDialog();
                 else {  // Case where the trash is already empty
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle(R.string.clear_error_title);
                     builder.setMessage(getResources().getString(R.string.trash_error));
                     builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-
+                           //builder.create().dismiss();
                         }
                     });
                     AlertDialog alert = builder.create();

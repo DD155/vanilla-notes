@@ -24,12 +24,4 @@
         app:showAsAction="never" />
 
 
-    <!-- Settings -->
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:icon="@drawable/more_vert_icon"
-        app:showAsAction="never" />
-
-
-
 </menu>

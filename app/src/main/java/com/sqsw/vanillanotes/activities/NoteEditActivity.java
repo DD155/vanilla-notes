@@ -18,6 +18,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
@@ -36,7 +37,6 @@ import com.sqsw.vanillanotes.classes.BroadcastReminder;
 import com.sqsw.vanillanotes.classes.Note;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.classes.Utility;
-import com.sqsw.vanillanotes.settings.SettingsActivity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -46,6 +46,10 @@ public class NoteEditActivity extends AppCompatActivity {
     private final Utility UTIL = new Utility(this);
     private Context mContext = this;
     private int colorPicked = -1;
+    private boolean isNew = false;
+    private boolean onCreate = true;
+    private boolean isStarred;
+    private Menu mMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,15 +75,11 @@ public class NoteEditActivity extends AppCompatActivity {
         EditText titleView = findViewById(R.id.titleText);
         EditText textView = findViewById(R.id.editText);
 
-        Log.d("date_time_0", UTIL.currentDate());
         titleView.setPadding(50, 50, 50, 0);
         textView.setPadding(50, 50, 50, 50);
 
-        Log.d("trash_debug", "1");
 
         if (text != null) { // Case where user is editing old note
-            Log.d("trash_debug", "in if statement");
-
             Note currentNote;
             // Retrive ArrayList depending on if user entered from activity trash or home
             if (!isTrash)
@@ -97,6 +97,7 @@ public class NoteEditActivity extends AppCompatActivity {
             textView.setSelection(textView.getText().length()); // Set cursor to the end
             textView.requestFocus();
         } else
+            isNew = true;
             dateView.setText(getString(R.string.date_created, UTIL.currentDate()));
 
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
@@ -155,6 +156,7 @@ public class NoteEditActivity extends AppCompatActivity {
             prev.putExtra("note", textView.getText().toString().trim());
             prev.putExtra("title", titleView.getText().toString().trim());
             prev.putExtra("date", UTIL.currentDate());
+            prev.putExtra("star", isStarred);
             prev.putExtra("color", colorPicked);
         } else { // Case where the note is being edited
             // Determine which list to use
@@ -170,6 +172,7 @@ public class NoteEditActivity extends AppCompatActivity {
                 current.setColor(colorPicked);
             current.setText(textView.getText().toString().trim());
             current.setTitle(titleView.getText().toString().trim());
+            current.setStarred(isStarred);
             UTIL.saveNotes(list, key);
         }
         startActivity(prev);
@@ -241,6 +244,7 @@ public class NoteEditActivity extends AppCompatActivity {
     // Toolbar Functions
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        mMenu = menu;
         // Make sure future calls do not return null pointer
         // Inflate the menu; this adds items to the action bar if it is present.
         if (getIntent().getStringExtra("caller") != null) {
@@ -251,32 +255,68 @@ public class NoteEditActivity extends AppCompatActivity {
         } else {
             Log.e("NoteActivity", "Caller is null");
         }
+
+
+        // If the note is not new, check if the current note has been starred and load menu item
+        if (!isNew) {
+            // Return boolean value for if the current note is starred or not
+            if (UTIL.getNotes("notes")
+                    .get(getIntent().getIntExtra("index", 0)).getStarred()) {
+                menu.findItem(R.id.action_star).setIcon(R.drawable.star_selected_icon);
+                isStarred = true;
+                //menu.findItem(R.id.action_starred).setVisible(true);
+            } else {
+                menu.findItem(R.id.action_star).setIcon(R.drawable.star_icon);
+                isStarred = false;
+                return true;
+            }
+        } else {
+            isStarred = false;
+            menu.findItem(R.id.action_star).setIcon(R.drawable.star_icon);
+        }
+
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        /*
+        Intent intent = new Intent();
+
+        Log.d("icon_test", isStarred + "");
+
+        if (!onCreate) {
+            if (isStarred) {
+                intent.putExtra("star", false);
+                menu.findItem(R.id.action_star).setVisible(true);
+                menu.findItem(R.id.action_starred).setVisible(false);
+                isStarred = false;
+            } else {
+                intent.putExtra("star", true);
+                menu.findItem(R.id.action_star).setVisible(false);
+                menu.findItem(R.id.action_starred).setVisible(true);
+                isStarred = true;
+            }
+        }
+        onCreate = false;
+        */
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                /*
-                if (getIntent().getStringExtra("caller") != null &&
-                        "MainActivity".equals(getIntent().getStringExtra("caller")))
-                    confirmDiscardDialog(MainActivity.class);
-                    //intent.setClass(getApplicationContext(), MainActivity.class);
-                else
-                    confirmDiscardDialog(TrashActivity.class);
-
-                 */
                 confirmDiscardDialog(MainActivity.class);
-                return true;
-
-            case R.id.action_settings:
-                // Create dialog if user wants to continue to settings, discarding the current note.
-                confirmDiscardDialog(SettingsActivity.class);
                 return true;
 
             case R.id.action_save:
                 saveText();
+                return true;
+
+            case R.id.action_star:
+                toggleIcon(isStarred);
                 return true;
 
             case R.id.action_restore:
@@ -304,14 +344,24 @@ public class NoteEditActivity extends AppCompatActivity {
         }
     }
 
-    // Dialog Functions
+    private void toggleIcon(boolean star){
+        if (star){
+            mMenu.findItem(R.id.action_star).setIcon(R.drawable.star_icon);
+            isStarred = false;
+        } else {
+            mMenu.findItem(R.id.action_star).setIcon(R.drawable.star_selected_icon);
+            isStarred = true;
+        }
+    }
 
+    // Dialog Functions
     private void colorDialog(){
         final ColorPicker colorPicker = new ColorPicker(NoteEditActivity.this);
         colorPicker.setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
             @Override
             public void onChooseColor(int position, int color) {
-                colorPicked = color;
+                if (color == 0) color = Color.WHITE;
+                else colorPicked = color;
                 //ArrayList<Note> notes = util.getNotes("notes");
                 // put code
                 TextView title = findViewById(R.id.titleText);
@@ -344,8 +394,6 @@ public class NoteEditActivity extends AppCompatActivity {
             .setRoundColorButton(true)
             .setTitle("Select your color")
             .show();
-
-
     }
 
     // Creates dialog for empty notes

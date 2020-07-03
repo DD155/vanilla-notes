@@ -63,7 +63,9 @@ public class MainActivity extends AppCompatActivity {
             newNote.setDate(date);
             if (titleText != null) newNote.setTitle(titleText); // Check if there is a title
             if (color != -1) newNote.setColor(color);
-            noteList.add(newNote);
+            newNote.setStarred(getIntent().getBooleanExtra("star", false));
+            // Add note to the top of the list
+            noteList.add(0, newNote);
 
             UTIL.saveNotes(noteList, "notes");
         }
