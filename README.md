@@ -21,7 +21,7 @@ The final application will have the following features:
 - Trash bin for deleted notes
 - Easily organizable notes with drag + drop
 - Sort by Title or Date Created
-- Undo changes in case you made a mistake in a note
+- Star notes to view them easier
 - Themes / Dark Mode
 - Import/Export Backup
 - Widgets (?)
