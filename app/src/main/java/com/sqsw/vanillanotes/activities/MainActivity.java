@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String CHANNEL_ID = "NoteChannel";
     private final Utility UTIL = new Utility(this);
     private int selectedSortItem = 4;
-    private DrawerLayout drawerLayout;
+    private boolean isTrashFrag;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(myToolbar);
 
         final ArrayList<Note> noteList = UTIL.getNotes("notes");
-
         String editedText = getIntent().getStringExtra("note");
         String titleText = getIntent().getStringExtra("title");
         String date = getIntent().getStringExtra("date");
@@ -66,9 +65,13 @@ public class MainActivity extends AppCompatActivity {
             newNote.setStarred(getIntent().getBooleanExtra("star", false));
             // Add note to the top of the list
             noteList.add(0, newNote);
-
             UTIL.saveNotes(noteList, "notes");
         }
+
+        // Resort
+        Log.d("sort_index", getSharedPreferences("NOTES", Context.MODE_PRIVATE).getInt("sort_index", 0)+"");
+        sortNotes(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getInt("sort_index", 0));
+
 
         BottomNavigationView navView = findViewById(R.id.bottom_nav);
         navView.setItemIconTintList(null);
@@ -147,13 +150,16 @@ public class MainActivity extends AppCompatActivity {
                     switch (item.getItemId()){
                         case R.id.nav_notes:
                             selectedFrag = new NoteFragment();
+                            isTrashFrag = false;
                             break;
 
                         case R.id.nav_trash:
                             selectedFrag = new TrashFragment();
+                            isTrashFrag = true;
                             break;
 
                         case R.id.nav_more:
+                            isTrashFrag = false;
                             selectedFrag = new SettingsFragmentCompat();
                             break;
                     }
@@ -201,8 +207,6 @@ public class MainActivity extends AppCompatActivity {
 
     */
 
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_sort) {
@@ -210,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     // Create dialog for sorting notes
     private void sortDialog() {
         final SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
@@ -253,33 +258,42 @@ public class MainActivity extends AppCompatActivity {
     // Type 3 = Sort by Date Created (Descending)
     // Type 4 = Custom Sort (User created sort)
     private void sortNotes(int type){
-        ArrayList<Note> notes = UTIL.getNotes("notes");
+        String key;
+        ArrayList<Note> list;
+        if (!isTrashFrag) {
+            list = UTIL.getNotes("notes");
+            key = "notes";
+        }
+        else {
+            list = UTIL.getNotes("trash");
+            key = "trash";
+        }
+
         switch (type){
             case 0:
                 Log.d("selected_index", "case 0");
-                Collections.sort(notes, new NoteComparator());
-                UTIL.saveNotes(notes, "notes");
+                Collections.sort(list, new NoteComparator());
+                UTIL.saveNotes(list, key);
                 refreshActivity();
                 break;
             case 1:
                 Log.d("selected_index", "case 1");
-                Collections.sort(notes, new NoteComparator());
-                Collections.reverse(notes);
-                UTIL.saveNotes(notes, "notes");
+                Collections.sort(list, new NoteComparator());
+                Collections.reverse(list);
+                UTIL.saveNotes(list, key);
                 refreshActivity();
                 break;
             case 2:
-                Collections.sort(notes, new DateComparator());
-                UTIL.saveNotes(notes, "notes");
+                Collections.sort(list, new DateComparator());
+                UTIL.saveNotes(list, key);
                 refreshActivity();
                 break;
             case 3:
-                Collections.sort(notes, new DateComparator());
-                Collections.reverse(notes);
-                UTIL.saveNotes(notes, "notes");
+                Collections.sort(list, new DateComparator());
+                Collections.reverse(list);
+                UTIL.saveNotes(list, key);
                 refreshActivity();
                 break;
-
             case 4:
                 // TODO: Custom sort
                 break;
@@ -302,17 +316,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void refreshActivity(){
-        finish();
-        overridePendingTransition(0, 0);
-        UTIL.goToActivity(MainActivity.class, null, this);
-        overridePendingTransition(0, 0);
+        BottomNavigationView navView = findViewById(R.id.bottom_nav);
+
+        //finish();
+        //overridePendingTransition(0, 0);
+
+        if (isTrashFrag) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new TrashFragment()).commit();
+            navView.getMenu().getItem(1).setChecked(true);
+        } else {
+            // Default fragment
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new NoteFragment()).commit();
+            navView.getMenu().getItem(0).setChecked(true);
+        }
+
+        //overridePendingTransition(0, 0);
     }
 
     @Override
     public void onBackPressed(){
-        if (drawerLayout.isDrawerOpen(GravityCompat.START))
-            drawerLayout.closeDrawer(GravityCompat.START);
-        else super.onBackPressed();
+        super.onBackPressed();
     }
 }
 

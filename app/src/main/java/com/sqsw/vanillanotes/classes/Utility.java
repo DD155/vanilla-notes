@@ -125,9 +125,16 @@ public class Utility extends ContextWrapper {
         String dayOfWeek = Integer.toString(instance.get(Calendar.DAY_OF_MONTH));
         String hour;
         String minutes;
+        String seconds;
+        if (Integer.toString(instance.get(Calendar.SECOND)).length() == 1)
+            seconds = "0" + Integer.toString(instance.get(Calendar.SECOND)).length();
+        else
+            seconds = Integer.toString(instance.get(Calendar.SECOND));
 
         if (instance.get(Calendar.MINUTE) / 10 == 0){
             minutes = "0" + (instance.get(Calendar.MINUTE));
+        } else if (instance.get(Calendar.MINUTE) == 0){
+            minutes = "00";
         } else
         {
             minutes = Integer.toString(instance.get(Calendar.MINUTE));
@@ -135,11 +142,11 @@ public class Utility extends ContextWrapper {
 
         if (instance.get(Calendar.HOUR_OF_DAY) >= 12){
             hour = Integer.toString(instance.get(Calendar.HOUR_OF_DAY) - 12);
-            minutes += " PM";
+            minutes += ":" + seconds + " PM";
         } else
         {
             hour = Integer.toString(instance.get(Calendar.HOUR_OF_DAY));
-            minutes = "AM";
+            minutes = ":" + seconds + "AM";
         }
 
         if (hour.equals("0")) hour = "12";

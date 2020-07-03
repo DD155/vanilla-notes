@@ -85,6 +85,7 @@ public class NoteFragment extends Fragment {
             for (int i = 0; i < noteList.size(); i++) {
                 final TextView text = new TextView(getContext());
                 final Note currNote = noteList.get(i);
+                Log.d("date_test", currNote.getDate());
 
                 String title = currNote.getTitle();
                 String description = currNote.getText();

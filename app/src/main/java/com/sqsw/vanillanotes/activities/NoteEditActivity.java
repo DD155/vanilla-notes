@@ -66,8 +66,7 @@ public class NoteEditActivity extends AppCompatActivity {
         int fontSize = UTIL.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
 
         // Check previous activity's caller
-        isTrash = false;
-        if ("Trash".equals(getIntent().getStringExtra("caller"))) isTrash = true;
+        isTrash = "Trash".equals(getIntent().getStringExtra("caller"));
 
         // Set attributes of EditTexts
         String text = getIntent().getStringExtra("savedText");
@@ -83,16 +82,22 @@ public class NoteEditActivity extends AppCompatActivity {
             Note currentNote = getCurrentNote();
 
             colorPicked = currentNote.getColor();
-            dateView.setText(getString(R.string.date_created, currentNote.getDate()));
+            String dateString = currentNote.getDate().substring(0, currentNote.getDate().length() - 6)
+                    + " " + currentNote.getDate().substring(currentNote.getDate().length() - 2);
+            Log.d("date_test", "In Edit: " + dateString);
+            dateView.setText(getString(R.string.date_created, dateString));
 
             //dateView.setText("Date Created: " + currentNote.getDate());
             if (title != null) titleView.setText(title);
             textView.setText(text); // Set the text on the note page as the old string
             textView.setSelection(textView.getText().length()); // Set cursor to the end
             textView.requestFocus();
-        } else
+        } else {
             isNew = true;
-            dateView.setText(getString(R.string.date_created, UTIL.currentDate()));
+            String dateString = UTIL.currentDate().substring(0, UTIL.currentDate().length() - 6)
+                    + " " + UTIL.currentDate().substring(UTIL.currentDate().length() - 2);
+            dateView.setText(getString(R.string.date_created, dateString));
+        }
 
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);

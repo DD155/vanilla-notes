@@ -72,6 +72,8 @@ public class TrashFragment extends Fragment {
         linear = view.findViewById(R.id.linear);
         UTIL = new Utility(getActivity().getApplicationContext());
 
+        Intent def = new Intent();
+        def.putExtra("caller", "Trash");
         noteList = getNotes("trash");
 
         if (noteList.size() != 0) { // Makes sure user has already notes, loads them on entering app
