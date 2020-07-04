@@ -59,30 +59,42 @@ public class TrashFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.notes_layout, container, false);
-
         if (getActivity() != null)
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Trash");
-        else return view;
 
+        view = inflater.inflate(R.layout.notes_layout, container, false);
         linear = view.findViewById(R.id.linear);
         UTIL = new Utility(getActivity().getApplicationContext());
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        Intent intent = new Intent();
-        intent.putExtra("caller", "Trash");
+        Intent def = new Intent();
+        def.putExtra("caller", "Trash");
         noteList = getNotes("trash");
 
         if (noteList.size() != 0) { // Makes sure user has already notes, loads them on entering app
             for (int i = 0; i < noteList.size(); i++) {
                 final TextView text = new TextView(getContext());
-                final int index = i; // Index of ArrayList
                 final Note currNote = noteList.get(i);
-                final Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
 
+                String title = currNote.getTitle();
+                String description = currNote.getText();
+
+                final Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
                 text.setBackground(drawable);
-                initializeText(text, currNote);
+
+                // Make the title larger than the description
+                SpannableString str = new SpannableString(title + "\n" + description);
+                str.setSpan(new RelativeSizeSpan(1.3f), 0, title.length(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                str.setSpan(new StyleSpan(Typeface.BOLD), 0, title.length(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                initializeText(text, currNote.getColor());
+                text.setText(str);
                 linear.addView(text);
+
+                // Make the text clickable
+                final int index = i; // Index of ArrayList as,dlas
 
                 text.setOnTouchListener(new View.OnTouchListener() {
                     @Override
@@ -148,7 +160,7 @@ public class TrashFragment extends Fragment {
         return view;
     }
 
-    private void initializeText(TextView text, Note note){
+    private void initializeText(TextView text, int color){
         float density = getResources().getDisplayMetrics().density;
         int fontSize;
         if (getActivity() != null)
@@ -187,17 +199,7 @@ public class TrashFragment extends Fragment {
         text.setHeight(height);
         text.setPadding(50, 20, 50, 30);
         text.setLayoutParams(params);
-
-        // Make the title larger than the description
-        SpannableString str = new SpannableString(note.getTitle() + "\n" + note.getText());
-        str.setSpan(new RelativeSizeSpan(1.3f), 0, note.getTitle().length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        str.setSpan(new StyleSpan(Typeface.BOLD), 0, note.getTitle().length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        text.setText(str);
-
-        if (UTIL.isDarkColor(note.getColor()))
+        if (UTIL.isDarkColor(color))
             text.setTextColor(getResources().getColor(R.color.white));
         else text.setTextColor(getResources().getColor(R.color.textColor));
     }
