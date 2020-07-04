@@ -1,4 +1,4 @@
-package com.sqsw.vanillanotes.settings;
+package com.sqsw.vanillanotes.nav_fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,20 +21,28 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
+import androidx.preference.SwitchPreferenceCompat;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-public class SettingsFragmentCompat extends PreferenceFragmentCompat {
+public class SettingsFragment extends PreferenceFragmentCompat {
 
     Activity mActivity;
     private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
     private final String KEY_FONT = "font_size";
+    private final String KEY_BACK_DIALOG = "back_dialog_toggle";
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (getActivity() == null) {
+            Log.e("settings_error", "getActivity() has returned null");
+            return super.onCreateView(inflater, container, savedInstanceState);
+        }
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("More");
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -41,9 +50,17 @@ public class SettingsFragmentCompat extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
+        ListPreference fontPref = findPreference(KEY_FONT);
+        Preference clearPref = findPreference("clear");
+        SwitchPreferenceCompat backPref = findPreference(KEY_BACK_DIALOG);
+
+        if (fontPref == null || clearPref == null || backPref == null){
+            Log.e("settings_error", "Preference initialization has thrown null pointer exception");
+            return;
+        }
         // Initialize the clear all notes preference
-        Preference pref = findPreference("clear");
-        pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+
+        clearPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -75,8 +92,15 @@ public class SettingsFragmentCompat extends PreferenceFragmentCompat {
             }
         });
 
-        ListPreference lp = findPreference(KEY_FONT);
-        lp.setSummary(lp.getValue());
+        // Initalize Font Size preference
+        fontPref.setSummary(fontPref.getValue());
+
+        // Initalize Back Dialog preference
+        if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("back_dialog_toggle", false)){
+            backPref.setSummary("Enabled");
+        } else {
+            backPref.setSummary("Disabled");
+        }
 
         preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
@@ -84,13 +108,22 @@ public class SettingsFragmentCompat extends PreferenceFragmentCompat {
                 if (s.equals(KEY_FONT)){
                     ListPreference pref = findPreference(s);
                     pref.setSummary(sharedPreferences.getString(s, ""));
-                    SharedPreferences prefs = mActivity.getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putString(KEY_FONT, ((ListPreference)findPreference(KEY_FONT)).getValue());
-                    editor.apply();
+                }
+
+                if (s.equals(KEY_BACK_DIALOG)){
+                    boolean toggle = sharedPreferences.getBoolean("back_dialog_toggle", false);
+                    SwitchPreferenceCompat pref = findPreference(s);
+                    if (toggle){
+                        pref.setSummary("Enabled");
+                    } else {
+                        pref.setSummary("Disabled");
+                    }
                 }
             }
         };
+
+
+
     }
 
     private void saveNotes(ArrayList<Note> list, String key){ // saves the arraylist using gson

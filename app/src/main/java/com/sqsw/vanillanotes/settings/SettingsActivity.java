@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import com.sqsw.vanillanotes.activities.MainActivity;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.activities.TrashActivity;
+import com.sqsw.vanillanotes.nav_fragments.SettingsFragment;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -28,7 +29,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         //adds setting fragment
         getSupportFragmentManager().beginTransaction().replace(R.id.settings_content,
-                new SettingsFragmentCompat()).commit();
+                new SettingsFragment()).commit();
 
     }
 

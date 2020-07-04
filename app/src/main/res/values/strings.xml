@@ -57,6 +57,8 @@
     <string name="clear_data_toast">All data cleared</string>
     <string name="clear_data_dialog_text">Would you like to clear ALL data? Your settings will still be saved.</string>
     <string name="clear_data_dialog_title">Clear Data</string>
+    <string name="back_dialog_toggle">Discard Confirmation</string>
+    <string name="back_dialog_toggle_summary">Show a confirmation for discarding your changes to a note</string>
 
     <!-- Interface Preferences -->
     <string name="font_size_title">Font Size</string>
@@ -83,4 +85,8 @@
     <string name="nav_item_more">More</string>
     <string name="action_star">Star note</string>
     <string name="action_starred">Unstar note</string>
+    <string name="back_dialog_toggle_off">Disabled</string>
+    <string name="back_dialog_toggle_on">Enabled</string>
+    <string name="checkbox_msg">Don\'t show this message again</string>
+
 </resources>

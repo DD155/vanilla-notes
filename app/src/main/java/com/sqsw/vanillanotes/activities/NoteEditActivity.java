@@ -5,6 +5,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.TaskStackBuilder;
+import androidx.preference.PreferenceManager;
 import petrov.kristiyan.colorpicker.ColorPicker;
 //import eltos.simpledialogfragment.color.SimpleColorDialog;
 
@@ -18,7 +19,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
@@ -27,6 +27,8 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -44,10 +46,11 @@ import java.util.Date;
 
 public class NoteEditActivity extends AppCompatActivity {
     private final Utility UTIL = new Utility(this);
+    private SharedPreferences prefs;
     private Context mContext = this;
     private int colorPicked = -1;
+    private boolean isOldNote;
     private boolean isTrash = false;
-    private boolean isNew = false;
     private boolean isStarred;
     private Menu mMenu;
 
@@ -62,84 +65,84 @@ public class NoteEditActivity extends AppCompatActivity {
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
         TextView dateView = findViewById(R.id.date);
         int fontSize = UTIL.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
 
-        // Check previous activity's caller
+        // Check previous activity's extras
         isTrash = "Trash".equals(getIntent().getStringExtra("caller"));
+        isOldNote = getIntent().getBooleanExtra("oldNote", false);
+
+        // Determine if previous activity was trash activity or not
+        if ("Trash".equals(getIntent().getStringExtra("caller")))
+            isTrash = true;
+
+        Log.d("bool_test", isOldNote + "");
 
         // Set attributes of EditTexts
-        String text = getIntent().getStringExtra("savedText");
-        String title = getIntent().getStringExtra("savedTitle");
         EditText titleView = findViewById(R.id.titleText);
         EditText textView = findViewById(R.id.editText);
 
         titleView.setPadding(50, 50, 50, 0);
         textView.setPadding(50, 50, 50, 50);
 
-
-        if (text != null) { // Case where user is editing old note
+        if (isOldNote) { // Case where user is editing old note
             Note currentNote = getCurrentNote();
-
+            // Set date information
             colorPicked = currentNote.getColor();
             String dateString = currentNote.getDate().substring(0, currentNote.getDate().length() - 6)
                     + " " + currentNote.getDate().substring(currentNote.getDate().length() - 2);
-            Log.d("date_test", "In Edit: " + dateString);
             dateView.setText(getString(R.string.date_created, dateString));
 
-            //dateView.setText("Date Created: " + currentNote.getDate());
-            if (title != null) titleView.setText(title);
-            textView.setText(text); // Set the text on the note page as the old string
+            // Set content and title
+            titleView.setText(currentNote.getTitle());
+            textView.setText(currentNote.getText()); // Set the text on the note page as the old string
             textView.setSelection(textView.getText().length()); // Set cursor to the end
             textView.requestFocus();
+
+            // Set color
+            colorPicked = currentNote.getColor();
+            Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, colorPicked);
+            titleView.setBackground(drawable);
+            textView.setBackground(drawable);
+
+            // Set text color depending if color is dark or not
+            if (UTIL.isDarkColor(colorPicked)) {
+                titleView.setTextColor(getResources().getColor(R.color.white));
+                textView.setTextColor(getResources().getColor(R.color.white));
+            }
         } else {
-            isNew = true;
             String dateString = UTIL.currentDate().substring(0, UTIL.currentDate().length() - 6)
                     + " " + UTIL.currentDate().substring(UTIL.currentDate().length() - 2);
             dateView.setText(getString(R.string.date_created, dateString));
+
+            // Set drawable of new note
+            textView.setBackgroundResource(R.drawable.shadow_border);
+            titleView.setBackgroundResource(R.drawable.shadow_border);
         }
 
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
         titleView.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
 
-        // Refresh drawables when focused on editing title
-        titleView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                refreshDrawables(colorPicked);
-            }
-        });
+        refreshDrawables(colorPicked);
 
-        // Change color of the background depending on what the user chose
-        if (getIntent().getIntExtra("color", 0) != -1 && getIntent().getIntExtra("color", 0) != 0){
-            colorPicked = getIntent().getIntExtra("color", 0);
-            Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, getIntent().getIntExtra("color", 0));
-            titleView.setBackground(drawable);
-            textView.setBackground(drawable);
 
-            if (UTIL.isDarkColor(colorPicked)) {
-                titleView.setTextColor(getResources().getColor(R.color.white));
-                textView.setTextColor(getResources().getColor(R.color.white));
-            }
-
-        } else {
-            textView.setBackgroundResource(R.drawable.shadow_border);
-            titleView.setBackgroundResource(R.drawable.shadow_border);
-        }
-
-        Log.d("trash_debug", "reached end of oncreate");
+        Log.d("dbg2", prefs.getBoolean("back_dialog_toggle", false)+"");
+        Log.d("dbg2", "pass oncreate test");
     }
 
     // Retrive ArrayList depending on if user entered from activity trash or home
     private Note getCurrentNote(){
         Note currentNote;
-        if (!isTrash)
-            currentNote = UTIL.getNotes("notes")
-                    .get(getIntent().getIntExtra("index", 0));
-        else
+        if (isTrash)
             currentNote = UTIL.getNotes("trash")
                     .get(getIntent().getIntExtra("index", 0));
+        else
+            currentNote = UTIL.getNotes("notes")
+                .get(getIntent().getIntExtra("index", 0));
+
 
         return currentNote;
     }
@@ -149,32 +152,18 @@ public class NoteEditActivity extends AppCompatActivity {
         ArrayList<Note> list; // ArrayList for either main notes or trash notes
         String key = "notes";
         Intent prev = new Intent(getApplicationContext(), MainActivity.class);
-        String text = getIntent().getStringExtra("savedText");
-        String caller = getIntent().getStringExtra("caller");
         EditText textView = findViewById(R.id.editText);
         EditText titleView = findViewById(R.id.titleText);
         // Make sure future calls do not return null pointer
-        if (caller == null) return;
 
-        // Determine if previous activity was trash activity or not
-        if ("Trash".equals(caller)) {
-            prev.putExtra("caller", "Trash");
-            isTrash = true;
-        }
+        if (isTrash) prev.putExtra("caller", "Trash");
 
         if (textView.getText().length() == 0) { // Check that the note is not empty
             warningDialog();
             return;
         }
 
-        if (text == null) { // Case where the note is new
-            prev.putExtra("note", textView.getText().toString().trim());
-            prev.putExtra("title", titleView.getText().toString().trim());
-            prev.putExtra("date", UTIL.currentDate());
-            prev.putExtra("star", isStarred);
-            prev.putExtra("color", colorPicked);
-        } else { // Case where the note is being edited
-            // Determine which list to use
+        if (isOldNote) { // Case where the note is new
             if (isTrash) {
                 list = UTIL.getNotes("trash");
                 key = "trash";
@@ -183,51 +172,44 @@ public class NoteEditActivity extends AppCompatActivity {
 
             Note current = list.get(getIntent().getIntExtra("index", 0));
             // Replace old strings with new strings in the ArrayList
-            if (colorPicked != -1)
-                current.setColor(colorPicked);
+            if (colorPicked != -1) current.setColor(colorPicked);
             current.setText(textView.getText().toString().trim());
             current.setTitle(titleView.getText().toString().trim());
             current.setStarred(isStarred);
             UTIL.saveNotes(list, key);
+        } else { // Case where the note is being edited
+            // Determine which list to use
+            prev.putExtra("note", textView.getText().toString().trim());
+            prev.putExtra("title", titleView.getText().toString().trim());
+            prev.putExtra("date", UTIL.currentDate());
+            prev.putExtra("star", isStarred);
+            prev.putExtra("color", colorPicked);
         }
         startActivity(prev);
     }
-
     private void deleteNote(){
-        String text = getIntent().getStringExtra("savedText");
-        String title = getIntent().getStringExtra("savedTitle");
-        String caller = getIntent().getStringExtra("caller");
-        int index = getIntent().getIntExtra("index", 0);
-        ArrayList<Note> trashList;
-
-        // Make sure future calls do not return null pointer
-        if (caller == null) return;
-
-        if (UTIL.getNotes("trash") != null) // check if trash can list is valid
-            trashList = UTIL.getNotes("trash");
-        else {
-            trashList = new ArrayList<>();
+        if (!isOldNote){
+            UTIL.goToActivity(MainActivity.class, null, getApplicationContext());
+            return;
         }
+        int index = getIntent().getIntExtra("index", 0);
+        ArrayList<Note> trashList = UTIL.getNotes("trash");
         ArrayList<Note> list  = UTIL.getNotes("notes");
+        Note current = list.get(index);
 
-        String date = list.get(index).getDate();
-
-
-        if (text != null) { // save the note to trash while deleting from main notes
-            if (caller.equals("Trash")) {
-                trashList.remove(getIntent().getIntExtra("index", 0)); //remove from trash can
+        if (isOldNote) { // save the note to trash while deleting from main notes
+            if ("Trash".equals(getIntent().getStringExtra("caller"))) {
+                trashList.remove(index); // Remove from trash can
             } else {
-                trashList.add(new Note(title, text, colorPicked, list.get(index).getDate()));
+                trashList.add(0, new Note(current.getTitle(), current.getText(), colorPicked, list.get(index).getDate()));
                 list.remove(index);
             }
             UTIL.saveNotes(list, "notes");
-
             UTIL.saveNotes(trashList, "trash");
         }
         Toast.makeText(getApplicationContext(), getString(R.string.delete_toast), Toast.LENGTH_LONG).show();
-
         // Load previously called activity
-        if (caller.equals("Trash")){
+        if ("Trash".equals(getIntent().getStringExtra("caller"))){
             UTIL.goToActivity(MainActivity.class, "Trash", getApplicationContext());
         } else {
             UTIL.goToActivity(MainActivity.class, null, getApplicationContext());
@@ -241,12 +223,8 @@ public class NoteEditActivity extends AppCompatActivity {
         trash = UTIL.getNotes("trash");
         list = UTIL.getNotes("notes");
 
-        Log.d("date_test", "Date: " + trash.get(index).getDate());
-
-        list.add(trash.get(index));
+        list.add(0, trash.get(index));
         trash.remove(index);
-
-        Log.d("date_test", list.get(list.size() - 1).getDate());
 
         UTIL.saveNotes(trash, "trash");
         UTIL.saveNotes(list, "notes");
@@ -264,17 +242,14 @@ public class NoteEditActivity extends AppCompatActivity {
 
         // Make sure future calls do not return null pointer
         // Inflate the menu; this adds items to the action bar if it is present.
-        if (getIntent().getStringExtra("caller") != null) {
-            if ("Trash".equals(getIntent().getStringExtra("caller"))) {
-                getMenuInflater().inflate(R.menu.trash_note_actions, menu);
-            } else
-                getMenuInflater().inflate(R.menu.edit_actions, menu);
+        if ("Trash".equals(getIntent().getStringExtra("caller"))) {
+            getMenuInflater().inflate(R.menu.trash_note_actions, menu);
         } else {
-            Log.e("NoteActivity", "Caller is null");
+            getMenuInflater().inflate(R.menu.edit_actions, menu);
         }
 
         // If the note is not new, check if the current note has been starred and load menu item
-        if (!isNew) {
+        if (isOldNote) {
             // Return boolean value for if the current note is starred or not
             if (list.get(getIntent().getIntExtra("index", 0)).getStarred()) {
                 menu.findItem(R.id.action_star).setIcon(R.drawable.star_selected_icon);
@@ -298,7 +273,11 @@ public class NoteEditActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                confirmDiscardDialog(MainActivity.class);
+                if (prefs.getBoolean("back_dialog_toggle", true))
+                    confirmDiscardDialog(MainActivity.class);
+                else{
+                    UTIL.goToActivity(MainActivity.class, getIntent().getStringExtra("caller"), this);
+                }
                 return true;
 
             case R.id.action_save:
@@ -394,7 +373,7 @@ public class NoteEditActivity extends AppCompatActivity {
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                dialog.dismiss();
             }
         });
 
@@ -403,13 +382,24 @@ public class NoteEditActivity extends AppCompatActivity {
     }
 
     private void confirmDiscardDialog(final Class<?> activity){
+        View checkBoxView = getLayoutInflater().inflate(R.layout.checkbox, null);
+        CheckBox checkBox = checkBoxView.findViewById(R.id.checkbox);
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean("back_dialog_toggle", false);
+                editor.apply();
+            }
+        });
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(checkBoxView);
         builder.setTitle(getString(R.string.discard_title));
         builder.setMessage(getString(R.string.discard_confirm));
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Log.d("caller_test", "Edit Actiivty: " + getIntent().getStringExtra("caller"));
                 if ("Trash".equals(getIntent().getStringExtra("caller")))
                     UTIL.goToActivity(activity,"Trash", getApplicationContext());
                 else
@@ -420,7 +410,7 @@ public class NoteEditActivity extends AppCompatActivity {
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                dialog.dismiss();
             }
         });
 
@@ -442,7 +432,7 @@ public class NoteEditActivity extends AppCompatActivity {
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                dialog.dismiss();
             }
         });
 
@@ -568,27 +558,23 @@ public class NoteEditActivity extends AppCompatActivity {
         Toast.makeText(mContext, "Reminder set", Toast.LENGTH_SHORT).show();
     }
 
-    // Shows a dialog when the user presses back while editing a note
-    @Override
-    public void onBackPressed() {
-        // Make sure future calls do not return null pointer
-        if (getIntent().getStringExtra("caller") != null) {
-            /*
-            if ("MainActivity".equals(getIntent().getStringExtra("caller")))
-                confirmDiscardDialog(MainActivity.class);
-            else
-                confirmDiscardDialog(TrashActivity.class);
-
-             */
-            confirmDiscardDialog(MainActivity.class);
-        } else {
-            Log.e("NoteActivity", "Caller is null");
-        }
-    }
-
     // Refresh drawables when creating notifications because they change them for some reason
     private void refreshDrawables(int color){
         findViewById(R.id.titleText).setBackground(UTIL.changeDrawableColor(R.drawable.shadow_border, color));
         findViewById(R.id.editText).setBackground(UTIL.changeDrawableColor(R.drawable.shadow_border, color));
     }
+
+    // Shows a dialog when the user presses back while editing a note
+    @Override
+    public void onBackPressed() {
+        Log.d("back_press_test",
+                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("back_dialog_toggle", true) + "");
+        if (prefs.getBoolean("back_dialog_toggle", true))
+            confirmDiscardDialog(MainActivity.class);
+        else {
+            super.onBackPressed();
+        }
+    }
+
+
 }

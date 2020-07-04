@@ -98,6 +98,21 @@ public class Utility extends ContextWrapper {
         return String.format("#%06X", (0xFFFFFF & color)).substring(1);
     }
 
+    public String getDarkerColor(int color){
+        // Logic for making pressed down color a darker shade
+        String[] rgbStr = {(hexFromColorInt(color)).substring(0, 2),
+                (hexFromColorInt(color)).substring(2, 4),
+                (hexFromColorInt(color)).substring(4)
+        };
+        double[] rgb = { // Divide RGB value to make the result darker
+                Math.round(Integer.valueOf(rgbStr[0], 16) * 0.75),
+                Math.round(Integer.valueOf(rgbStr[1], 16) * 0.75),
+                Math.round(Integer.valueOf(rgbStr[2], 16) * 0.75)
+        };
+        // Format string in #RRGGBB style
+        return String.format("#%02X%02X%02X", (int)rgb[0], (int)rgb[1], (int)rgb[2]);
+    }
+
     // Returns boolean if the given color is dark or not. Used to change text color for readability
     public boolean isDarkColor(int color){
         return color == getResources().getColor(R.color.red) || color == getResources().getColor(R.color.blue) ||

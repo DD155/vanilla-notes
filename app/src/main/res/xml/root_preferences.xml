@@ -25,6 +25,11 @@
         app:iconSpaceReserved="false"
         app:title="@string/settings_notes">
 
+        <SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            app:key="back_dialog_toggle"
+            app:title="@string/back_dialog_toggle" />
+
         <Preference
             app:iconSpaceReserved="false"
             app:key="clear"

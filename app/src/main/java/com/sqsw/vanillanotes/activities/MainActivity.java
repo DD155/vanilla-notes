@@ -4,8 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import android.annotation.SuppressLint;
@@ -27,7 +25,7 @@ import com.sqsw.vanillanotes.classes.NoteComparator;
 import com.sqsw.vanillanotes.classes.Utility;
 import com.sqsw.vanillanotes.nav_fragments.NoteFragment;
 import com.sqsw.vanillanotes.nav_fragments.TrashFragment;
-import com.sqsw.vanillanotes.settings.SettingsFragmentCompat;
+import com.sqsw.vanillanotes.nav_fragments.SettingsFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,26 +50,33 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(myToolbar);
 
         final ArrayList<Note> noteList = UTIL.getNotes("notes");
+        ArrayList<Note> starredNotes = UTIL.getNotes("starred");
         String editedText = getIntent().getStringExtra("note");
         String titleText = getIntent().getStringExtra("title");
         String date = getIntent().getStringExtra("date");
         int color = getIntent().getIntExtra("color", 0);
 
-        if (editedText != null){ // If the user has input text already, add new note with that text
+        // Check if user just created a new note
+        if (editedText != null){
             Note newNote = new Note(editedText);
             newNote.setDate(date);
-            if (titleText != null) newNote.setTitle(titleText); // Check if there is a title
+            if (titleText != null) newNote.setTitle(titleText);
             if (color != -1) newNote.setColor(color);
+            // Handle starred note case
             newNote.setStarred(getIntent().getBooleanExtra("star", false));
-            // Add note to the top of the list
-            noteList.add(0, newNote);
-            UTIL.saveNotes(noteList, "notes");
+            if (newNote.getStarred()){ // Put current note to starred notes list
+                starredNotes.add(0, newNote);
+                UTIL.saveNotes(starredNotes, "starred");
+            } else {
+                // Add note to the top of the list
+                noteList.add(0, newNote);
+                UTIL.saveNotes(noteList, "notes");
+            }
         }
 
-        // Resort
+        // Resort after note is created or edited
         Log.d("sort_index", getSharedPreferences("NOTES", Context.MODE_PRIVATE).getInt("sort_index", 0)+"");
         sortNotes(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getInt("sort_index", 0));
-
 
         BottomNavigationView navView = findViewById(R.id.bottom_nav);
         navView.setItemIconTintList(null);
@@ -86,58 +91,6 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new NoteFragment()).commit();
             navView.getMenu().getItem(0).setChecked(true);
         }
-
-
-        /* Set up navigation drawer
-        drawerLayout = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.nav_notes:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new NoteFragment(),
-                                "notes_frag").commit();
-                        break;
-
-                    case R.id.nav_trash:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout,
-                                new TrashFragment(), "trash_frag").commit();
-                        break;
-
-                    case R.id.nav_fav:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout,
-                                new FavoritesFragment()).commit();
-                        break;
-
-                    case R.id.nav_settings:
-                        UTIL.goToActivity(SettingsActivity.class, "MainActivity", getApplicationContext());
-                        break;
-
-                    case R.id.nav_about:
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/DD155/vanilla-notes")));
-                        break;
-                }
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
-            }
-        });
-
-        if (getIntent().getStringExtra("caller") != null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new TrashFragment()).commit();
-            navigationView.getMenu().getItem(1).setChecked(true);
-        } else {
-            // Default fragment
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new NoteFragment()).commit();
-            navigationView.getMenu().getItem(0).setChecked(true);
-        }
-        // Set Navigation Button on Toolbar
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, myToolbar,
-                R.string.nav_drawer_open, R.string.nav_drawer_close);
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-
-         */
     }
 
 
@@ -160,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
                         case R.id.nav_more:
                             isTrashFrag = false;
-                            selectedFrag = new SettingsFragmentCompat();
+                            selectedFrag = new SettingsFragment();
                             break;
                     }
 

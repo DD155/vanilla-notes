@@ -45,103 +45,59 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.solver.widgets.Helper;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 public class NoteFragment extends Fragment {
     private View view;
     private LinearLayout linear;
-    private Helper helper;
-    private static final String SERIALIZABLE_KEY = "KEY";
+    private SharedPreferences prefs;
     private Utility UTIL;
-    private FragmentListener listener;
-
-    public interface FragmentListener {
-        void onInputSent (CharSequence input);
-    }
-
-    // Get Notes ArrayList from Main Activity
-    public static NoteFragment newInstance(ArrayList<Note> notes) {
-        Bundle args = new Bundle();
-        args.putSerializable(SERIALIZABLE_KEY, notes);
-        NoteFragment fragment = new NoteFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.notes_layout, container, false);
-        final ArrayList<Note> noteList;
+        final ArrayList<Note> noteList, starredList;
         linear = view.findViewById(R.id.linear);
         UTIL = new Utility(getActivity());
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Notes");
         //Bundle bundle = getArguments();
 
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
         //noteList = (ArrayList<Note>)bundle.getSerializable(SERIALIZABLE_KEY);
         noteList = getNotes("notes");
+        starredList = getNotes("starred");
 
         if (noteList.size() != 0) { // Makes sure user has already notes, loads them on entering app
             for (int i = 0; i < noteList.size(); i++) {
                 final TextView text = new TextView(getContext());
+                final int index = i; // Index of ArrayList
                 final Note currNote = noteList.get(i);
-                Log.d("date_test", currNote.getDate());
-
-                String title = currNote.getTitle();
-                String description = currNote.getText();
-
                 final Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
+
                 text.setBackground(drawable);
-
-                // Make the title larger than the description
-                SpannableString str = new SpannableString(title + "\n" + description);
-                str.setSpan(new RelativeSizeSpan(1.3f), 0, title.length(),
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                str.setSpan(new StyleSpan(Typeface.BOLD), 0, title.length(),
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                Log.d("Frag_test", "clear 6");
-
-                initializeText(text, currNote.getColor());
-                text.setText(str);
+                initializeText(text, currNote);
                 linear.addView(text);
-                Log.d("Frag_test", "clear 7");
 
                 // Make the text clickable
-                final int index = i; // Index of ArrayList as,dlas
-
                 text.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
                         switch (event.getAction()){
                             case MotionEvent.ACTION_CANCEL:
-                                Log.d("cancel_action", "Cancel action");
                                 text.setBackground(drawable);
                                 return true;
 
                             case MotionEvent.ACTION_DOWN:
                                 if (currNote.getColor() != -1) {
-                                    // Logic for making pressed down color a darker shade
-                                    String[] rgbStr = {(UTIL.hexFromColorInt(currNote.getColor())).substring(0, 2),
-                                            (UTIL.hexFromColorInt(currNote.getColor())).substring(2, 4),
-                                            (UTIL.hexFromColorInt(currNote.getColor())).substring(4)
-                                    };
-                                    double[] rgb = { // Divide RGB value to make the result darker
-                                            Math.round(Integer.valueOf(rgbStr[0], 16) * 0.75),
-                                            Math.round(Integer.valueOf(rgbStr[1], 16) * 0.75),
-                                            Math.round(Integer.valueOf(rgbStr[2], 16) * 0.75)
-                                    };
-                                    // Format string in #RRGGBB style
-                                    String newHex = String.format("#%02X%02X%02X", (int)rgb[0], (int)rgb[1], (int)rgb[2]);
-
+                                    String newHex = UTIL.getDarkerColor(currNote.getColor());
                                     // Create new drawable to replace
                                     Drawable holdDrawable = UTIL.returnDrawable(R.drawable.shadow_border);
                                     holdDrawable.setColorFilter(new
                                             PorterDuffColorFilter(Color.parseColor(newHex), PorterDuff.Mode.MULTIPLY));
-
                                     text.setBackground(holdDrawable);
-
-                                    Log.d("shade", "New Hex: " + newHex);
                                 } else
                                     text.setBackgroundResource(R.drawable.shadow_border_hold);
 
@@ -155,12 +111,9 @@ public class NoteFragment extends Fragment {
                                     Intent notesActivity = new Intent();
 
                                     notesActivity.setClass(getActivity().getApplicationContext(), NoteEditActivity.class);
-                                    notesActivity.putExtra("savedText", noteList.get(index).getText());
-                                    notesActivity.putExtra("savedTitle", noteList.get(index).getTitle());
+                                    notesActivity.putExtra("oldNote", true);
                                     notesActivity.putExtra("index", index); // pass index to next activity to change content later
-                                    notesActivity.putExtra("caller", "MainActivity");
-                                    notesActivity.putExtra("date", noteList.get(index).getDate());
-                                    notesActivity.putExtra("color", currNote.getColor());
+                                    //notesActivity.putExtra("caller", "MainActivity");
                                     text.setBackground(drawable);
                                     startActivity(notesActivity);
                                 } else {
@@ -178,9 +131,9 @@ public class NoteFragment extends Fragment {
         return view;
     }
 
-    private void initializeText(TextView text, int color){
+    private void initializeText(TextView text, Note note){
         float density = getResources().getDisplayMetrics().density;
-        int fontSize = UTIL.getFontSize(getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
+        int fontSize = UTIL.getFontSize(prefs.getString("font_size", null));
         int height;
         Log.d("density", Float.toString(density));
         // Set height based on dpi
@@ -211,7 +164,17 @@ public class NoteFragment extends Fragment {
         text.setHeight(height);
         text.setPadding(50, 20, 50, 30);
         text.setLayoutParams(params);
-        if (UTIL.isDarkColor(color))
+
+        // Make the title larger than the description
+        SpannableString str = new SpannableString(note.getTitle() + "\n" + note.getText());
+        str.setSpan(new RelativeSizeSpan(1.3f), 0, note.getTitle().length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        str.setSpan(new StyleSpan(Typeface.BOLD), 0, note.getTitle().length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        text.setText(str);
+
+        if (UTIL.isDarkColor(note.getColor()))
             text.setTextColor(getResources().getColor(R.color.white));
         else text.setTextColor(getResources().getColor(R.color.textColor));
     }
@@ -287,5 +250,4 @@ public class NoteFragment extends Fragment {
         }
         return gson.fromJson(json, type);
     }
-
 }

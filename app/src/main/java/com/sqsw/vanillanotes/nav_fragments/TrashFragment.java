@@ -45,61 +45,44 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.solver.widgets.Helper;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 public class TrashFragment extends Fragment {
     private View view;
     private LinearLayout linear;
     private ArrayList<Note> noteList;
-    private Helper helper;
-    private static final String SERIALIZABLE_KEY = "KEY";
+    private SharedPreferences prefs;
     private Utility UTIL;
-    private NoteFragment.FragmentListener listener;
 
-    public static TrashFragment newInstance(ArrayList<Note> notes) {
-        Bundle args = new Bundle();
-        args.putSerializable(SERIALIZABLE_KEY, notes);
-        TrashFragment fragment = new TrashFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Trash");
         view = inflater.inflate(R.layout.notes_layout, container, false);
+
+        if (getActivity() != null)
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Trash");
+        else return view;
+
         linear = view.findViewById(R.id.linear);
         UTIL = new Utility(getActivity().getApplicationContext());
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        Intent def = new Intent();
-        def.putExtra("caller", "Trash");
+        Intent intent = new Intent();
+        intent.putExtra("caller", "Trash");
         noteList = getNotes("trash");
 
         if (noteList.size() != 0) { // Makes sure user has already notes, loads them on entering app
             for (int i = 0; i < noteList.size(); i++) {
                 final TextView text = new TextView(getContext());
+                final int index = i; // Index of ArrayList
                 final Note currNote = noteList.get(i);
-
-                String title = currNote.getTitle();
-                String description = currNote.getText();
-
                 final Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
+
                 text.setBackground(drawable);
-
-                // Make the title larger than the description
-                SpannableString str = new SpannableString(title + "\n" + description);
-                str.setSpan(new RelativeSizeSpan(1.3f), 0, title.length(),
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                str.setSpan(new StyleSpan(Typeface.BOLD), 0, title.length(),
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                initializeText(text, currNote.getColor());
-                text.setText(str);
+                initializeText(text, currNote);
                 linear.addView(text);
-
-                // Make the text clickable
-                final int index = i; // Index of ArrayList as,dlas
 
                 text.setOnTouchListener(new View.OnTouchListener() {
                     @Override
@@ -139,12 +122,9 @@ public class TrashFragment extends Fragment {
                                     else {
                                         Log.e("null_err", "TrashFragment getActivity() in OnCreate() returns null");
                                     }
-                                    notesActivity.putExtra("savedText", noteList.get(index).getText());
-                                    notesActivity.putExtra("savedTitle", noteList.get(index).getTitle());
+                                    notesActivity.putExtra("oldNote", true);
                                     notesActivity.putExtra("index", index); // pass index to next activity to change content later
                                     notesActivity.putExtra("caller", "Trash");
-                                    notesActivity.putExtra("date", noteList.get(index).getDate());
-                                    notesActivity.putExtra("color", currNote.getColor());
                                     text.setBackground(drawable);
                                     startActivity(notesActivity);
                                 } else {
@@ -168,11 +148,11 @@ public class TrashFragment extends Fragment {
         return view;
     }
 
-    private void initializeText(TextView text, int color){
+    private void initializeText(TextView text, Note note){
         float density = getResources().getDisplayMetrics().density;
         int fontSize;
         if (getActivity() != null)
-            fontSize = UTIL.getFontSize(getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
+            fontSize = UTIL.getFontSize(prefs.getString("font_size", ""));
         else {
             fontSize = 17;
             Log.e("null_err", "TrashFragment getActivity() in intializeText() returns null");
@@ -207,7 +187,17 @@ public class TrashFragment extends Fragment {
         text.setHeight(height);
         text.setPadding(50, 20, 50, 30);
         text.setLayoutParams(params);
-        if (UTIL.isDarkColor(color))
+
+        // Make the title larger than the description
+        SpannableString str = new SpannableString(note.getTitle() + "\n" + note.getText());
+        str.setSpan(new RelativeSizeSpan(1.3f), 0, note.getTitle().length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        str.setSpan(new StyleSpan(Typeface.BOLD), 0, note.getTitle().length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        text.setText(str);
+
+        if (UTIL.isDarkColor(note.getColor()))
             text.setTextColor(getResources().getColor(R.color.white));
         else text.setTextColor(getResources().getColor(R.color.textColor));
     }
