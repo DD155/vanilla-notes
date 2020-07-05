@@ -83,6 +83,8 @@ public class NoteEditActivity extends AppCompatActivity {
         // Set attributes of EditTexts
         EditText titleView = findViewById(R.id.titleText);
         EditText textView = findViewById(R.id.editText);
+        titleView.setElevation(10);
+        textView.setElevation(10);
 
         titleView.setPadding(50, 50, 50, 0);
         textView.setPadding(50, 50, 50, 50);

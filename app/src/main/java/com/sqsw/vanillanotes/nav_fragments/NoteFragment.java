@@ -135,6 +135,7 @@ public class NoteFragment extends Fragment {
         float density = getResources().getDisplayMetrics().density;
         int fontSize = UTIL.getFontSize(prefs.getString("font_size", null));
         int height;
+
         Log.d("density", Float.toString(density));
         // Set height based on dpi
         if (density >= 4.0) {
