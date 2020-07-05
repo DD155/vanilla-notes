@@ -105,9 +105,9 @@ public class Utility extends ContextWrapper {
                 (hexFromColorInt(color)).substring(4)
         };
         double[] rgb = { // Divide RGB value to make the result darker
-                Math.round(Integer.valueOf(rgbStr[0], 16) * 0.75),
-                Math.round(Integer.valueOf(rgbStr[1], 16) * 0.75),
-                Math.round(Integer.valueOf(rgbStr[2], 16) * 0.75)
+                Math.round(Integer.valueOf(rgbStr[0], 16) * 0.85),
+                Math.round(Integer.valueOf(rgbStr[1], 16) * 0.85),
+                Math.round(Integer.valueOf(rgbStr[2], 16) * 0.85)
         };
         // Format string in #RRGGBB style
         return String.format("#%02X%02X%02X", (int)rgb[0], (int)rgb[1], (int)rgb[2]);

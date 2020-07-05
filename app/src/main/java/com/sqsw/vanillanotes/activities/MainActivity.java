@@ -23,6 +23,7 @@ import com.sqsw.vanillanotes.classes.Note;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.classes.NoteComparator;
 import com.sqsw.vanillanotes.classes.Utility;
+import com.sqsw.vanillanotes.nav_fragments.NoteCardFragment;
 import com.sqsw.vanillanotes.nav_fragments.NoteFragment;
 import com.sqsw.vanillanotes.nav_fragments.TrashFragment;
 import com.sqsw.vanillanotes.nav_fragments.SettingsFragment;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         String titleText = getIntent().getStringExtra("title");
         String date = getIntent().getStringExtra("date");
         int color = getIntent().getIntExtra("color", 0);
+
 
         // Check if user just created a new note
         if (editedText != null){
@@ -102,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
 
                     switch (item.getItemId()){
                         case R.id.nav_notes:
+                            //selectedFrag = new NoteFragment();
                             selectedFrag = new NoteFragment();
                             isTrashFrag = false;
                             break;

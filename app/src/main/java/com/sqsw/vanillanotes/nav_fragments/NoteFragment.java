@@ -172,6 +172,7 @@ public class NoteFragment extends Fragment {
         str.setSpan(new StyleSpan(Typeface.BOLD), 0, note.getTitle().length(),
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
+        text.setElevation(10);
         text.setText(str);
 
         if (UTIL.isDarkColor(note.getColor()))

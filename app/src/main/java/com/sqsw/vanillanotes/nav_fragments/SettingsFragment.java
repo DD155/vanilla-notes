@@ -44,7 +44,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             return super.onCreateView(inflater, container, savedInstanceState);
         }
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("More");
-        return super.onCreateView(inflater, container, savedInstanceState);
+        View v = super.onCreateView(inflater, container, savedInstanceState);
+        v.setBackgroundColor(getResources().getColor(R.color.background));
+        return v;
     }
 
     @Override

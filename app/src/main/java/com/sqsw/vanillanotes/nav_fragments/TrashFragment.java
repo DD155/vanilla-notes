@@ -76,21 +76,10 @@ public class TrashFragment extends Fragment {
                 final TextView text = new TextView(getContext());
                 final Note currNote = noteList.get(i);
 
-                String title = currNote.getTitle();
-                String description = currNote.getText();
-
                 final Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
                 text.setBackground(drawable);
 
-                // Make the title larger than the description
-                SpannableString str = new SpannableString(title + "\n" + description);
-                str.setSpan(new RelativeSizeSpan(1.3f), 0, title.length(),
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                str.setSpan(new StyleSpan(Typeface.BOLD), 0, title.length(),
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                initializeText(text, currNote.getColor());
-                text.setText(str);
+                initializeText(text, currNote);
                 linear.addView(text);
 
                 // Make the text clickable
@@ -108,7 +97,7 @@ public class TrashFragment extends Fragment {
                             case MotionEvent.ACTION_DOWN:
                                 if (currNote.getColor() != -1) {
                                     // Logic for making pressed down color a darker shade
-                                    String newHex = returnDarkerColor(currNote);
+                                    String newHex = UTIL.getDarkerColor(currNote.getColor());
                                     // Create new drawable to replace
                                     Drawable holdDrawable = UTIL.returnDrawable(R.drawable.shadow_border);
                                     holdDrawable.setColorFilter(new
@@ -160,15 +149,9 @@ public class TrashFragment extends Fragment {
         return view;
     }
 
-    private void initializeText(TextView text, int color){
+    private void initializeText(TextView text, Note note){
         float density = getResources().getDisplayMetrics().density;
-        int fontSize;
-        if (getActivity() != null)
-            fontSize = UTIL.getFontSize(prefs.getString("font_size", ""));
-        else {
-            fontSize = 17;
-            Log.e("null_err", "TrashFragment getActivity() in intializeText() returns null");
-        }
+        int fontSize = UTIL.getFontSize(prefs.getString("font_size", null));
         int height;
         Log.d("density", Float.toString(density));
         // Set height based on dpi
@@ -199,23 +182,20 @@ public class TrashFragment extends Fragment {
         text.setHeight(height);
         text.setPadding(50, 20, 50, 30);
         text.setLayoutParams(params);
-        if (UTIL.isDarkColor(color))
+
+        // Make the title larger than the description
+        SpannableString str = new SpannableString(note.getTitle() + "\n" + note.getText());
+        str.setSpan(new RelativeSizeSpan(1.3f), 0, note.getTitle().length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        str.setSpan(new StyleSpan(Typeface.BOLD), 0, note.getTitle().length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        text.setElevation(10);
+        text.setText(str);
+
+        if (UTIL.isDarkColor(note.getColor()))
             text.setTextColor(getResources().getColor(R.color.white));
         else text.setTextColor(getResources().getColor(R.color.textColor));
-    }
-
-    private String returnDarkerColor(Note currNote){
-        String[] rgbStr = {(UTIL.hexFromColorInt(currNote.getColor())).substring(0, 2),
-                (UTIL.hexFromColorInt(currNote.getColor())).substring(2, 4),
-                (UTIL.hexFromColorInt(currNote.getColor())).substring(4)
-        };
-        double[] rgb = { // Divide RGB value to make the result darker
-                Math.round(Integer.valueOf(rgbStr[0], 16) * 0.75),
-                Math.round(Integer.valueOf(rgbStr[1], 16) * 0.75),
-                Math.round(Integer.valueOf(rgbStr[2], 16) * 0.75)
-        };
-        // Format string in #RRGGBB style
-        return String.format("#%02X%02X%02X", (int)rgb[0], (int)rgb[1], (int)rgb[2]);
     }
 
     private void confirmDialog(){
