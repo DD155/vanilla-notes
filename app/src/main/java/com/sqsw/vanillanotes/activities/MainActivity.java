@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
@@ -56,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
         String titleText = getIntent().getStringExtra("title");
         String date = getIntent().getStringExtra("date");
         int color = getIntent().getIntExtra("color", 0);
-
 
         // Check if user just created a new note
         if (editedText != null){

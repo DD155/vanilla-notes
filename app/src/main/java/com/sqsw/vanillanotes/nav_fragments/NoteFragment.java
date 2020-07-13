@@ -34,6 +34,7 @@ import com.google.gson.reflect.TypeToken;
 import com.sqsw.vanillanotes.classes.Note;
 import com.sqsw.vanillanotes.activities.NoteEditActivity;
 import com.sqsw.vanillanotes.R;
+import com.sqsw.vanillanotes.classes.NotesAdapter;
 import com.sqsw.vanillanotes.classes.Utility;
 
 import java.lang.reflect.Type;
@@ -46,6 +47,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.solver.widgets.Helper;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class NoteFragment extends Fragment {
     private View view;
@@ -57,11 +60,19 @@ public class NoteFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.notes_layout, container, false);
+        //view = inflater.inflate(R.layout.notes_layout, container, false);
+        view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
         final ArrayList<Note> noteList, starredList;
         linear = view.findViewById(R.id.linear);
         UTIL = new Utility(getActivity());
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Notes");
+
+        Log.d("rv_test", "1");
+
+        RecyclerView rv = view.findViewById(R.id.recycler_notes);
+
+        Log.d("rv_test", "2");
+
         //Bundle bundle = getArguments();
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -70,6 +81,13 @@ public class NoteFragment extends Fragment {
         noteList = getNotes("notes");
         starredList = getNotes("starred");
 
+        NotesAdapter adapter = new NotesAdapter(noteList);
+        rv.setAdapter(adapter);
+        rv.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        Log.d("rv_test", "3");
+
+        /*
         if (noteList.size() != 0) { // Makes sure user has already notes, loads them on entering app
             for (int i = 0; i < noteList.size(); i++) {
                 final TextView text = new TextView(getContext());
@@ -126,8 +144,10 @@ public class NoteFragment extends Fragment {
                     }
                 });
             }
-        }
+        } */
         setHasOptionsMenu(true);
+        Log.d("rv_test", "4");
+
         return view;
     }
 
