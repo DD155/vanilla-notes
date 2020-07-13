@@ -34,7 +34,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.activities.NoteEditActivity;
+import com.sqsw.vanillanotes.classes.ItemClickSupport;
 import com.sqsw.vanillanotes.classes.Note;
+import com.sqsw.vanillanotes.classes.NotesAdapter;
 import com.sqsw.vanillanotes.classes.Utility;
 
 import java.lang.reflect.Type;
@@ -46,13 +48,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.solver.widgets.Helper;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 public class TrashFragment extends Fragment {
     private View view;
-    private LinearLayout linear;
     private ArrayList<Note> noteList;
     private SharedPreferences prefs;
     private Utility UTIL;
+    private RecyclerView recyclerView;
+    private NotesAdapter adapter;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -62,15 +68,39 @@ public class TrashFragment extends Fragment {
         if (getActivity() != null)
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Trash");
 
-        view = inflater.inflate(R.layout.notes_layout, container, false);
-        linear = view.findViewById(R.id.linear);
+        view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
         UTIL = new Utility(getActivity().getApplicationContext());
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         Intent def = new Intent();
         def.putExtra("caller", "Trash");
         noteList = getNotes("trash");
+        recyclerView = view.findViewById(R.id.recycler_notes);
 
+        ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+            @Override
+            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                Log.d("click_test", "clicked");
+                Intent notesActivity = new Intent();
+
+                notesActivity.setClass(getActivity(), NoteEditActivity.class);
+                notesActivity.putExtra("oldNote", true);
+                notesActivity.putExtra("index", position);
+                notesActivity.putExtra("caller", "Trash"); // Pass caller to edit activity
+                startActivity(notesActivity);
+            }
+        });
+
+        if (noteList.size() > 0) {
+            adapter = new NotesAdapter(noteList);
+            recyclerView.setAdapter(adapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        } else { // Show text showing the trash is empty
+            TextView defaultText = view.findViewById(R.id.clear_text);
+            defaultText.setText(getResources().getString(R.string.trash_empty));
+        }
+
+        /*
         if (noteList.size() != 0) { // Makes sure user has already notes, loads them on entering app
             for (int i = 0; i < noteList.size(); i++) {
                 final TextView text = new TextView(getContext());
@@ -80,7 +110,7 @@ public class TrashFragment extends Fragment {
                 text.setBackground(drawable);
 
                 initializeText(text, currNote);
-                linear.addView(text);
+                //linear.addView(text);
 
                 // Make the text clickable
                 final int index = i; // Index of ArrayList as,dlas
@@ -143,8 +173,8 @@ public class TrashFragment extends Fragment {
             defaultText.setText(getResources().getString(R.string.trash_empty));
             defaultText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
             defaultText.setGravity(Gravity.CENTER_HORIZONTAL);
-            linear.addView(defaultText);
-        }
+            //linear.addView(defaultText);
+        } */
         setHasOptionsMenu(true);
         return view;
     }
@@ -221,7 +251,10 @@ public class TrashFragment extends Fragment {
     }
 
     private void clearNotes(){
+        int size = noteList.size();
         noteList.clear();
+
+        adapter.notifyItemRangeRemoved(0, size);
 
         if (getActivity() != null) {
             SharedPreferences prefs = getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
@@ -232,14 +265,8 @@ public class TrashFragment extends Fragment {
             editor.apply();
         } else Log.e("null_err", "TrashFragment getActivity() in clearNotes() returns null");
 
-        LinearLayout ll = view.findViewById(R.id.linear);
-        ll.removeAllViews();
-
-        TextView defaultText = new TextView(getActivity());
+        TextView defaultText = view.findViewById(R.id.clear_text);
         defaultText.setText(getResources().getString(R.string.trash_empty));
-        defaultText.setTextSize(20);
-        defaultText.setGravity(Gravity.CENTER_HORIZONTAL);
-        ll.addView(defaultText);
 
         Toast.makeText(getActivity().getApplicationContext(), "Trash emptied", Toast.LENGTH_LONG).show();
     }
@@ -248,7 +275,6 @@ public class TrashFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.trash_actions, menu);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {

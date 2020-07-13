@@ -19,6 +19,7 @@
         android:ems="10"
         android:gravity="top"
         android:hint="@string/enter_your_title"
+        android:textStyle="bold"
         android:importantForAutofill="no"
         android:inputType="text"
         android:maxLength="31"

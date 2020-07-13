@@ -78,7 +78,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Resort after note is created or edited
         Log.d("sort_index", getSharedPreferences("NOTES", Context.MODE_PRIVATE).getInt("sort_index", 0)+"");
-        sortNotes(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getInt("sort_index", 0));
+        if (noteList.size() > 0)
+            sortNotes(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getInt("sort_index", 0));
 
         BottomNavigationView navView = findViewById(R.id.bottom_nav);
         navView.setItemIconTintList(null);

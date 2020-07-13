@@ -66,7 +66,6 @@ public class NoteEditActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
         TextView dateView = findViewById(R.id.date);
         int fontSize = UTIL.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
 
@@ -85,6 +84,9 @@ public class NoteEditActivity extends AppCompatActivity {
         EditText textView = findViewById(R.id.editText);
         titleView.setElevation(10);
         textView.setElevation(10);
+
+        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize + 3);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
 
         titleView.setPadding(50, 50, 50, 0);
         textView.setPadding(50, 50, 50, 50);
@@ -129,10 +131,6 @@ public class NoteEditActivity extends AppCompatActivity {
         titleView.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
 
         refreshDrawables(colorPicked);
-
-
-        Log.d("dbg2", prefs.getBoolean("back_dialog_toggle", false)+"");
-        Log.d("dbg2", "pass oncreate test");
     }
 
     // Retrive ArrayList depending on if user entered from activity trash or home
@@ -144,7 +142,6 @@ public class NoteEditActivity extends AppCompatActivity {
         else
             currentNote = UTIL.getNotes("notes")
                 .get(getIntent().getIntExtra("index", 0));
-
 
         return currentNote;
     }

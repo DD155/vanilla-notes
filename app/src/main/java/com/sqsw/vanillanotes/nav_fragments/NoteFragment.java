@@ -39,6 +39,7 @@ import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.classes.NotesAdapter;
 import com.sqsw.vanillanotes.classes.Utility;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
@@ -55,10 +56,11 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 public class NoteFragment extends Fragment {
     private View view;
-    private LinearLayout linear;
+    private ArrayList<Note> notes;
     private SharedPreferences prefs;
     private Utility UTIL;
     private RecyclerView recyclerView;
+    private NotesAdapter adapter;
 
     @SuppressLint("ClickableViewAccessibility")
     @Nullable
@@ -66,8 +68,7 @@ public class NoteFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //view = inflater.inflate(R.layout.notes_layout, container, false);
         view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
-        final ArrayList<Note> noteList, starredList;
-        linear = view.findViewById(R.id.linear);
+        final ArrayList<Note> starredList;
         UTIL = new Utility(getActivity());
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Notes");
 
@@ -77,7 +78,7 @@ public class NoteFragment extends Fragment {
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         //noteList = (ArrayList<Note>)bundle.getSerializable(SERIALIZABLE_KEY);
-        noteList = getNotes("notes");
+        notes = getNotes("notes");
         starredList = getNotes("starred");
 
         ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
@@ -94,10 +95,11 @@ public class NoteFragment extends Fragment {
             }
         });
 
-        NotesAdapter adapter = new NotesAdapter(noteList);
+        adapter = new NotesAdapter(notes);
         recyclerView.setItemAnimator(new SlideInUpAnimator());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
 
 
 
@@ -240,17 +242,15 @@ public class NoteFragment extends Fragment {
 
     // Remove notes by clearing note ArrayList and resetting linear layout.
     private void clearNotes(){
-        ArrayList<Note> list = UTIL.getNotes("notes");
         ArrayList<Note> trash = UTIL.getNotes("trash");
-        trash.addAll(list);
-        list.clear();
+        trash.addAll(notes);
+        int size = notes.size();
+        notes.clear();
 
-        UTIL.saveNotes(list, "notes");
+        UTIL.saveNotes(notes, "notes");
         UTIL.saveNotes(trash, "trash");
-        // Remove notes from layout
-        LinearLayout ll = view.findViewById(R.id.linear);
-        ll.removeAllViews();
 
+        adapter.notifyItemRangeRemoved(0, size);
         Toast.makeText(getActivity(), getString(R.string.clear_notes_toast), Toast.LENGTH_LONG).show();
     }
 
