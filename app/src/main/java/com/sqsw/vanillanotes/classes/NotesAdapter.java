@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.sqsw.vanillanotes.R;
@@ -24,7 +23,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
             super(itemView);
             title = itemView.findViewById(R.id.note_title);
             content = itemView.findViewById(R.id.note_content);
-            img = itemView.findViewById(R.id.image_view);
+            img = itemView.findViewById(R.id.colorview);
         }
     }
 

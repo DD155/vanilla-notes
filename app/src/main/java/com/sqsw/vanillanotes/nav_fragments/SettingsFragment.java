@@ -123,9 +123,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 }
             }
         };
-
-
-
     }
 
     private void saveNotes(ArrayList<Note> list, String key){ // saves the arraylist using gson

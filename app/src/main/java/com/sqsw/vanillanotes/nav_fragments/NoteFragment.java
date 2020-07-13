@@ -1,5 +1,6 @@
 package com.sqsw.vanillanotes.nav_fragments;
 
+import android.animation.RectEvaluator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.sqsw.vanillanotes.classes.ItemClickSupport;
 import com.sqsw.vanillanotes.classes.Note;
 import com.sqsw.vanillanotes.activities.NoteEditActivity;
 import com.sqsw.vanillanotes.R;
@@ -49,12 +51,14 @@ import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 public class NoteFragment extends Fragment {
     private View view;
     private LinearLayout linear;
     private SharedPreferences prefs;
     private Utility UTIL;
+    private RecyclerView recyclerView;
 
     @SuppressLint("ClickableViewAccessibility")
     @Nullable
@@ -67,12 +71,7 @@ public class NoteFragment extends Fragment {
         UTIL = new Utility(getActivity());
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Notes");
 
-        Log.d("rv_test", "1");
-
-        RecyclerView rv = view.findViewById(R.id.recycler_notes);
-
-        Log.d("rv_test", "2");
-
+        recyclerView = view.findViewById(R.id.recycler_notes);
         //Bundle bundle = getArguments();
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -81,11 +80,26 @@ public class NoteFragment extends Fragment {
         noteList = getNotes("notes");
         starredList = getNotes("starred");
 
-        NotesAdapter adapter = new NotesAdapter(noteList);
-        rv.setAdapter(adapter);
-        rv.setLayoutManager(new LinearLayoutManager(getActivity()));
+        ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+            @Override
+            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                Log.d("click_test", "clicked");
+                Intent notesActivity = new Intent();
 
-        Log.d("rv_test", "3");
+                notesActivity.setClass(getActivity(), NoteEditActivity.class);
+                notesActivity.putExtra("oldNote", true);
+                notesActivity.putExtra("index", position); // pass index to next activity to change content later
+                //notesActivity.putExtra("caller", "MainActivity");
+                startActivity(notesActivity);
+            }
+        });
+
+        NotesAdapter adapter = new NotesAdapter(noteList);
+        recyclerView.setItemAnimator(new SlideInUpAnimator());
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+
 
         /*
         if (noteList.size() != 0) { // Makes sure user has already notes, loads them on entering app
@@ -146,10 +160,10 @@ public class NoteFragment extends Fragment {
             }
         } */
         setHasOptionsMenu(true);
-        Log.d("rv_test", "4");
 
         return view;
     }
+
 
     private void initializeText(TextView text, Note note){
         float density = getResources().getDisplayMetrics().density;
