@@ -158,6 +158,7 @@ public class Utility extends ContextWrapper {
         }
 
         if (instance.get(Calendar.HOUR_OF_DAY) >= 12){
+
             hour = Integer.toString(instance.get(Calendar.HOUR_OF_DAY) - 12);
             minutes += ":" + seconds + " PM";
         } else
@@ -179,6 +180,8 @@ public class Utility extends ContextWrapper {
             dayOfWeek = Integer.toString(instance.get(Calendar.DAY_OF_MONTH));
 
         String year = Integer.toString(instance.get(Calendar.YEAR));
+
+        if (hour.length() == 1) return month + "/" + dayOfWeek + "/" + year + " " + "0" + hour + ":" + minutes;
         return month + "/" + dayOfWeek + "/" + year + " " + hour + ":" + minutes;
     }
 }

@@ -11,12 +11,11 @@
     <string name="clear_notes_toast">Notes cleared</string>
 
     <!-- Trash Activity -->
-    <string name="trash_empty">The trash can is currently empty.</string>
+    <string name="trash_empty">Nothing here…</string>
     <string name="trash_clear_confirm">Are you sure you want to empty the trash?
-        The notes cannot be recovered after this.</string>
+        The notes cannot be recovered after this</string>
     <string name="clear_error_title">Trash Empty</string>
-    <string name="trash_error">The trash is already empty and cannot be cleared again.</string>
-
+    <string name="trash_error">The trash is already empty and cannot be cleared again</string>
 
     <!-- Note Edit Activity -->
     <string name="enter_your_title">Title</string>
@@ -26,7 +25,7 @@
     <string name="discard_title">Discard Changes</string>
     <string name="discard_confirm">Are you sure you want to discard any changes?</string>
     <string name="warning_title">Error</string>
-    <string name="warning_confirm">Your note is currently blank. Please enter text to save it.</string>
+    <string name="warning_confirm">Your note is currently blank. Please enter text to save it</string>
     <string name="restore_toast">Note restored</string>
     <string name="delete_toast">Note deleted</string>
 
@@ -55,7 +54,7 @@
     <string name="clear_data_title">Clear</string>
     <string name="clear_data_summary">Deletes all notes in the home page</string>
     <string name="clear_data_toast">All data cleared</string>
-    <string name="clear_data_dialog_text">Would you like to clear ALL data? Your settings will still be saved.</string>
+    <string name="clear_data_dialog_text">Would you like to clear ALL data? Your settings will still be saved</string>
     <string name="clear_data_dialog_title">Clear Data</string>
     <string name="back_dialog_toggle">Discard Confirmation</string>
     <string name="back_dialog_toggle_summary">Show a confirmation for discarding your changes to a note</string>
@@ -88,5 +87,6 @@
     <string name="back_dialog_toggle_off">Disabled</string>
     <string name="back_dialog_toggle_on">Enabled</string>
     <string name="checkbox_msg">Don\'t show this message again</string>
+    <string name="notes_empty">No notes found</string>
 
 </resources>

@@ -37,6 +37,7 @@
         android:layout_gravity="bottom"
         android:background="@color/white"
         android:layout_height="wrap_content"
+        app:labelVisibilityMode="labeled"
         app:elevation="8dp"
         app:itemBackground="@color/white"
         app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"

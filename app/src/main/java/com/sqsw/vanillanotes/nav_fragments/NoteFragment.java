@@ -32,16 +32,19 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.sqsw.vanillanotes.classes.DateComparator;
 import com.sqsw.vanillanotes.classes.ItemClickSupport;
 import com.sqsw.vanillanotes.classes.Note;
 import com.sqsw.vanillanotes.activities.NoteEditActivity;
 import com.sqsw.vanillanotes.R;
+import com.sqsw.vanillanotes.classes.NoteComparator;
 import com.sqsw.vanillanotes.classes.NotesAdapter;
 import com.sqsw.vanillanotes.classes.Utility;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -61,6 +64,7 @@ public class NoteFragment extends Fragment {
     private Utility UTIL;
     private RecyclerView recyclerView;
     private NotesAdapter adapter;
+    private int selectedSortItem = 4;
 
     @SuppressLint("ClickableViewAccessibility")
     @Nullable
@@ -81,26 +85,33 @@ public class NoteFragment extends Fragment {
         notes = getNotes("notes");
         starredList = getNotes("starred");
 
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        int sortValue = sharedPreferences.getInt("sort_index", 0);
+
+        adapter = new NotesAdapter(notes);
+
+        if (notes.size() > 0)
+            sortNotes(sortValue);
+        else {
+            TextView defaultText = view.findViewById(R.id.clear_text);
+            defaultText.setText(getResources().getString(R.string.notes_empty));
+        }
+
+        Log.d("sort_test", "3");
+
         ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                Log.d("click_test", "clicked");
                 Intent notesActivity = new Intent();
-
                 notesActivity.setClass(getActivity(), NoteEditActivity.class);
                 notesActivity.putExtra("oldNote", true);
-                notesActivity.putExtra("index", position); // pass index to next activity to change content later
-                //notesActivity.putExtra("caller", "MainActivity");
+                notesActivity.putExtra("index", position);
                 startActivity(notesActivity);
             }
         });
 
-        adapter = new NotesAdapter(notes);
-        recyclerView.setItemAnimator(new SlideInUpAnimator());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-
 
 
         /*
@@ -164,6 +175,80 @@ public class NoteFragment extends Fragment {
         setHasOptionsMenu(true);
 
         return view;
+    }
+
+    // Create dialog for sorting notes
+    private void sortDialog() {
+        final SharedPreferences prefs = getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        if (selectedSortItem != prefs.getInt("sort_index", 0)){
+            selectedSortItem = prefs.getInt("sort_index", 0);
+        }
+
+        String[] items = getResources().getStringArray(R.array.sort_values);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Sort");
+        builder.setCancelable(true);
+        builder.setSingleChoiceItems(items, selectedSortItem, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int index) {
+                selectedSortItem = index;
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt("sort_index", index);
+                editor.apply();
+            }
+        });
+
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.d("selected_index", selectedSortItem + "");
+                dialogInterface.dismiss();
+                sortNotes(selectedSortItem);
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setCanceledOnTouchOutside(true);
+        alertDialog.show();
+    }
+
+
+    // Function for sort based on user selection of previous dialog above
+    // Type 4 = Custom Sort (User created sort)
+    private void sortNotes(int type){
+        switch (type){
+            case 0:
+                // Type 0 = Sort by Title (Ascending)
+                Log.d("selected_index", "case 0");
+                Collections.sort(notes, new NoteComparator());
+                UTIL.saveNotes(notes, "notes");
+                adapter.notifyDataSetChanged();
+                break;
+            case 1:
+                // Type 1 = Sort by Title (Descending)
+                Log.d("selected_index", "case 1");
+                Collections.sort(notes, new NoteComparator());
+                Collections.reverse(notes);
+                UTIL.saveNotes(notes, "notes");
+                adapter.notifyDataSetChanged();
+                break;
+            case 2:
+                // Type 2 = Sort by Date Created (Ascending)
+                Collections.sort(notes, new DateComparator());
+                UTIL.saveNotes(notes, "notes");
+                adapter.notifyDataSetChanged();
+                break;
+            case 3:
+                // Type 3 = Sort by Date Created (Descending)
+                Collections.sort(notes, new DateComparator());
+                Collections.reverse(notes);
+                UTIL.saveNotes(notes, "notes");
+                adapter.notifyDataSetChanged();
+                break;
+            case 4:
+                // TODO: Custom sort
+                break;
+        }
     }
 
 
@@ -263,11 +348,15 @@ public class NoteFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
-                UTIL.goToActivity(NoteEditActivity.class, "Notes", getActivity());
+                UTIL.goToActivity(NoteEditActivity.class, null, getActivity());
                 return true;
 
             case R.id.action_clear:
                 createDialog();
+                return true;
+
+            case R.id.action_sort:
+                sortDialog();
                 return true;
 
             default:

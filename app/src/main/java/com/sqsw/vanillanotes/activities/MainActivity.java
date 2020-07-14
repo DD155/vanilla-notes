@@ -76,10 +76,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        // Reload starred notes
+
+
         // Resort after note is created or edited
         Log.d("sort_index", getSharedPreferences("NOTES", Context.MODE_PRIVATE).getInt("sort_index", 0)+"");
-        if (noteList.size() > 0)
-            sortNotes(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getInt("sort_index", 0));
+        //if (noteList.size() > 0)
+        //    sortNotes(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getInt("sort_index", 0));
 
         BottomNavigationView navView = findViewById(R.id.bottom_nav);
         navView.setItemIconTintList(null);
@@ -164,98 +167,6 @@ public class MainActivity extends AppCompatActivity {
 
     */
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_sort) {
-           sortDialog();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    // Create dialog for sorting notes
-    private void sortDialog() {
-        final SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        if (selectedSortItem != prefs.getInt("sort_index", 0)){
-            selectedSortItem = prefs.getInt("sort_index", 0);
-        }
-
-        String[] items = getResources().getStringArray(R.array.sort_values);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Sort");
-        builder.setCancelable(true);
-        builder.setSingleChoiceItems(items, selectedSortItem, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int index) {
-                selectedSortItem = index;
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putInt("sort_index", index);
-                editor.apply();
-            }
-        });
-
-        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Log.d("selected_index", selectedSortItem + "");
-                dialogInterface.dismiss();
-                sortNotes(selectedSortItem);
-            }
-        });
-
-        AlertDialog alertDialog = builder.create();
-        alertDialog.setCanceledOnTouchOutside(true);
-        alertDialog.show();
-    }
-
-
-    // Function for sort based on user selection of previous dialog above
-    // Type 0 = Sort by Title (Ascending)
-    // Type 1 = Sort by Title (Descending)
-    // Type 2 = Sort by Date Created (Ascending)
-    // Type 3 = Sort by Date Created (Descending)
-    // Type 4 = Custom Sort (User created sort)
-    private void sortNotes(int type){
-        String key;
-        ArrayList<Note> list;
-        if (!isTrashFrag) {
-            list = UTIL.getNotes("notes");
-            key = "notes";
-        }
-        else {
-            list = UTIL.getNotes("trash");
-            key = "trash";
-        }
-
-        switch (type){
-            case 0:
-                Log.d("selected_index", "case 0");
-                Collections.sort(list, new NoteComparator());
-                UTIL.saveNotes(list, key);
-                refreshActivity();
-                break;
-            case 1:
-                Log.d("selected_index", "case 1");
-                Collections.sort(list, new NoteComparator());
-                Collections.reverse(list);
-                UTIL.saveNotes(list, key);
-                refreshActivity();
-                break;
-            case 2:
-                Collections.sort(list, new DateComparator());
-                UTIL.saveNotes(list, key);
-                refreshActivity();
-                break;
-            case 3:
-                Collections.sort(list, new DateComparator());
-                Collections.reverse(list);
-                UTIL.saveNotes(list, key);
-                refreshActivity();
-                break;
-            case 4:
-                // TODO: Custom sort
-                break;
-        }
-    }
 
     // Create the NotificationChannel, but only on API 26+ because
     // the NotificationChannel class is new and not in the support library

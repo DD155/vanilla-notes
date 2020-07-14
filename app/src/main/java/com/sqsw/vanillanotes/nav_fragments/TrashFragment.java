@@ -34,16 +34,20 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.activities.NoteEditActivity;
+import com.sqsw.vanillanotes.classes.DateComparator;
 import com.sqsw.vanillanotes.classes.ItemClickSupport;
 import com.sqsw.vanillanotes.classes.Note;
+import com.sqsw.vanillanotes.classes.NoteComparator;
 import com.sqsw.vanillanotes.classes.NotesAdapter;
 import com.sqsw.vanillanotes.classes.Utility;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.solver.widgets.Helper;
 import androidx.fragment.app.Fragment;
@@ -59,6 +63,7 @@ public class TrashFragment extends Fragment {
     private Utility UTIL;
     private RecyclerView recyclerView;
     private NotesAdapter adapter;
+    private int selectedSortItem = 4;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -80,7 +85,6 @@ public class TrashFragment extends Fragment {
         ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                Log.d("click_test", "clicked");
                 Intent notesActivity = new Intent();
 
                 notesActivity.setClass(getActivity(), NoteEditActivity.class);
@@ -93,12 +97,14 @@ public class TrashFragment extends Fragment {
 
         if (noteList.size() > 0) {
             adapter = new NotesAdapter(noteList);
-            recyclerView.setAdapter(adapter);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            sortNotes(getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE).getInt("sort_index", 0));
         } else { // Show text showing the trash is empty
             TextView defaultText = view.findViewById(R.id.clear_text);
             defaultText.setText(getResources().getString(R.string.trash_empty));
         }
+
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         /*
         if (noteList.size() != 0) { // Makes sure user has already notes, loads them on entering app
@@ -271,6 +277,80 @@ public class TrashFragment extends Fragment {
         Toast.makeText(getActivity().getApplicationContext(), "Trash emptied", Toast.LENGTH_LONG).show();
     }
 
+    // Create dialog for sorting notes
+    private void sortDialog() {
+        final SharedPreferences prefs = getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        if (selectedSortItem != prefs.getInt("sort_index", 0)){
+            selectedSortItem = prefs.getInt("sort_index", 0);
+        }
+
+        String[] items = getResources().getStringArray(R.array.sort_values);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Sort");
+        builder.setCancelable(true);
+        builder.setSingleChoiceItems(items, selectedSortItem, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int index) {
+                selectedSortItem = index;
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt("sort_index", index);
+                editor.apply();
+            }
+        });
+
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.d("selected_index", selectedSortItem + "");
+                dialogInterface.dismiss();
+                sortNotes(selectedSortItem);
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setCanceledOnTouchOutside(true);
+        alertDialog.show();
+    }
+
+
+    // Function for sort based on user selection of previous dialog above
+    // Type 4 = Custom Sort (User created sort)
+    private void sortNotes(int type){
+        switch (type){
+            case 0:
+                // Type 0 = Sort by Title (Ascending)
+                Log.d("selected_index", "case 0");
+                Collections.sort(noteList, new NoteComparator());
+                UTIL.saveNotes(noteList, "trash");
+                adapter.notifyDataSetChanged();
+                break;
+            case 1:
+                // Type 1 = Sort by Title (Descending)
+                Log.d("selected_index", "case 1");
+                Collections.sort(noteList, new NoteComparator());
+                Collections.reverse(noteList);
+                UTIL.saveNotes(noteList, "trash");
+                adapter.notifyDataSetChanged();
+                break;
+            case 2:
+                // Type 2 = Sort by Date Created (Descending)
+                Collections.sort(noteList, new DateComparator());
+                Collections.reverse(noteList);
+                UTIL.saveNotes(noteList, "trash");
+                adapter.notifyDataSetChanged();
+                break;
+            case 3:
+                // Type 3 = Sort by Date Created (Ascending)
+                Collections.sort(noteList, new DateComparator());
+                UTIL.saveNotes(noteList, "trash");
+                adapter.notifyDataSetChanged();
+                break;
+            case 4:
+                // TODO: Custom sort
+                break;
+        }
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.trash_actions, menu);
@@ -295,8 +375,11 @@ public class TrashFragment extends Fragment {
                 alert.show();
             }
             return true;
+        } else { // Case where user selects sort
+            sortDialog();
+            return true;
         }
-        return super.onOptionsItemSelected(item);
+        //return super.onOptionsItemSelected(item);
     }
 
     // Returns the ArrayList from sharedprefs

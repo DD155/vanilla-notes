@@ -251,17 +251,17 @@ public class NoteEditActivity extends AppCompatActivity {
         if (isOldNote) {
             // Return boolean value for if the current note is starred or not
             if (list.get(getIntent().getIntExtra("index", 0)).getStarred()) {
-                menu.findItem(R.id.action_star).setIcon(R.drawable.star_selected_icon);
+                menu.findItem(R.id.action_star).setIcon(R.drawable.favorite_icon_selected);
                 isStarred = true;
                 //menu.findItem(R.id.action_starred).setVisible(true);
             } else {
-                menu.findItem(R.id.action_star).setIcon(R.drawable.star_icon);
+                menu.findItem(R.id.action_star).setIcon(R.drawable.favorite_icon);
                 isStarred = false;
                 return true;
             }
         } else {
             isStarred = false;
-            menu.findItem(R.id.action_star).setIcon(R.drawable.star_icon);
+            menu.findItem(R.id.action_star).setIcon(R.drawable.favorite_icon);
         }
 
         Log.d("trash_debug", "oncreateoptions end");
@@ -314,10 +314,10 @@ public class NoteEditActivity extends AppCompatActivity {
 
     private void toggleIcon(boolean star){
         if (star){
-            mMenu.findItem(R.id.action_star).setIcon(R.drawable.star_icon);
+            mMenu.findItem(R.id.action_star).setIcon(R.drawable.favorite_icon);
             isStarred = false;
         } else {
-            mMenu.findItem(R.id.action_star).setIcon(R.drawable.star_selected_icon);
+            mMenu.findItem(R.id.action_star).setIcon(R.drawable.favorite_icon_selected);
             isStarred = true;
         }
     }
