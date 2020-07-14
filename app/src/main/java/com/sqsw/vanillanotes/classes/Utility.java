@@ -134,13 +134,15 @@ public class Utility extends ContextWrapper {
         return s;
     }
 
-    // Returns a string of the current time and date in format MM/DD/YY HH:MM
+    // Returns a string of the current time and date in format MM/DD/YY HH:MM:SS
     public String currentDate(){
         Calendar instance = Calendar.getInstance();
-        String dayOfWeek = Integer.toString(instance.get(Calendar.DAY_OF_MONTH));
+        String dayOfWeek;
         String hour;
         String minutes;
         String seconds;
+        String month;
+
         if (Integer.toString(instance.get(Calendar.SECOND)).length() == 1)
             seconds = "0" + Integer.toString(instance.get(Calendar.SECOND)).length();
         else
@@ -166,7 +168,16 @@ public class Utility extends ContextWrapper {
 
         if (hour.equals("0")) hour = "12";
 
-        String month = Integer.toString(instance.get(Calendar.MONTH) + 1);
+        if (Integer.toString(instance.get(Calendar.MONTH) + 1).length() == 1)
+            month = "0" + (instance.get(Calendar.MONTH) + 1);
+        else
+            month = Integer.toString(instance.get(Calendar.MONTH) + 1);
+
+        if (Integer.toString(instance.get(Calendar.DAY_OF_MONTH)).length() == 1)
+            dayOfWeek = "0" + instance.get(Calendar.DAY_OF_MONTH);
+        else
+            dayOfWeek = Integer.toString(instance.get(Calendar.DAY_OF_MONTH));
+
         String year = Integer.toString(instance.get(Calendar.YEAR));
         return month + "/" + dayOfWeek + "/" + year + " " + hour + ":" + minutes;
     }
