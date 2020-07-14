@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -16,6 +17,7 @@ import com.sqsw.vanillanotes.R;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 
 // utility class for other com.sqsw.vanillanotes.activities
 public class Utility extends ContextWrapper {
@@ -183,5 +185,40 @@ public class Utility extends ContextWrapper {
 
         if (hour.length() == 1) return month + "/" + dayOfWeek + "/" + year + " " + "0" + hour + ":" + minutes;
         return month + "/" + dayOfWeek + "/" + year + " " + hour + ":" + minutes;
+    }
+
+    public void sortNotes(int type, ArrayList<Note> notes, NotesAdapter adapter, String key){
+        switch (type){
+            case 0:
+                // Type 0 = Sort by Title (Ascending)
+                Log.d("selected_index", "case 0");
+                Collections.sort(notes, new NoteComparator());
+                saveNotes(notes, key);
+                adapter.notifyDataSetChanged();
+                break;
+            case 1:
+                // Type 1 = Sort by Title (Descending)
+                Log.d("selected_index", "case 1");
+                Collections.sort(notes, new NoteComparator());
+                Collections.reverse(notes);
+                saveNotes(notes, key);
+                adapter.notifyDataSetChanged();
+                break;
+            case 2:
+                // Type 2 = Sort by Date Created (Ascending)
+                Collections.sort(notes, new DateComparator());
+                saveNotes(notes, key);
+                adapter.notifyDataSetChanged();
+                break;
+            case 3:
+                // Type 3 = Sort by Date Created (Descending)
+                Collections.sort(notes, new DateComparator());
+                Collections.reverse(notes);
+                saveNotes(notes, key);
+                adapter.notifyDataSetChanged();
+                break;
+            case 4:
+                break;
+        }
     }
 }

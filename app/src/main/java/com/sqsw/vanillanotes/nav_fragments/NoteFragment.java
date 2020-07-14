@@ -91,7 +91,7 @@ public class NoteFragment extends Fragment {
         adapter = new NotesAdapter(notes);
 
         if (notes.size() > 0)
-            sortNotes(sortValue);
+            UTIL.sortNotes(sortValue, notes, adapter, "notes");
         else {
             TextView defaultText = view.findViewById(R.id.clear_text);
             defaultText.setText(getResources().getString(R.string.notes_empty));
@@ -113,65 +113,6 @@ public class NoteFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-
-        /*
-        if (noteList.size() != 0) { // Makes sure user has already notes, loads them on entering app
-            for (int i = 0; i < noteList.size(); i++) {
-                final TextView text = new TextView(getContext());
-                final int index = i; // Index of ArrayList
-                final Note currNote = noteList.get(i);
-                final Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
-
-                text.setBackground(drawable);
-                initializeText(text, currNote);
-                linear.addView(text);
-
-                // Make the text clickable
-                text.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        switch (event.getAction()){
-                            case MotionEvent.ACTION_CANCEL:
-                                text.setBackground(drawable);
-                                return true;
-
-                            case MotionEvent.ACTION_DOWN:
-                                if (currNote.getColor() != -1) {
-                                    String newHex = UTIL.getDarkerColor(currNote.getColor());
-                                    // Create new drawable to replace
-                                    Drawable holdDrawable = UTIL.returnDrawable(R.drawable.shadow_border);
-                                    holdDrawable.setColorFilter(new
-                                            PorterDuffColorFilter(Color.parseColor(newHex), PorterDuff.Mode.MULTIPLY));
-                                    text.setBackground(holdDrawable);
-                                } else
-                                    text.setBackgroundResource(R.drawable.shadow_border_hold);
-
-                                return true;
-
-                            case MotionEvent.ACTION_UP:
-                                // Check if location of user touch is still within the TextView
-                                if ((int)event.getX() >= 0 && (int)event.getX() <= 1360
-                                        && (int)event.getY() >= 0 && (int)event.getY() <= 300){
-                                    v.performClick();
-                                    Intent notesActivity = new Intent();
-
-                                    notesActivity.setClass(getActivity().getApplicationContext(), NoteEditActivity.class);
-                                    notesActivity.putExtra("oldNote", true);
-                                    notesActivity.putExtra("index", index); // pass index to next activity to change content later
-                                    //notesActivity.putExtra("caller", "MainActivity");
-                                    text.setBackground(drawable);
-                                    startActivity(notesActivity);
-                                } else {
-                                    // Just change the color back if user moves finger out of the textbox
-                                    text.setBackground(drawable);
-                                }
-                                return true;
-                        }
-                        return false;
-                    }
-                });
-            }
-        } */
         setHasOptionsMenu(true);
 
         return view;
@@ -203,103 +144,13 @@ public class NoteFragment extends Fragment {
             public void onClick(DialogInterface dialogInterface, int i) {
                 Log.d("selected_index", selectedSortItem + "");
                 dialogInterface.dismiss();
-                sortNotes(selectedSortItem);
+                UTIL.sortNotes(selectedSortItem, notes, adapter, "notes");
             }
         });
 
         AlertDialog alertDialog = builder.create();
         alertDialog.setCanceledOnTouchOutside(true);
         alertDialog.show();
-    }
-
-
-    // Function for sort based on user selection of previous dialog above
-    // Type 4 = Custom Sort (User created sort)
-    private void sortNotes(int type){
-        switch (type){
-            case 0:
-                // Type 0 = Sort by Title (Ascending)
-                Log.d("selected_index", "case 0");
-                Collections.sort(notes, new NoteComparator());
-                UTIL.saveNotes(notes, "notes");
-                adapter.notifyDataSetChanged();
-                break;
-            case 1:
-                // Type 1 = Sort by Title (Descending)
-                Log.d("selected_index", "case 1");
-                Collections.sort(notes, new NoteComparator());
-                Collections.reverse(notes);
-                UTIL.saveNotes(notes, "notes");
-                adapter.notifyDataSetChanged();
-                break;
-            case 2:
-                // Type 2 = Sort by Date Created (Ascending)
-                Collections.sort(notes, new DateComparator());
-                UTIL.saveNotes(notes, "notes");
-                adapter.notifyDataSetChanged();
-                break;
-            case 3:
-                // Type 3 = Sort by Date Created (Descending)
-                Collections.sort(notes, new DateComparator());
-                Collections.reverse(notes);
-                UTIL.saveNotes(notes, "notes");
-                adapter.notifyDataSetChanged();
-                break;
-            case 4:
-                // TODO: Custom sort
-                break;
-        }
-    }
-
-
-    private void initializeText(TextView text, Note note){
-        float density = getResources().getDisplayMetrics().density;
-        int fontSize = UTIL.getFontSize(prefs.getString("font_size", null));
-        int height;
-
-        Log.d("density", Float.toString(density));
-        // Set height based on dpi
-        if (density >= 4.0) {
-            height = 350;
-            Log.d("density", "Density is 4.0");
-        } else if (density >= 3.0) {
-            height = 300;
-            Log.d("density", "Density is 3.0");
-        } else if (density >= 2.0) {
-            height = 150;
-            Log.d("density", "Density is 2.0");
-
-        } else if (density >= 1.5) {
-            height = 100;
-            Log.d("density", "Density is 1.5");
-        } else
-        {
-            height = 75;
-            Log.d("density", "Density is 1.0");
-        }
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        params.setMargins(0, 25, 0, 25);
-        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
-        text.setFilters(new InputFilter[] { new InputFilter.LengthFilter(82) });
-        //text.setBackgroundResource(R.drawable.shadow_border);
-        text.setHeight(height);
-        text.setPadding(50, 20, 50, 30);
-        text.setLayoutParams(params);
-
-        // Make the title larger than the description
-        SpannableString str = new SpannableString(note.getTitle() + "\n" + note.getText());
-        str.setSpan(new RelativeSizeSpan(1.3f), 0, note.getTitle().length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        str.setSpan(new StyleSpan(Typeface.BOLD), 0, note.getTitle().length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        text.setElevation(10);
-        text.setText(str);
-
-        if (UTIL.isDarkColor(note.getColor()))
-            text.setTextColor(getResources().getColor(R.color.white));
-        else text.setTextColor(getResources().getColor(R.color.textColor));
     }
 
     // Creates dialog for the clear

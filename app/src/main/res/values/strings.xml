@@ -89,4 +89,9 @@
     <string name="checkbox_msg">Don\'t show this message again</string>
     <string name="notes_empty">No notes found</string>
 
+    <!-- Favorites -->
+    <string name="favs_empty">Add favorites to view them here!</string>
+    <string name="delete_favorite_title">Cannot Delete Favorite</string>
+    <string name="delete_favorite_message">Please unfavorite this note to move it to the trash</string>
+
 </resources>

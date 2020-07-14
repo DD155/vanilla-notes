@@ -1,36 +1,29 @@
 package com.sqsw.vanillanotes.activities;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.sqsw.vanillanotes.classes.DateComparator;
 import com.sqsw.vanillanotes.classes.Note;
 import com.sqsw.vanillanotes.R;
-import com.sqsw.vanillanotes.classes.NoteComparator;
 import com.sqsw.vanillanotes.classes.Utility;
-import com.sqsw.vanillanotes.nav_fragments.NoteCardFragment;
+import com.sqsw.vanillanotes.nav_fragments.FavoritesFragment;
 import com.sqsw.vanillanotes.nav_fragments.NoteFragment;
 import com.sqsw.vanillanotes.nav_fragments.TrashFragment;
 import com.sqsw.vanillanotes.nav_fragments.SettingsFragment;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
     private static final String CHANNEL_ID = "NoteChannel";
@@ -51,54 +44,24 @@ public class MainActivity extends AppCompatActivity {
         myToolbar.setTitle("Notes");
         setSupportActionBar(myToolbar);
 
-        final ArrayList<Note> noteList = UTIL.getNotes("notes");
-        ArrayList<Note> starredNotes = UTIL.getNotes("starred");
-        String editedText = getIntent().getStringExtra("note");
-        String titleText = getIntent().getStringExtra("title");
-        String date = getIntent().getStringExtra("date");
-        int color = getIntent().getIntExtra("color", 0);
-
-        // Check if user just created a new note
-        if (editedText != null){
-            Note newNote = new Note(editedText);
-            newNote.setDate(date);
-            if (titleText != null) newNote.setTitle(titleText);
-            if (color != -1) newNote.setColor(color);
-            // Handle starred note case
-            newNote.setStarred(getIntent().getBooleanExtra("star", false));
-            if (newNote.getStarred()){ // Put current note to starred notes list
-                starredNotes.add(0, newNote);
-                UTIL.saveNotes(starredNotes, "starred");
-            } else {
-                // Add note to the top of the list
-                noteList.add(0, newNote);
-                UTIL.saveNotes(noteList, "notes");
-            }
-        }
-
-        // Reload starred notes
-
-
-        // Resort after note is created or edited
-        Log.d("sort_index", getSharedPreferences("NOTES", Context.MODE_PRIVATE).getInt("sort_index", 0)+"");
-        //if (noteList.size() > 0)
-        //    sortNotes(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getInt("sort_index", 0));
-
         BottomNavigationView navView = findViewById(R.id.bottom_nav);
         navView.setItemIconTintList(null);
 
         navView.setOnNavigationItemSelectedListener(navListener);
 
-        if (getIntent().getStringExtra("caller") != null) {
+        Log.d("fav_test", "Favorite extra: " + getIntent().getBooleanExtra("favorite", false));
+
+        if (getIntent().getStringExtra("caller") != null) { // Start trash fragment
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new TrashFragment()).commit();
+            navView.getMenu().getItem(2).setChecked(true);
+        } else if (getIntent().getBooleanExtra("favorite", false)){ // Start favs fragment
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new FavoritesFragment()).commit();
             navView.getMenu().getItem(1).setChecked(true);
         } else {
-            // Default fragment
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new NoteFragment()).commit();
             navView.getMenu().getItem(0).setChecked(true);
         }
     }
-
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -110,6 +73,11 @@ public class MainActivity extends AppCompatActivity {
                         case R.id.nav_notes:
                             //selectedFrag = new NoteFragment();
                             selectedFrag = new NoteFragment();
+                            isTrashFrag = false;
+                            break;
+
+                        case R.id.nav_fav:
+                            selectedFrag = new FavoritesFragment();
                             isTrashFrag = false;
                             break;
 
