@@ -19,9 +19,8 @@ The final application will have the following features:
 - Color code your notes
 - Pin notes to your notification
 - Trash bin for deleted notes
-- Easily organizable notes with drag + drop
 - Sort by Title or Date Created
-- Star notes to view them easier
+- Favorite notes to view them easier
 - Themes / Dark Mode
 - Import/Export Backup
 - Widgets (?)
@@ -36,6 +35,7 @@ Project is created with and uses:
 - [Gson](https://github.com/google/gson) - A JSON library for Java
 - [material.io](https://material.io/) - Material guidelines with resources such as components and icons
 - [Color Picker Library](https://github.com/kristiyanP/colorpicker) - Material Color Picker asset created by [Kristiyan Petrov](https://github.com/kristiyanP)
+- [Item Click Support for RecyclerView](https://www.littlerobots.nl/blog/Handle-Android-RecyclerView-Clicks/) - Onclick handling for RecyclerView items by [Hugo Visser](https://www.littlerobots.nl/blog/)
 
 
 ## Launch
