@@ -68,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     Fragment selectedFrag = null;
-
                     switch (item.getItemId()){
                         case R.id.nav_notes:
                             //selectedFrag = new NoteFragment();
@@ -151,23 +150,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void refreshActivity(){
-        BottomNavigationView navView = findViewById(R.id.bottom_nav);
-
-        //finish();
-        //overridePendingTransition(0, 0);
-
-        if (isTrashFrag) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new TrashFragment()).commit();
-            navView.getMenu().getItem(1).setChecked(true);
-        } else {
-            // Default fragment
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new NoteFragment()).commit();
-            navView.getMenu().getItem(0).setChecked(true);
-        }
-
-        //overridePendingTransition(0, 0);
-    }
 
     @Override
     public void onBackPressed(){

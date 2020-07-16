@@ -161,7 +161,7 @@ public class NoteFragment extends Fragment {
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                builder.create().dismiss();
+                dialog.dismiss();
             }
         });
 

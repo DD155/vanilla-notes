@@ -42,19 +42,23 @@ import com.sqsw.vanillanotes.classes.Utility;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 
 public class NoteEditActivity extends AppCompatActivity {
     private final Utility UTIL = new Utility(this);
-    private SharedPreferences prefs;
+    private SharedPreferences prefs; // Used for confirming discard dialog
     private Context mContext = this;
+    private Menu mMenu;
+
+    private EditText contentView;
+    private EditText titleView;
+
     private int colorPicked = -1;
-    private boolean isOldNote;
-    private boolean isTrash = false;
+
+    private boolean isOldNote; // Determines if the user is editing an old note or not
+    private boolean isTrash = false; // Determines if user clicked on note from trash fragment
     private boolean isFavorite; // Coming from a previously favorited note
     private boolean newFavorite; // The new favorite value based on user changing it in this activity
-    private Menu mMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +71,13 @@ public class NoteEditActivity extends AppCompatActivity {
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         TextView dateView = findViewById(R.id.date);
-        int fontSize = UTIL.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE).getString("font_size", ""));
+        titleView = findViewById(R.id.titleText);
+        contentView = findViewById(R.id.editText);
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        int fontSize = UTIL.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE)
+                .getString("font_size", ""));
 
         // Check previous activity's extras
         isTrash = "Trash".equals(getIntent().getStringExtra("caller"));
@@ -80,17 +88,14 @@ public class NoteEditActivity extends AppCompatActivity {
         newFavorite = isFavorite;
 
         // Set attributes of EditTexts
-        EditText titleView = findViewById(R.id.titleText);
-        EditText textView = findViewById(R.id.editText);
-
         titleView.setElevation(10);
-        textView.setElevation(10);
-
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize + 3);
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
-
         titleView.setPadding(50, 50, 50, 0);
-        textView.setPadding(50, 50, 50, 50);
+        titleView.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+
+        contentView.setElevation(10);
+        contentView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
+        contentView.setPadding(50, 50, 50, 50);
 
         if (isOldNote) { // Case where user is editing old note
             Note currentNote = getCurrentNote();
@@ -102,20 +107,20 @@ public class NoteEditActivity extends AppCompatActivity {
 
             // Set content and title
             titleView.setText(currentNote.getTitle());
-            textView.setText(currentNote.getText()); // Set the text on the note page as the old string
-            textView.setSelection(textView.getText().length()); // Set cursor to the end
-            textView.requestFocus();
+            contentView.setText(currentNote.getText()); // Set the text on the note page as the old string
+            contentView.setSelection(contentView.getText().length()); // Set cursor to the end
+            contentView.requestFocus();
 
             // Set color
             colorPicked = currentNote.getColor();
             Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, colorPicked);
             titleView.setBackground(drawable);
-            textView.setBackground(drawable);
+            contentView.setBackground(drawable);
 
             // Set text color depending if color is dark or not
             if (UTIL.isDarkColor(colorPicked)) {
                 titleView.setTextColor(getResources().getColor(R.color.white));
-                textView.setTextColor(getResources().getColor(R.color.white));
+                contentView.setTextColor(getResources().getColor(R.color.white));
             }
         } else {
             /*
@@ -125,15 +130,12 @@ public class NoteEditActivity extends AppCompatActivity {
              */
 
             // Set drawable of new note
-            textView.setBackgroundResource(R.drawable.shadow_border);
+            contentView.setBackgroundResource(R.drawable.shadow_border);
             titleView.setBackgroundResource(R.drawable.shadow_border);
         }
 
-        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
-        titleView.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-
-        refreshDrawables(colorPicked);
+        //title.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
+        //content.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
     }
 
     // Retrive ArrayList depending on if user entered from activity trash or home
@@ -149,42 +151,61 @@ public class NoteEditActivity extends AppCompatActivity {
             currentNote = UTIL.getNotes("notes")
                     .get(getIntent().getIntExtra("index", 0));
         }
-
         return currentNote;
+    }
+
+    // Helper function for getting the correct notes depending on the user's previous fragment
+    private String returnKeyFromList(Intent intent){
+        if (isTrash) {
+            intent.putExtra("caller", "Trash");
+            return "trash";
+        } else if (isFavorite){
+            intent.putExtra("favorite", true);
+            return "favorites";
+        } else return "notes";
+    }
+
+    // Case 1: If the note is NOT originally a favorited note and is now being favorited by the user
+    // Case 2: If the note was a favorited note and the user wants to unfavorite it now
+    private void saveToFavorites(ArrayList<Note> list, int index){
+        Note current = list.get(index);
+        // If the note is newly favorited, remove it from its current list and add to favorites list
+        if (!isFavorite && newFavorite) {
+            ArrayList<Note> fav = UTIL.getNotes("favorites");
+            fav.add(0, current);
+            UTIL.saveNotes(fav, "favorites");
+            list.remove(index);
+        } else if (isFavorite && !newFavorite){
+            // Case where note was originally in favorites, but user wants to unfavorite
+            // So put it back in the note list and remove from the favorite list
+            ArrayList<Note> notes = UTIL.getNotes("notes");
+            notes.add(0, current);
+            UTIL.saveNotes(notes, "notes");
+            list.remove(index);
+        }
     }
 
     // Save the text of the note to the previous activity
     private void saveText(){
-        ArrayList<Note> list; // ArrayList for either main notes or trash notes
-        String key = "notes";
-        int index = getIntent().getIntExtra("index", 0);
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        EditText contentView = findViewById(R.id.editText);
-        EditText titleView = findViewById(R.id.titleText);
+        Intent intent = new Intent(this, MainActivity.class);
+        String contentText = contentView.getText().toString().trim();
+        String titleText = titleView.getText().toString().trim();
+        String key = returnKeyFromList(intent);
 
-        if (contentView.getText().length() == 0) { // Check that the note is not empty
+        if (contentView.length() == 0) { // Check that the note is not empty
             warningDialog();
             return;
         }
 
-        // Determine which list to use
-        if (isTrash) {
-            intent.putExtra("caller", "Trash");
-            list = UTIL.getNotes("trash");
-            key = "trash";
-        } else if (isFavorite){
-            intent.putExtra("favorite", true);
-            list = UTIL.getNotes("favorites");
-            key = "favorites";
-        } else list = UTIL.getNotes("notes");
-
+        ArrayList<Note> list = UTIL.getNotes(key);
 
         if (isOldNote) { // Case where the note is old
+            int index = getIntent().getIntExtra("index", 0);
             Note current = list.get(index);
-            // Replace old strings with new strings in note
+            // Set new attributes to the note
             if (colorPicked != -1) current.setColor(colorPicked);
-            current.setText(contentView.getText().toString().trim());
-            current.setTitle(titleView.getText().toString().trim());
+            current.setText(contentText);
+            current.setTitle(titleText);
             current.setFavorite(newFavorite);
             // Move the old saved note to the top
             if (index != 0) {
@@ -192,28 +213,10 @@ public class NoteEditActivity extends AppCompatActivity {
                 list.add(0, current);
             }
 
-            // If the note is newly favorited, remove it from its current list and add to favorites list
-            if (!isFavorite && newFavorite) {
-                ArrayList<Note> fav = UTIL.getNotes("favorites");
-                fav.add(0, current);
-                UTIL.saveNotes(fav, "favorites");
-                list.remove(index);
-            } else if (isFavorite && !newFavorite){
-                // Case where note was originally in favorites, but user wants to unfavorite
-                // So put it back in the note list and remove from the favorite list
-                ArrayList<Note> notes = UTIL.getNotes("notes");
-                notes.add(0, current);
-                UTIL.saveNotes(notes, "notes");
-                list.remove(index);
-            }
-            // Save original note list as usual
+            saveToFavorites(list, index);
             UTIL.saveNotes(list, key);
         } else {
-            Note newNote = new Note(titleView.getText().toString().trim(),
-                    contentView.getText().toString().trim(),
-                    colorPicked,
-                    UTIL.currentDate()
-            );
+            Note newNote = new Note(contentText, titleText, colorPicked, UTIL.currentDate());
             newNote.setFavorite(newFavorite);
             // If new note is favorited, add it to the favorites list
             if (newFavorite) {
@@ -237,6 +240,7 @@ public class NoteEditActivity extends AppCompatActivity {
         int index = getIntent().getIntExtra("index", 0);
         ArrayList<Note> trashList = UTIL.getNotes("trash");
         ArrayList<Note> list;
+
         if (isFavorite) {
             list = UTIL.getNotes("favorites");
             key = "favorites";
@@ -251,7 +255,8 @@ public class NoteEditActivity extends AppCompatActivity {
         if ("Trash".equals(getIntent().getStringExtra("caller"))) {
             trashList.remove(index); // Remove from trash can
         } else {
-            trashList.add(0, new Note(current.getTitle(), current.getText(), colorPicked, current.getDate()));
+            trashList.add(0, new Note(current.getTitle(), current.getText(), colorPicked,
+                    current.getDate()));
             list.remove(index);
         }
         UTIL.saveNotes(list, key);
@@ -259,15 +264,14 @@ public class NoteEditActivity extends AppCompatActivity {
 
         Toast.makeText(getApplicationContext(), getString(R.string.delete_toast), Toast.LENGTH_LONG).show();
         // Load previously called activity
-        if ("Trash".equals(getIntent().getStringExtra("caller"))){
+        if ("Trash".equals(getIntent().getStringExtra("caller")))
             UTIL.goToActivity(MainActivity.class, "Trash", getApplicationContext());
-        } else if (isFavorite){
+        else if (isFavorite){
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra("favorite", true);
             startActivity(intent);
         } else
             UTIL.goToActivity(MainActivity.class, null, getApplicationContext());
-
     }
 
     // Restore the note from the trash can to the main notes
@@ -293,24 +297,16 @@ public class NoteEditActivity extends AppCompatActivity {
 
         // Make sure future calls do not return null pointer
         // Inflate the menu; this adds items to the action bar if it is present.
-        if ("Trash".equals(getIntent().getStringExtra("caller"))) {
+        if ("Trash".equals(getIntent().getStringExtra("caller")))
             getMenuInflater().inflate(R.menu.trash_note_actions, menu);
-        } else {
+        else
             getMenuInflater().inflate(R.menu.edit_actions, menu);
-        }
 
-        // If the note is not new, check if the current note has been starred and load menu item
-        if (isOldNote) {
-            // Return boolean value for if the current note is starred or not
-            if (isFavorite) {
-                menu.findItem(R.id.action_star).setIcon(R.drawable.favorite_icon_selected);
-            } else {
-                menu.findItem(R.id.action_star).setIcon(R.drawable.favorite_icon);
-                return true;
-            }
-        } else {
+        // Change favorite icon depending on if the current note is favorited or not
+        if (isFavorite)
+            menu.findItem(R.id.action_star).setIcon(R.drawable.favorite_icon_selected);
+        else
             menu.findItem(R.id.action_star).setIcon(R.drawable.favorite_icon);
-        }
 
         return true;
     }
@@ -380,34 +376,31 @@ public class NoteEditActivity extends AppCompatActivity {
             public void onChooseColor(int position, int color) {
                 if (color != 0) {
                     colorPicked = color;
-                    //ArrayList<Note> notes = util.getNotes("notes");
-                    // put code
-                    TextView title = findViewById(R.id.titleText);
-                    TextView text = findViewById(R.id.editText);
                     Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, color);
 
-                    title.setBackground(drawable);
-                    text.setBackground(drawable);
+                    titleView.setBackground(drawable);
+                    contentView.setBackground(drawable);
 
+                    // Change the color of the text depending if the color chosen is dark or not to
+                    // make it easier to see for the user
                     if (UTIL.isDarkColor(color)) {
-                        ((TextView) findViewById(R.id.editText)).setTextColor(getResources().getColor(R.color.white));
-                        ((TextView) findViewById(R.id.titleText)).setTextColor(getResources().getColor(R.color.white));
+                        contentView.setTextColor(getResources().getColor(R.color.white));
+                        titleView.setTextColor(getResources().getColor(R.color.white));
                     } else {
-                        ((TextView) findViewById(R.id.editText)).setTextColor(getResources().getColor(R.color.textColor));
-                        ((TextView) findViewById(R.id.titleText)).setTextColor(getResources().getColor(R.color.textColor));
+                        contentView.setTextColor(getResources().getColor(R.color.textColor));
+                        titleView.setTextColor(getResources().getColor(R.color.textColor));
                     }
                 }
             }
 
             @Override
             public void onCancel(){
-                // put code
+                colorPicker.dismissDialog();
             }
         })
             .disableDefaultButtons(false)
             .setColors(getResources().getIntArray(R.array.color_array))
             .setDefaultColorButton(colorPicked)
-            //.setDefaultColor(Color.parseColor("#f84c44"))
             .setColumns(4)
             .setRoundColorButton(true)
             .setTitle("Select your color")
@@ -502,28 +495,21 @@ public class NoteEditActivity extends AppCompatActivity {
 
     // Notification Functions
     private Notification buildNotification(String title, String note) {
-        //EditText text = findViewById(R.id.editText);
-        //EditText title = findViewById(R.id.titleText);
-        //String message = text.getText().toString().trim();
-        //String titleMessage = title.getText().toString().trim();
-
-        Log.d("notif_test", title);
-
         // Create an Intent for the activity
         Intent intent = new Intent(this, NoteEditActivity.class);
         intent.putExtra("savedTitle", title);
         intent.putExtra("savedText", note);
         intent.putExtra("caller", getIntent().getStringExtra("caller"));
         intent.putExtra("index", getIntent().getIntExtra("index", 0));
-        // Create the TaskStackBuilder and add the intent, which inflates the back stack
+        // Create the TaskStackBuilder and add the intent
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntentWithParentStack(intent);
-        // Get the PendingIntent containing the entire back stack
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Build the notification
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "NoteChannel")
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this, "NoteChannel")
                 .setSmallIcon(R.drawable.ic_baseline_event_note_24)
                 .setContentTitle(title)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(note))
@@ -538,15 +524,14 @@ public class NoteEditActivity extends AppCompatActivity {
 
     // Calls notify on the made notification
     private void showNotification(){
-        String title = ((EditText)(findViewById(R.id.titleText))).getText().toString();
-        String note = ((EditText)(findViewById(R.id.editText))).getText().toString();
-        int m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
+        String notifTitle = titleView.getText().toString().trim();
+        String notifContent = contentView.getText().toString().trim();
+        int m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE); // Unique value for id
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
-        notificationManagerCompat.notify(m, buildNotification(title, note));
-        refreshDrawables(colorPicked);
+        notificationManagerCompat.notify(m, buildNotification(notifTitle, notifContent));
     }
 
-    // Creates the dialog for the scheduled notification. First opens up date dialog then time dialog.
+    // Creates the dialog for the scheduled notification.
     private void createReminderDialog() {
         Calendar calendar = Calendar.getInstance();
         // Set as final to be used in inner functions
@@ -555,11 +540,10 @@ public class NoteEditActivity extends AppCompatActivity {
         final int year = calendar.get(Calendar.YEAR);
         final int month = calendar.get(Calendar.MONTH);
         final int day = calendar.get(Calendar.DAY_OF_MONTH);
-        final String title = ((EditText)(findViewById(R.id.titleText))).getText().toString();
-        final String note = ((EditText)(findViewById(R.id.editText))).getText().toString();
 
         // Create Date Dialog
-        DatePickerDialog datePickerDialog = new DatePickerDialog(mContext, android.R.style.Theme_DeviceDefault_Light_Dialog,
+        DatePickerDialog datePickerDialog =
+                new DatePickerDialog(mContext, android.R.style.Theme_DeviceDefault_Light_Dialog,
         new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int yr, int mon, int day) {
@@ -567,30 +551,27 @@ public class NoteEditActivity extends AppCompatActivity {
                 final int y = yr;
                 final int m = mon;
                 final int d = day;
-                TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
+                TimePickerDialog timePickerDialog =
+                        new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hr, int min) {
-                        createScheduledNotification(buildNotification(title, note), hr, min, y, m, d);
-                        //Toast.makeText(util, pickedTime, Toast.LENGTH_SHORT).show();
+                        createScheduledNotification(hr, min, y, m, d);
                     }
                 }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
                 timePickerDialog.show();
             }
         }, year, month, day);
-        //datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable((Color.TRANSPARENT)));
         datePickerDialog.show();
     }
     // Create a scheduled notification based on user input from previous dialogs
-    private void createScheduledNotification(Notification notification, int hour, int min, int year, int month, int day){
+    private void createScheduledNotification(int hour, int min, int year, int month, int day){
         // Create Alarm Manager for Notification
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-
         int id = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
-        Log.d("notif_test2", "Generated ID: " + id);
 
         SharedPreferences.Editor editor = getSharedPreferences("ID", Context.MODE_PRIVATE).edit();
-        editor.putString("title"+id, (((EditText)findViewById(R.id.titleText)).getText().toString().trim()));
-        editor.putString("content"+id, (((EditText)findViewById(R.id.editText)).getText().toString().trim()));
+        editor.putString("title" + id, titleView.getText().toString().trim());
+        editor.putString("content" + id, contentView.getText().toString().trim());
         editor.apply();
 
         Intent notificationIntent = new Intent( this, BroadcastReminder.class);
@@ -614,27 +595,15 @@ public class NoteEditActivity extends AppCompatActivity {
         calendar.set(Calendar.SECOND, 0);
 
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-        refreshDrawables(colorPicked);
         Toast.makeText(mContext, "Reminder set", Toast.LENGTH_SHORT).show();
-    }
-
-    // Refresh drawables when creating notifications because they change them for some reason
-    private void refreshDrawables(int color){
-        findViewById(R.id.titleText).setBackground(UTIL.changeDrawableColor(R.drawable.shadow_border, color));
-        findViewById(R.id.editText).setBackground(UTIL.changeDrawableColor(R.drawable.shadow_border, color));
     }
 
     // Shows a dialog when the user presses back while editing a note
     @Override
     public void onBackPressed() {
-        Log.d("back_press_test",
-                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("back_dialog_toggle", true) + "");
         if (prefs.getBoolean("back_dialog_toggle", true))
             confirmDiscardDialog(MainActivity.class);
-        else {
+        else
             super.onBackPressed();
-        }
     }
-
-
 }
