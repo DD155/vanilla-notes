@@ -42,6 +42,7 @@ import com.sqsw.vanillanotes.classes.Utility;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 
 public class NoteEditActivity extends AppCompatActivity {
@@ -117,9 +118,11 @@ public class NoteEditActivity extends AppCompatActivity {
                 textView.setTextColor(getResources().getColor(R.color.white));
             }
         } else {
+            /*
             String dateString = UTIL.currentDate().substring(0, UTIL.currentDate().length() - 6)
                     + " " + UTIL.currentDate().substring(UTIL.currentDate().length() - 2);
             dateView.setText(getString(R.string.date_created, dateString));
+             */
 
             // Set drawable of new note
             textView.setBackgroundResource(R.drawable.shadow_border);
@@ -155,7 +158,7 @@ public class NoteEditActivity extends AppCompatActivity {
         ArrayList<Note> list; // ArrayList for either main notes or trash notes
         String key = "notes";
         int index = getIntent().getIntExtra("index", 0);
-        Intent prev = new Intent(getApplicationContext(), MainActivity.class);
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         EditText contentView = findViewById(R.id.editText);
         EditText titleView = findViewById(R.id.titleText);
 
@@ -166,11 +169,11 @@ public class NoteEditActivity extends AppCompatActivity {
 
         // Determine which list to use
         if (isTrash) {
-            prev.putExtra("caller", "Trash");
+            intent.putExtra("caller", "Trash");
             list = UTIL.getNotes("trash");
             key = "trash";
         } else if (isFavorite){
-            prev.putExtra("favorite", true);
+            intent.putExtra("favorite", true);
             list = UTIL.getNotes("favorites");
             key = "favorites";
         } else list = UTIL.getNotes("notes");
@@ -183,8 +186,11 @@ public class NoteEditActivity extends AppCompatActivity {
             current.setText(contentView.getText().toString().trim());
             current.setTitle(titleView.getText().toString().trim());
             current.setFavorite(newFavorite);
-
-            Log.d("fav_test", "Saving: (New Favorite status) " + newFavorite);
+            // Move the old saved note to the top
+            if (index != 0) {
+                list.remove(index);
+                list.add(0, current);
+            }
 
             // If the note is newly favorited, remove it from its current list and add to favorites list
             if (!isFavorite && newFavorite) {
@@ -218,9 +224,8 @@ public class NoteEditActivity extends AppCompatActivity {
                 list.add(0, newNote);
                 UTIL.saveNotes(list, key);
             }
-
         }
-        startActivity(prev);
+        startActivity(intent);
     }
     private void deleteNote(){
         if (!isOldNote){

@@ -72,18 +72,12 @@ public class NoteFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //view = inflater.inflate(R.layout.notes_layout, container, false);
         view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
-        final ArrayList<Note> starredList;
         UTIL = new Utility(getActivity());
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Notes");
 
         recyclerView = view.findViewById(R.id.recycler_notes);
-        //Bundle bundle = getArguments();
-
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
-        //noteList = (ArrayList<Note>)bundle.getSerializable(SERIALIZABLE_KEY);
         notes = getNotes("notes");
-        starredList = getNotes("starred");
 
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         int sortValue = sharedPreferences.getInt("sort_index", 0);
@@ -97,8 +91,7 @@ public class NoteFragment extends Fragment {
             defaultText.setText(getResources().getString(R.string.notes_empty));
         }
 
-        Log.d("sort_test", "3");
-
+        // Create onclick listener for RecyclerView items
         ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
@@ -155,7 +148,7 @@ public class NoteFragment extends Fragment {
 
     // Creates dialog for the clear
     private void createDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(getString(R.string.clear_notes_title));
         builder.setMessage(getString(R.string.clear_notes_text));
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -168,7 +161,7 @@ public class NoteFragment extends Fragment {
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                builder.create().dismiss();
             }
         });
 

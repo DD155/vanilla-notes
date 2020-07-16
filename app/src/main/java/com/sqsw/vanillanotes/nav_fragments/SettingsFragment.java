@@ -73,11 +73,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     public void onClick(DialogInterface dialog, int which) {
                         ArrayList<Note> note = getNotes("notes");
                         ArrayList<Note> trash = getNotes("trash");
+                        ArrayList<Note> fav = getNotes("favorites");
                         note.clear();
                         trash.clear();
+                        fav.clear();
                         saveNotes(note, "notes");
                         saveNotes(trash, "trash");
-                        Toast.makeText(getActivity(), getString(R.string.clear_data_summary), Toast.LENGTH_LONG).show();
+                        saveNotes(fav, "favorites");
+                        Toast.makeText(getActivity(), getString(R.string.clear_data_toast), Toast.LENGTH_LONG).show();
                     }
                 });
 

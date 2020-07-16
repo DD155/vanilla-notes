@@ -52,7 +52,7 @@
 
     <!-- Notes Preferences -->
     <string name="clear_data_title">Clear</string>
-    <string name="clear_data_summary">Deletes all notes in the home page</string>
+    <string name="clear_data_summary">Deletes all notes in the application</string>
     <string name="clear_data_toast">All data cleared</string>
     <string name="clear_data_dialog_text">Would you like to clear ALL data? Your settings will still be saved</string>
     <string name="clear_data_dialog_title">Clear Data</string>
@@ -68,7 +68,6 @@
     <!-- Notification Channel -->
     <string name="channel_name">Notifications</string>
     <string name="channel_description">Channel for pinned notes</string>
-
 
     <!-- Navigation Menu -->
     <string name="nav_header_title">Vanilla Notes</string>
