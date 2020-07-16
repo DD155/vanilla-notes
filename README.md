@@ -19,9 +19,8 @@ The final application will have the following features:
 - Color code your notes
 - Pin notes to your notification
 - Trash bin for deleted notes
-- Easily organizable notes with drag + drop
 - Sort by Title or Date Created
-- Star notes to view them easier
+- Favorite notes to view them easier
 - Themes / Dark Mode
 - Import/Export Backup
 - Widgets (?)
