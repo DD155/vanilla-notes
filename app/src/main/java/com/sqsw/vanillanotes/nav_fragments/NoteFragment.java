@@ -50,6 +50,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.constraintlayout.solver.widgets.Helper;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
@@ -60,7 +61,7 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 public class NoteFragment extends Fragment {
     private View view;
     private ArrayList<Note> notes;
-    private SharedPreferences prefs;
+    private SearchView searchView;
     private Utility UTIL;
     private RecyclerView recyclerView;
     private NotesAdapter adapter;
@@ -76,7 +77,7 @@ public class NoteFragment extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Notes");
 
         recyclerView = view.findViewById(R.id.recycler_notes);
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        //prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         notes = getNotes("notes");
 
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
@@ -186,6 +187,28 @@ public class NoteFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.notes_actions, menu);
+
+        final MenuItem myActionMenuItem = menu.findItem( R.id.action_search);
+        searchView = (SearchView) myActionMenuItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // Toast like print
+                Toast.makeText(UTIL, query, Toast.LENGTH_SHORT).show();
+                //UserFeedback.show( "SearchOnQueryTextSubmit: " + query);
+                if( ! searchView.isIconified()) {
+                    searchView.setIconified(true);
+                }
+                myActionMenuItem.collapseActionView();
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String s) {
+                // UserFeedback.show( "SearchOnQueryTextChanged: " + s);
+                return false;
+            }
+        });
+
     }
 
     @Override

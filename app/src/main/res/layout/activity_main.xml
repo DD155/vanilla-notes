@@ -20,7 +20,8 @@
             android:layout_height="?attr/actionBarSize"
             android:background="#FFFFFF"
             android:theme="?attr/actionBarTheme"
-            android:gravity="start" />
+            android:gravity="start">
+        </androidx.appcompat.widget.Toolbar>
     </LinearLayout>
 
     <FrameLayout
