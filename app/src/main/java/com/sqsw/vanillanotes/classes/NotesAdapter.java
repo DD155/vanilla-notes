@@ -84,24 +84,24 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
         return notes.size();
     }
 
-    private ArrayList<Integer> indices;
+    public Note getItem(int position){
+        Log.d("index_test", "Current title: " + notes.get(position).getTitle());
+        return notes.get(position);
+    }
 
     private Filter filter = new Filter() {
         FilterResults results = new FilterResults();
         @Override
         protected FilterResults performFiltering(CharSequence query) {
             List<Note> filteredList = new ArrayList<>();
-            indices = new ArrayList<>();
 
-            if (query == null || query.length() == 0){
+            if (query == null || query.toString().trim().length() == 0){
                 filteredList.addAll(copy);
             } else {
                 String search = query.toString().toLowerCase().trim();
                 for (int i = 0; i < copy.size(); i++){
-                    if (copy.get(i).getTitle().toLowerCase().contains(search)) {
+                    if (copy.get(i).getTitle().toLowerCase().contains(search))
                         filteredList.add(copy.get(i));
-                        indices.add(i);
-                    }
                 }
             }
 
@@ -113,6 +113,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             notes.clear();
             notes.addAll((List)results.values);
+            Log.d("index_test", "Current amt of notes: " + getItemCount());
             notifyDataSetChanged();
         }
 
@@ -121,9 +122,5 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
     @Override
     public Filter getFilter() {
         return filter;
-    }
-
-    public ArrayList<Integer> getResultIndices(){
-        return indices;
     }
 }

@@ -89,9 +89,9 @@ public class NoteEditActivity extends AppCompatActivity {
 
         // Set attributes of EditTexts
         titleView.setElevation(10);
-        //titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize + 3);
+        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize + 3);
         titleView.setPadding(50, 50, 50, 0);
-        //titleView.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        titleView.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
 
         contentView.setElevation(10);
         contentView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
@@ -202,7 +202,8 @@ public class NoteEditActivity extends AppCompatActivity {
             // Move the old saved note to the top
             if (index != 0) {
                 list.remove(index);
-                list.add(0, current);
+                //list.add(0, current);
+                list.add(current);
             }
 
             saveToFavorites(list, index);

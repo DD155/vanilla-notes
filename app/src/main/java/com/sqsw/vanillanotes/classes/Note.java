@@ -1,13 +1,16 @@
 package com.sqsw.vanillanotes.classes;
 
+import android.graphics.Color;
+
 import java.io.Serializable;
 
 public class Note implements Serializable {
+    private boolean favorite;
     private String title;
     private String text;
     private String date;
-    private boolean favorite;
     private int color;
+    private int index = -1;
 
     public Note(String title, String text, int color, String date){
         this.title = title;
@@ -25,12 +28,11 @@ public class Note implements Serializable {
         this.favorite = false;
     }
 
-
     public Note(String title, String text){
         this.title = title;
         this.text = text;
         this.date = "";
-        this.color = -1;
+        this.color = Color.WHITE;
         this.favorite = false;
     }
 
@@ -38,7 +40,7 @@ public class Note implements Serializable {
         this.title = "";
         this.text = text;
         this.date = "";
-        this.color = -1;
+        this.color = Color.WHITE;
         this.favorite = false;
     }
 
@@ -53,6 +55,7 @@ public class Note implements Serializable {
     public String getDate() { return date; }
 
     public int getColor() { return color; }
+
 
     public void setTitle(String title){
         this.title = title;
@@ -74,9 +77,22 @@ public class Note implements Serializable {
         this.favorite = favorite;
     }
 
-    public boolean getFavorite(){
-        return favorite;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+
+        if (!Note.class.isAssignableFrom(obj.getClass())) {
+            return false;
+        }
+
+        final Note b = (Note) obj;
+
+        return (this.getTitle().equals(b.getTitle()) && this.getText().equals(b.getText()) &&
+                this.getDate().equals(b.getDate()) && this.getColor() == b.getColor());
     }
+
+
 
 
 

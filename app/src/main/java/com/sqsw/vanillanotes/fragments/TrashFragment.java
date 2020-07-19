@@ -68,7 +68,7 @@ public class TrashFragment extends Fragment {
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                 Intent notesActivity = new Intent();
 
-                notesActivity.setClass(getActivity(), NoteEditActivity.class);
+                notesActivity.setClass(requireActivity(), NoteEditActivity.class);
                 notesActivity.putExtra("oldNote", true);
                 notesActivity.putExtra("index", position);
                 notesActivity.putExtra("caller", "Trash"); // Pass caller to edit activity
@@ -79,7 +79,8 @@ public class TrashFragment extends Fragment {
         if (noteList.size() > 0) {
             adapter = new NotesAdapter(noteList);
             UTIL.sortNotes(getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE).getInt("sort_index", 0),
-                    noteList, adapter, "trash");
+                    noteList, "trash");
+            adapter.notifyDataSetChanged();
         } else { // Show text showing the trash is empty
             TextView defaultText = view.findViewById(R.id.clear_text);
             defaultText.setText(getResources().getString(R.string.trash_empty));
@@ -236,7 +237,8 @@ public class TrashFragment extends Fragment {
             public void onClick(DialogInterface dialogInterface, int i) {
                 Log.d("selected_index", selectedSortItem + "");
                 dialogInterface.dismiss();
-                UTIL.sortNotes(selectedSortItem, noteList, adapter, "trash");
+                UTIL.sortNotes(selectedSortItem, noteList, "trash");
+                adapter.notifyDataSetChanged();
             }
         });
 

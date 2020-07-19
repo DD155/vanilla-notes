@@ -25,6 +25,7 @@ import com.sqsw.vanillanotes.classes.Note;
 import com.sqsw.vanillanotes.classes.NotesAdapter;
 import com.sqsw.vanillanotes.classes.Utility;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
@@ -42,6 +43,7 @@ public class NoteFragment extends Fragment {
     private SearchView searchView;
     private Utility UTIL;
     private RecyclerView recyclerView;
+    private boolean isSearched = false;
     private NotesAdapter adapter;
     private int selectedSortItem = 4;
 
@@ -54,23 +56,25 @@ public class NoteFragment extends Fragment {
         UTIL = new Utility(requireActivity());
         ((AppCompatActivity) requireActivity()).getSupportActionBar().setTitle("Notes");
 
-
         recyclerView = view.findViewById(R.id.recycler_notes);
         notes = getNotes("notes");
+
 
         Log.d("search_test", "Original size: " + notes.size());
 
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         int sortValue = sharedPreferences.getInt("sort_index", 0);
 
-        adapter = new NotesAdapter(notes);
-
-        if (notes.size() > 0)
-            UTIL.sortNotes(sortValue, notes, adapter, "notes");
+        if (notes.size() > 0) {
+            UTIL.sortNotes(sortValue, notes, "notes");
+        }
         else {
             TextView defaultText = view.findViewById(R.id.clear_text);
             defaultText.setText(getResources().getString(R.string.notes_empty));
         }
+
+        adapter = new NotesAdapter(notes);
+        adapter.notifyDataSetChanged();
 
         // Create onclick listener for RecyclerView items
         ItemClickSupport.addTo(recyclerView).setOnItemClickListener(listener);
@@ -86,11 +90,22 @@ public class NoteFragment extends Fragment {
     ItemClickSupport.OnItemClickListener listener = new ItemClickSupport.OnItemClickListener() {
         @Override
         public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-            Intent notesActivity = new Intent();
-            notesActivity.setClass(requireActivity(), NoteEditActivity.class);
-            notesActivity.putExtra("oldNote", true);
-            notesActivity.putExtra("index", position);
-            startActivity(notesActivity);
+            Intent intent = new Intent(requireActivity(), NoteEditActivity.class);
+            Note current = adapter.getItem(position);
+
+            if (isSearched) {
+                for (int i = 0; i < getNotes("notes").size(); i++) {
+                    if (current.equals(getNotes("notes").get(i))) {
+                        intent.putExtra("index", i);
+                        break;
+                    }
+                }
+            } else {
+                intent.putExtra("index", position);
+            }
+
+            intent.putExtra("oldNote", true);
+            startActivity(intent);
         }
     };
 
@@ -120,7 +135,8 @@ public class NoteFragment extends Fragment {
             public void onClick(DialogInterface dialogInterface, int i) {
                 Log.d("selected_index", selectedSortItem + "");
                 dialogInterface.dismiss();
-                UTIL.sortNotes(selectedSortItem, notes, adapter, "notes");
+                UTIL.sortNotes(selectedSortItem, notes, "notes");
+                adapter.notifyDataSetChanged();
             }
         });
 
@@ -174,36 +190,31 @@ public class NoteFragment extends Fragment {
         final MenuItem myActionMenuItem = menu.findItem( R.id.action_search);
         searchView = (SearchView)myActionMenuItem.getActionView();
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(UTIL, query, Toast.LENGTH_SHORT).show();
-                if(!searchView.isIconified()) {
-                    searchView.setIconified(true);
-                }
-                myActionMenuItem.collapseActionView();
-                return true;
-            }
-            @Override
-            public boolean onQueryTextChange(String text) {
-                Log.d("search_test", notes.size() + "" );
-                adapter.getFilter().filter(text);
-                if (adapter.getResultIndices() != null) {
-                    ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
-                        @Override
-                        public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                            Intent notesActivity = new Intent();
-                            notesActivity.setClass(requireActivity(), NoteEditActivity.class);
-                            notesActivity.putExtra("oldNote", true);
-                            notesActivity.putExtra("index", adapter.getResultIndices().get(position));
-                            startActivity(notesActivity);
+            public void onClick(View view) {
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        //Toast.makeText(UTIL, query, Toast.LENGTH_SHORT).show();
+                        if(!searchView.isIconified()) {
+                            searchView.setIconified(true);
                         }
-                    });
-                }
-                return true;
+                        myActionMenuItem.collapseActionView();
+                        return true;
+                    }
+                    @Override
+                    public boolean onQueryTextChange(String text) {
+                        adapter.getFilter().filter(text);
+                        isSearched = true;
+                        //Log.d("index_test", "Current amt of notes: " + adapter.getItemCount());
+
+                        return true;
+                    }
+                });
             }
         });
-
     }
 
     @Override

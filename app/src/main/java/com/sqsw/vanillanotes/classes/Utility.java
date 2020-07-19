@@ -170,14 +170,13 @@ public class Utility extends ContextWrapper {
         return month + "/" + dayOfWeek + "/" + year + " " + hour + ":" + minutes;
     }
 
-    public void sortNotes(int type, ArrayList<Note> notes, NotesAdapter adapter, String key){
+    public void sortNotes(int type, ArrayList<Note> notes, String key){
         switch (type){
             case 0:
                 // Type 0 = Sort by Title (Ascending)
                 Log.d("selected_index", "case 0");
                 Collections.sort(notes, new NoteComparator());
                 saveNotes(notes, key);
-                adapter.notifyDataSetChanged();
                 break;
             case 1:
                 // Type 1 = Sort by Title (Descending)
@@ -185,20 +184,17 @@ public class Utility extends ContextWrapper {
                 Collections.sort(notes, new NoteComparator());
                 Collections.reverse(notes);
                 saveNotes(notes, key);
-                adapter.notifyDataSetChanged();
                 break;
             case 2:
                 // Type 2 = Sort by Date Created (Ascending)
                 Collections.sort(notes, new DateComparator());
                 saveNotes(notes, key);
-                adapter.notifyDataSetChanged();
                 break;
             case 3:
                 // Type 3 = Sort by Date Created (Descending)
                 Collections.sort(notes, new DateComparator());
                 Collections.reverse(notes);
                 saveNotes(notes, key);
-                adapter.notifyDataSetChanged();
                 break;
             case 4:
                 break;
