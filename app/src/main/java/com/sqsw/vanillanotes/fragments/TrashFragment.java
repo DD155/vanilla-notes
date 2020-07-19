@@ -1,32 +1,18 @@
-package com.sqsw.vanillanotes.nav_fragments;
+package com.sqsw.vanillanotes.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.text.InputFilter;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,27 +20,22 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.activities.NoteEditActivity;
-import com.sqsw.vanillanotes.classes.DateComparator;
 import com.sqsw.vanillanotes.classes.ItemClickSupport;
 import com.sqsw.vanillanotes.classes.Note;
-import com.sqsw.vanillanotes.classes.NoteComparator;
 import com.sqsw.vanillanotes.classes.NotesAdapter;
 import com.sqsw.vanillanotes.classes.Utility;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.solver.widgets.Helper;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 public class TrashFragment extends Fragment {
     private View view;
@@ -113,7 +94,7 @@ public class TrashFragment extends Fragment {
                 final TextView text = new TextView(getContext());
                 final Note currNote = noteList.get(i);
 
-                final Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
+                final Drawable drawable = UTIL.changeDrawableColor(R.drawable.note_background, currNote.getColor());
                 text.setBackground(drawable);
 
                 initializeText(text, currNote);
@@ -136,7 +117,7 @@ public class TrashFragment extends Fragment {
                                     // Logic for making pressed down color a darker shade
                                     String newHex = UTIL.getDarkerColor(currNote.getColor());
                                     // Create new drawable to replace
-                                    Drawable holdDrawable = UTIL.returnDrawable(R.drawable.shadow_border);
+                                    Drawable holdDrawable = UTIL.returnDrawable(R.drawable.note_background);
                                     holdDrawable.setColorFilter(new
                                             PorterDuffColorFilter(Color.parseColor(newHex), PorterDuff.Mode.MULTIPLY));
 

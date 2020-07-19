@@ -8,22 +8,18 @@ import androidx.fragment.app.Fragment;
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.sqsw.vanillanotes.classes.Note;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.classes.Utility;
-import com.sqsw.vanillanotes.nav_fragments.FavoritesFragment;
-import com.sqsw.vanillanotes.nav_fragments.NoteFragment;
-import com.sqsw.vanillanotes.nav_fragments.TrashFragment;
-import com.sqsw.vanillanotes.nav_fragments.SettingsFragment;
-
-import java.util.ArrayList;
+import com.sqsw.vanillanotes.fragments.FavoritesFragment;
+import com.sqsw.vanillanotes.fragments.NoteFragment;
+import com.sqsw.vanillanotes.fragments.TrashFragment;
+import com.sqsw.vanillanotes.fragments.SettingsFragment;
 
 public class MainActivity extends AppCompatActivity {
     private static final String CHANNEL_ID = "NoteChannel";

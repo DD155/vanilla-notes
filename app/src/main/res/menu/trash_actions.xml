@@ -6,7 +6,7 @@
         <!-- Empty trash can -->
         <item android:id="@+id/action_empty"
             android:title="@string/action_empty"
-            android:icon="@drawable/ic_delete_forever_black_24dp"
+            android:icon="@drawable/delete_icon"
             app:showAsAction="ifRoom" />
 
         <!-- Sort -->

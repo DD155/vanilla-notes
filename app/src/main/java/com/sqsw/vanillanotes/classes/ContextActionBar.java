@@ -1,4 +1,4 @@
-package com.sqsw.vanillanotes.settings;
+package com.sqsw.vanillanotes.classes;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;

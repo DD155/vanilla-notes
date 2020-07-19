@@ -1,6 +1,5 @@
 package com.sqsw.vanillanotes.classes;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -11,8 +10,6 @@ import android.util.Log;
 
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.activities.NoteEditActivity;
-
-import java.util.Date;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.TaskStackBuilder;
@@ -42,7 +39,7 @@ public class BroadcastReminder extends BroadcastReceiver {
 
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "NoteChannel")
-                .setSmallIcon(R.drawable.ic_baseline_event_note_24)
+                .setSmallIcon(R.drawable.event_icon)
                 .setContentTitle(title)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(content))
                 .setAutoCancel(true)

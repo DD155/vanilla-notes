@@ -2,6 +2,7 @@
     <string name="app_name">Vanilla Notes</string>
     <string name="button_text">Add Note</string>
     <string name="enter_your_note">Enter your note…</string>
+    <string name="search_hint">Search notes…</string>
     <string name="save">Save</string>
     <string name="clear">Clear</string>
 
@@ -10,7 +11,7 @@
     <string name="clear_notes_text">Would you like to clear all the notes?</string>
     <string name="clear_notes_toast">Notes cleared</string>
 
-    <!-- Trash Activity -->
+    <!-- Trash Fragment -->
     <string name="trash_empty">Nothing here…</string>
     <string name="trash_clear_confirm">Are you sure you want to empty the trash?
         The notes cannot be recovered after this</string>

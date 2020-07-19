@@ -1,4 +1,4 @@
-package com.sqsw.vanillanotes.nav_fragments;
+package com.sqsw.vanillanotes.fragments;
 
 import android.content.Context;
 import android.content.Intent;

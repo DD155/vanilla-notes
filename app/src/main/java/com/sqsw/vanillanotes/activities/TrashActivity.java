@@ -30,7 +30,6 @@ import android.widget.Toast;
 import com.sqsw.vanillanotes.classes.Note;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.classes.Utility;
-import com.sqsw.vanillanotes.settings.SettingsActivity;
 
 import java.util.ArrayList;
 
@@ -90,7 +89,7 @@ public class TrashActivity extends AppCompatActivity {
                 String title = currNote.getTitle();
                 String description = currNote.getText();
                 Log.d("color_picked", ""+currNote.getColor());
-                Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, currNote.getColor());
+                Drawable drawable = UTIL.changeDrawableColor(R.drawable.note_background, currNote.getColor());
                 text.setBackground(drawable);
                 /*
                 String[] strParts = description.split("\\r?\\n|\\r");
@@ -172,7 +171,7 @@ public class TrashActivity extends AppCompatActivity {
         params.setMargins(0, 25, 0, 25);
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
         text.setFilters(new InputFilter[] { new InputFilter.LengthFilter(82) });
-        //text.setBackgroundResource(R.drawable.shadow_border);
+        //text.setBackgroundResource(R.drawable.note_background);
         text.setHeight(height);
         text.setPadding(50, 20, 50, 30);
         text.setLayoutParams(params);

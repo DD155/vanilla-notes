@@ -15,9 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name="com.sqsw.vanillanotes.settings.ContextActionBar"/>
+        <activity android:name="com.sqsw.vanillanotes.classes.ContextActionBar"/>
         <activity android:name="com.sqsw.vanillanotes.activities.TrashActivity" />
-        <activity android:name="com.sqsw.vanillanotes.settings.SettingsActivity" />
         <activity android:name="com.sqsw.vanillanotes.activities.NoteEditActivity" />
         <activity android:name="com.sqsw.vanillanotes.activities.MainActivity">
             <intent-filter>

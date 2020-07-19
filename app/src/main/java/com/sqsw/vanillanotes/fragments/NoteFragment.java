@@ -1,65 +1,43 @@
-package com.sqsw.vanillanotes.nav_fragments;
+package com.sqsw.vanillanotes.fragments;
 
-import android.animation.RectEvaluator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.text.InputFilter;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.sqsw.vanillanotes.classes.DateComparator;
+import com.sqsw.vanillanotes.R;
+import com.sqsw.vanillanotes.activities.NoteEditActivity;
 import com.sqsw.vanillanotes.classes.ItemClickSupport;
 import com.sqsw.vanillanotes.classes.Note;
-import com.sqsw.vanillanotes.activities.NoteEditActivity;
-import com.sqsw.vanillanotes.R;
-import com.sqsw.vanillanotes.classes.NoteComparator;
 import com.sqsw.vanillanotes.classes.NotesAdapter;
 import com.sqsw.vanillanotes.classes.Utility;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.constraintlayout.solver.widgets.Helper;
 import androidx.fragment.app.Fragment;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 
 public class NoteFragment extends Fragment {
-    private View view;
     private ArrayList<Note> notes;
     private SearchView searchView;
     private Utility UTIL;
@@ -72,15 +50,17 @@ public class NoteFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //view = inflater.inflate(R.layout.notes_layout, container, false);
-        view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
-        UTIL = new Utility(getActivity());
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Notes");
+        View view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
+        UTIL = new Utility(requireActivity());
+        ((AppCompatActivity) requireActivity()).getSupportActionBar().setTitle("Notes");
+
 
         recyclerView = view.findViewById(R.id.recycler_notes);
-        //prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         notes = getNotes("notes");
 
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        Log.d("search_test", "Original size: " + notes.size());
+
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         int sortValue = sharedPreferences.getInt("sort_index", 0);
 
         adapter = new NotesAdapter(notes);
@@ -93,16 +73,7 @@ public class NoteFragment extends Fragment {
         }
 
         // Create onclick listener for RecyclerView items
-        ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
-            @Override
-            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                Intent notesActivity = new Intent();
-                notesActivity.setClass(getActivity(), NoteEditActivity.class);
-                notesActivity.putExtra("oldNote", true);
-                notesActivity.putExtra("index", position);
-                startActivity(notesActivity);
-            }
-        });
+        ItemClickSupport.addTo(recyclerView).setOnItemClickListener(listener);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -112,15 +83,26 @@ public class NoteFragment extends Fragment {
         return view;
     }
 
+    ItemClickSupport.OnItemClickListener listener = new ItemClickSupport.OnItemClickListener() {
+        @Override
+        public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+            Intent notesActivity = new Intent();
+            notesActivity.setClass(requireActivity(), NoteEditActivity.class);
+            notesActivity.putExtra("oldNote", true);
+            notesActivity.putExtra("index", position);
+            startActivity(notesActivity);
+        }
+    };
+
     // Create dialog for sorting notes
     private void sortDialog() {
-        final SharedPreferences prefs = getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        final SharedPreferences prefs = requireActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         if (selectedSortItem != prefs.getInt("sort_index", 0)){
             selectedSortItem = prefs.getInt("sort_index", 0);
         }
 
         String[] items = getResources().getStringArray(R.array.sort_values);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         builder.setTitle("Sort");
         builder.setCancelable(true);
         builder.setSingleChoiceItems(items, selectedSortItem, new DialogInterface.OnClickListener() {
@@ -149,7 +131,7 @@ public class NoteFragment extends Fragment {
 
     // Creates dialog for the clear
     private void createDialog() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         builder.setTitle(getString(R.string.clear_notes_title));
         builder.setMessage(getString(R.string.clear_notes_text));
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -189,23 +171,24 @@ public class NoteFragment extends Fragment {
         inflater.inflate(R.menu.notes_actions, menu);
 
         final MenuItem myActionMenuItem = menu.findItem( R.id.action_search);
-        searchView = (SearchView) myActionMenuItem.getActionView();
+        searchView = (SearchView)myActionMenuItem.getActionView();
+        searchView.setQueryHint(getResources().getString(R.string.search_hint));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // Toast like print
                 Toast.makeText(UTIL, query, Toast.LENGTH_SHORT).show();
-                //UserFeedback.show( "SearchOnQueryTextSubmit: " + query);
-                if( ! searchView.isIconified()) {
+                if(!searchView.isIconified()) {
                     searchView.setIconified(true);
                 }
                 myActionMenuItem.collapseActionView();
-                return false;
+                return true;
             }
             @Override
-            public boolean onQueryTextChange(String s) {
-                // UserFeedback.show( "SearchOnQueryTextChanged: " + s);
-                return false;
+            public boolean onQueryTextChange(String text) {
+                Log.d("search_test", notes.size() + "" );
+                adapter.getFilter().filter(text);
+                ItemClickSupport.addTo(recyclerView).setOnItemClickListener(listener);
+                return true;
             }
         });
 
@@ -215,7 +198,7 @@ public class NoteFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
-                UTIL.goToActivity(NoteEditActivity.class, null, getActivity());
+                UTIL.goToActivity(NoteEditActivity.class, null, requireActivity());
                 return true;
 
             case R.id.action_clear:
@@ -233,7 +216,7 @@ public class NoteFragment extends Fragment {
 
     // Returns the ArrayList from sharedprefs
     public ArrayList<Note> getNotes(String key){
-        SharedPreferences prefs = getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        SharedPreferences prefs = requireActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         Gson gson = new Gson();
         String json = prefs.getString(key, null);
         Type type = new TypeToken<ArrayList<Note>>() {}.getType();

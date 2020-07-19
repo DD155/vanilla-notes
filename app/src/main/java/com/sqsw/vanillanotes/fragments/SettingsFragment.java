@@ -1,4 +1,4 @@
-package com.sqsw.vanillanotes.nav_fragments;
+package com.sqsw.vanillanotes.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;

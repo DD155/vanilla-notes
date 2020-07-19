@@ -7,17 +7,21 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.sqsw.vanillanotes.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> {
+public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> implements Filterable {
     private Utility util;
 
 
@@ -34,11 +38,14 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
         }
     }
 
+    //private AdapterView.
     private List<Note> notes;
+    private List<Note> copy;
     private Context context;
 
-    public NotesAdapter(List<Note> notes){
+    public NotesAdapter(List<Note> notes/*, AdapterView.OnItemClickListener listener*/){
         this.notes = notes;
+        copy = new ArrayList<>(notes);
     }
 
     @NonNull
@@ -77,5 +84,36 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
         return notes.size();
     }
 
+    private Filter filter = new Filter() {
+        FilterResults results = new FilterResults();
+        @Override
+        protected FilterResults performFiltering(CharSequence query) {
+            List<Note> filteredList = new ArrayList<>();
 
+            if (query == null || query.length() == 0){
+                filteredList.addAll(copy);
+            } else {
+                String search = query.toString().toLowerCase().trim();
+                for (int i = 0; i < copy.size(); i++){
+                    if (copy.get(i).getTitle().toLowerCase().contains(search))
+                        filteredList.add(copy.get(i));
+                }
+            }
+
+            results.values = filteredList;
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            notes.clear();
+            notes.addAll((List)results.values);
+            notifyDataSetChanged();
+        }
+    };
+
+    @Override
+    public Filter getFilter() {
+        return filter;
+    }
 }

@@ -22,7 +22,6 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -113,7 +112,7 @@ public class NoteEditActivity extends AppCompatActivity {
 
             // Set color
             colorPicked = currentNote.getColor();
-            Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, colorPicked);
+            Drawable drawable = UTIL.changeDrawableColor(R.drawable.note_background, colorPicked);
             titleView.setBackground(drawable);
             contentView.setBackground(drawable);
 
@@ -123,20 +122,26 @@ public class NoteEditActivity extends AppCompatActivity {
                 contentView.setTextColor(getResources().getColor(R.color.white));
             }
         } else {
-            /*
-            String dateString = UTIL.currentDate().substring(0, UTIL.currentDate().length() - 6)
-                    + " " + UTIL.currentDate().substring(UTIL.currentDate().length() - 2);
-            dateView.setText(getString(R.string.date_created, dateString));
-             */
-
             // Set drawable of new note
-            contentView.setBackgroundResource(R.drawable.shadow_border);
-            titleView.setBackgroundResource(R.drawable.shadow_border);
+            contentView.setBackgroundResource(R.drawable.note_background);
+            titleView.setBackgroundResource(R.drawable.note_background);
         }
+
+        contentView.setOnFocusChangeListener(focusChangeListener);
+        titleView.setOnFocusChangeListener(focusChangeListener);
 
         //title.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
         //content.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
     }
+
+    // Used to refresh drawables since they change for some reason when focusing on it
+    private View.OnFocusChangeListener focusChangeListener = new View.OnFocusChangeListener() {
+        @Override
+        public void onFocusChange(View view, boolean b) {
+            contentView.setBackgroundResource(R.drawable.note_background);
+            titleView.setBackgroundResource(R.drawable.note_background);
+        }
+    };
 
     // Retrive ArrayList depending on if user entered from activity trash or home
     private Note getCurrentNote(){
@@ -216,7 +221,7 @@ public class NoteEditActivity extends AppCompatActivity {
             saveToFavorites(list, index);
             UTIL.saveNotes(list, key);
         } else {
-            Note newNote = new Note(contentText, titleText, colorPicked, UTIL.currentDate());
+            Note newNote = new Note(titleText, contentText, colorPicked, UTIL.currentDate());
             newNote.setFavorite(newFavorite);
             // If new note is favorited, add it to the favorites list
             if (newFavorite) {
@@ -376,7 +381,7 @@ public class NoteEditActivity extends AppCompatActivity {
             public void onChooseColor(int position, int color) {
                 if (color != 0) {
                     colorPicked = color;
-                    Drawable drawable = UTIL.changeDrawableColor(R.drawable.shadow_border, color);
+                    Drawable drawable = UTIL.changeDrawableColor(R.drawable.note_background, color);
 
                     titleView.setBackground(drawable);
                     contentView.setBackground(drawable);
@@ -510,7 +515,7 @@ public class NoteEditActivity extends AppCompatActivity {
         // Build the notification
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this, "NoteChannel")
-                .setSmallIcon(R.drawable.ic_baseline_event_note_24)
+                .setSmallIcon(R.drawable.event_icon)
                 .setContentTitle(title)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(note))
                 .setAutoCancel(true)

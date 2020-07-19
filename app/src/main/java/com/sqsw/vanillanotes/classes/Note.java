@@ -8,7 +8,6 @@ public class Note implements Serializable {
     private String date;
     private boolean favorite;
     private int color;
-    private int index; // TODO: Implement indexing for custom user sort
 
     public Note(String title, String text, int color, String date){
         this.title = title;
