@@ -84,19 +84,24 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
         return notes.size();
     }
 
+    private ArrayList<Integer> indices;
+
     private Filter filter = new Filter() {
         FilterResults results = new FilterResults();
         @Override
         protected FilterResults performFiltering(CharSequence query) {
             List<Note> filteredList = new ArrayList<>();
+            indices = new ArrayList<>();
 
             if (query == null || query.length() == 0){
                 filteredList.addAll(copy);
             } else {
                 String search = query.toString().toLowerCase().trim();
                 for (int i = 0; i < copy.size(); i++){
-                    if (copy.get(i).getTitle().toLowerCase().contains(search))
+                    if (copy.get(i).getTitle().toLowerCase().contains(search)) {
                         filteredList.add(copy.get(i));
+                        indices.add(i);
+                    }
                 }
             }
 
@@ -110,10 +115,15 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
             notes.addAll((List)results.values);
             notifyDataSetChanged();
         }
+
     };
 
     @Override
     public Filter getFilter() {
         return filter;
+    }
+
+    public ArrayList<Integer> getResultIndices(){
+        return indices;
     }
 }

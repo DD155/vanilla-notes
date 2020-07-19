@@ -170,6 +170,7 @@ public class NoteFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.notes_actions, menu);
 
+        // Initialize the searchview in the toolbar
         final MenuItem myActionMenuItem = menu.findItem( R.id.action_search);
         searchView = (SearchView)myActionMenuItem.getActionView();
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
@@ -187,7 +188,18 @@ public class NoteFragment extends Fragment {
             public boolean onQueryTextChange(String text) {
                 Log.d("search_test", notes.size() + "" );
                 adapter.getFilter().filter(text);
-                ItemClickSupport.addTo(recyclerView).setOnItemClickListener(listener);
+                if (adapter.getResultIndices() != null) {
+                    ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+                        @Override
+                        public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                            Intent notesActivity = new Intent();
+                            notesActivity.setClass(requireActivity(), NoteEditActivity.class);
+                            notesActivity.putExtra("oldNote", true);
+                            notesActivity.putExtra("index", adapter.getResultIndices().get(position));
+                            startActivity(notesActivity);
+                        }
+                    });
+                }
                 return true;
             }
         });

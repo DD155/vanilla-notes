@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
@@ -88,9 +89,9 @@ public class NoteEditActivity extends AppCompatActivity {
 
         // Set attributes of EditTexts
         titleView.setElevation(10);
-        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize + 3);
+        //titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize + 3);
         titleView.setPadding(50, 50, 50, 0);
-        titleView.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        //titleView.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
 
         contentView.setElevation(10);
         contentView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
@@ -108,13 +109,13 @@ public class NoteEditActivity extends AppCompatActivity {
             titleView.setText(currentNote.getTitle());
             contentView.setText(currentNote.getText()); // Set the text on the note page as the old string
             contentView.setSelection(contentView.getText().length()); // Set cursor to the end
-            contentView.requestFocus();
+            //contentView.requestFocus();
 
             // Set color
             colorPicked = currentNote.getColor();
-            Drawable drawable = UTIL.changeDrawableColor(R.drawable.note_background, colorPicked);
-            titleView.setBackground(drawable);
-            contentView.setBackground(drawable);
+            changeViewColor(titleView, colorPicked);
+            changeViewColor(contentView, colorPicked);
+
 
             // Set text color depending if color is dark or not
             if (UTIL.isDarkColor(colorPicked)) {
@@ -127,21 +128,7 @@ public class NoteEditActivity extends AppCompatActivity {
             titleView.setBackgroundResource(R.drawable.note_background);
         }
 
-        contentView.setOnFocusChangeListener(focusChangeListener);
-        titleView.setOnFocusChangeListener(focusChangeListener);
-
-        //title.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
-        //content.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
     }
-
-    // Used to refresh drawables since they change for some reason when focusing on it
-    private View.OnFocusChangeListener focusChangeListener = new View.OnFocusChangeListener() {
-        @Override
-        public void onFocusChange(View view, boolean b) {
-            contentView.setBackgroundResource(R.drawable.note_background);
-            titleView.setBackgroundResource(R.drawable.note_background);
-        }
-    };
 
     // Retrive ArrayList depending on if user entered from activity trash or home
     private Note getCurrentNote(){
@@ -381,10 +368,9 @@ public class NoteEditActivity extends AppCompatActivity {
             public void onChooseColor(int position, int color) {
                 if (color != 0) {
                     colorPicked = color;
-                    Drawable drawable = UTIL.changeDrawableColor(R.drawable.note_background, color);
 
-                    titleView.setBackground(drawable);
-                    contentView.setBackground(drawable);
+                    changeViewColor(titleView, color);
+                    changeViewColor(contentView, color);
 
                     // Change the color of the text depending if the color chosen is dark or not to
                     // make it easier to see for the user
@@ -601,6 +587,11 @@ public class NoteEditActivity extends AppCompatActivity {
 
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         Toast.makeText(mContext, "Reminder set", Toast.LENGTH_SHORT).show();
+    }
+
+    private void changeViewColor(EditText view, int colorPicked){
+        view.setBackgroundResource(R.drawable.note_background);
+        view.getBackground().setColorFilter(colorPicked, PorterDuff.Mode.SRC_ATOP);
     }
 
     // Shows a dialog when the user presses back while editing a note

@@ -9,6 +9,8 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -74,25 +76,6 @@ public class Utility extends ContextWrapper {
         } else if ("Large".equals(pref)){
             return FONT_LARGE;
         } else return FONT_MEDIUM;
-    }
-
-    // Returns a drawable that has a color filter applied
-    public Drawable changeDrawableColor(int drawableID, int color){
-        Drawable d = getResources().getDrawable(drawableID);
-        d.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.MULTIPLY));
-        return d;
-    }
-
-    // Replaces getDrawable method
-    public Drawable returnDrawable(int id){
-        Drawable d;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            d = getResources().getDrawable(id, null);
-        } else
-        {
-            d = getResources().getDrawable(id);
-        }
-        return d;
     }
 
     // Return a hex code string from R.color int
