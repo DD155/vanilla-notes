@@ -36,6 +36,7 @@ Project is created with and uses:
 - [material.io](https://material.io/) - Material guidelines with resources such as components and icons
 - [Color Picker Library](https://github.com/kristiyanP/colorpicker) - Material Color Picker asset created by [Kristiyan Petrov](https://github.com/kristiyanP)
 - [Item Click Support for RecyclerView](https://www.littlerobots.nl/blog/Handle-Android-RecyclerView-Clicks/) - Onclick handling for RecyclerView items by [Hugo Visser](https://www.littlerobots.nl/blog/)
+- [Floating Action Menu](https://github.com/Clans/FloatingActionButton) - Floating Action Button with an option to have multiple child buttons by [Dmytro Tarianyk](https://github.com/Clans)
 
 
 ## Launch
