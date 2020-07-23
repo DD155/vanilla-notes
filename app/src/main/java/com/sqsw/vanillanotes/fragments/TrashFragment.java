@@ -66,9 +66,8 @@ public class TrashFragment extends Fragment {
         ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                Intent notesActivity = new Intent();
+                Intent notesActivity = new Intent(requireActivity(), NoteEditActivity.class);
 
-                notesActivity.setClass(requireActivity(), NoteEditActivity.class);
                 notesActivity.putExtra("oldNote", true);
                 notesActivity.putExtra("index", position);
                 notesActivity.putExtra("caller", "Trash"); // Pass caller to edit activity

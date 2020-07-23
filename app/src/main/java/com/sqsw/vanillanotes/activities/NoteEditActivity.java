@@ -23,6 +23,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -164,6 +165,7 @@ public class NoteEditActivity extends AppCompatActivity {
         // If the note is newly favorited, remove it from its current list and add to favorites list
         if (!isFavorite && newFavorite) {
             ArrayList<Note> fav = UTIL.getNotes("favorites");
+            Log.d("fav_test", "Current index: " + index);
             fav.add(0, current);
             UTIL.saveNotes(fav, "favorites");
             list.remove(index);
@@ -174,6 +176,9 @@ public class NoteEditActivity extends AppCompatActivity {
             notes.add(0, current);
             UTIL.saveNotes(notes, "notes");
             list.remove(index);
+        } else {
+            list.remove(index);
+            list.add(0, current);
         }
     }
 
@@ -193,18 +198,18 @@ public class NoteEditActivity extends AppCompatActivity {
 
         if (isOldNote) { // Case where the note is old
             int index = getIntent().getIntExtra("index", 0);
+            Log.d("fav_test", "Current index: " + index);
             Note current = list.get(index);
             // Set new attributes to the note
             if (colorPicked != -1) current.setColor(colorPicked);
             current.setText(contentText);
             current.setTitle(titleText);
             current.setFavorite(newFavorite);
-            // Move the old saved note to the top
+            /* Move the old saved note to the top
             if (index != 0) {
                 list.remove(index);
-                //list.add(0, current);
-                list.add(current);
-            }
+                list.add(0, current);
+            }*/
 
             saveToFavorites(list, index);
             UTIL.saveNotes(list, key);
@@ -323,7 +328,7 @@ public class NoteEditActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_star:
-                toggleIcon(isFavorite);
+                toggleIcon(newFavorite);
                 return true;
 
             case R.id.action_restore:
