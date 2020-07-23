@@ -8,11 +8,15 @@ import androidx.fragment.app.Fragment;
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.classes.Utility;
@@ -24,14 +28,16 @@ import com.sqsw.vanillanotes.fragments.SettingsFragment;
 public class MainActivity extends AppCompatActivity {
     private static final String CHANNEL_ID = "NoteChannel";
     private final Utility UTIL = new Utility(this);
+    private Context mContext;
     private int selectedSortItem = 4;
-    private boolean isTrashFrag;
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mContext = this;
 
         // Create notification channel
         createNotificationChannel();
@@ -45,8 +51,6 @@ public class MainActivity extends AppCompatActivity {
 
         navView.setOnNavigationItemSelectedListener(navListener);
 
-        Log.d("fav_test", "Favorite extra: " + getIntent().getBooleanExtra("favorite", false));
-
         if (getIntent().getStringExtra("caller") != null) { // Start trash fragment
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new TrashFragment()).commit();
             navView.getMenu().getItem(2).setChecked(true);
@@ -57,6 +61,18 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new NoteFragment()).commit();
             navView.getMenu().getItem(0).setChecked(true);
         }
+
+        FloatingActionButton fabNote = findViewById(R.id.fab_item_note);
+        fabNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                UTIL.goToActivity(NoteEditActivity.class, null, mContext);
+            }
+        });
+
+
+        FloatingActionButton fabChecklist = findViewById(R.id.fab_item_checklist);
+
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =
@@ -68,21 +84,16 @@ public class MainActivity extends AppCompatActivity {
                         case R.id.nav_notes:
                             //selectedFrag = new NoteFragment();
                             selectedFrag = new NoteFragment();
-                            isTrashFrag = false;
                             break;
 
                         case R.id.nav_fav:
                             selectedFrag = new FavoritesFragment();
-                            isTrashFrag = false;
                             break;
 
                         case R.id.nav_trash:
                             selectedFrag = new TrashFragment();
-                            isTrashFrag = true;
                             break;
-
                         case R.id.nav_more:
-                            isTrashFrag = false;
                             selectedFrag = new SettingsFragment();
                             break;
                     }

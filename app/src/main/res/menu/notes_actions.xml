@@ -10,12 +10,6 @@
             app:showAsAction="always|collapseActionView"
             app:actionViewClass="androidx.appcompat.widget.SearchView" />
 
-        <!-- Add Note -->
-        <item android:id="@+id/action_add"
-            android:title="@string/action_add"
-            android:icon="@drawable/plus_icon"
-            app:showAsAction="ifRoom" />
-
         <!-- Sort -->
         <item android:id="@+id/action_sort"
             android:title="@string/action_sort"

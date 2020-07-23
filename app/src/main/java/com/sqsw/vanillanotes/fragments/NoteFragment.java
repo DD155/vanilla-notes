@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sqsw.vanillanotes.R;
@@ -25,7 +27,6 @@ import com.sqsw.vanillanotes.classes.Note;
 import com.sqsw.vanillanotes.classes.NotesAdapter;
 import com.sqsw.vanillanotes.classes.Utility;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
@@ -55,6 +56,10 @@ public class NoteFragment extends Fragment {
         View view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
         UTIL = new Utility(requireActivity());
         ((AppCompatActivity) requireActivity()).getSupportActionBar().setTitle("Notes");
+
+        FloatingActionMenu fam = getActivity().findViewById(R.id.fam);
+        fam.setVisibility(View.VISIBLE);
+        fam.setClosedOnTouchOutside(true);
 
         recyclerView = view.findViewById(R.id.recycler_notes);
         notes = getNotes("notes");
@@ -191,28 +196,23 @@ public class NoteFragment extends Fragment {
         searchView = (SearchView)myActionMenuItem.getActionView();
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
 
-        searchView.setOnSearchClickListener(new View.OnClickListener() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void onClick(View view) {
-                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                    @Override
-                    public boolean onQueryTextSubmit(String query) {
-                        //Toast.makeText(UTIL, query, Toast.LENGTH_SHORT).show();
-                        if(!searchView.isIconified()) {
-                            searchView.setIconified(true);
-                        }
-                        myActionMenuItem.collapseActionView();
-                        return true;
-                    }
-                    @Override
-                    public boolean onQueryTextChange(String text) {
-                        adapter.getFilter().filter(text);
-                        isSearched = true;
-                        //Log.d("index_test", "Current amt of notes: " + adapter.getItemCount());
+            public boolean onQueryTextSubmit(String query) {
+                if(!searchView.isIconified()) {
+                    searchView.setIconified(true);
+                }
+                myActionMenuItem.collapseActionView();
+                return true;
+            }
 
-                        return true;
-                    }
-                });
+            @Override
+            public boolean onQueryTextChange(String text) {
+                adapter.getFilter().filter(text);
+                isSearched = true;
+                //Log.d("index_test", "Current amt of notes: " + adapter.getItemCount());
+
+                return true;
             }
         });
     }
@@ -220,10 +220,6 @@ public class NoteFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_add:
-                UTIL.goToActivity(NoteEditActivity.class, null, requireActivity());
-                return true;
-
             case R.id.action_clear:
                 createDialog();
                 return true;

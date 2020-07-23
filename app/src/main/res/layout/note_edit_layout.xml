@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#E0E0E0"
-    tools:context="com.sqsw.vanillanotes.activities.NoteEditActivity">
+    tools:context="com.sqsw.vanillanotes.activities.NoteEditActivity"
+    android:focusableInTouchMode="true">
 
     <EditText
         android:id="@+id/titleText"
@@ -22,7 +23,6 @@
         android:textStyle="bold"
         android:importantForAutofill="no"
         android:inputType="text"
-        android:maxLength="31"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.333"
         app:layout_constraintStart_toStartOf="parent"

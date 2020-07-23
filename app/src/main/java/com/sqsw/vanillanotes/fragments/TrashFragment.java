@@ -54,6 +54,8 @@ public class TrashFragment extends Fragment {
         if (getActivity() != null)
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Trash");
 
+        getActivity().findViewById(R.id.fam).setVisibility(View.GONE);
+
         view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
         UTIL = new Utility(getActivity().getApplicationContext());
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());

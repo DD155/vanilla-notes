@@ -109,12 +109,12 @@ public class Utility extends ContextWrapper {
         return lines.length;
     }
 
-    public String addEllipsis(String str){
+    public String addEllipsis(String str, int maxChars){
         String s;
-        if (str.length() >= 83){
-            s = str.substring(0, 75) + "…";
+        if (str.length() >= maxChars){
+            s = str.substring(0, maxChars - 3) + "…";
         } else {
-            s = str + "…";
+            s = str;
         }
         return s;
     }

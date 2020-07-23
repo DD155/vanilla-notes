@@ -28,10 +28,10 @@ android {
 }
 
 dependencies {
+    implementation 'com.github.clans:fab:1.6.4' // https://github.com/Clans/FloatingActionButton
     implementation 'jp.wasabeef:recyclerview-animators:3.0.0' // https://github.com/wasabeef/recyclerview-animators
     implementation 'com.google.android.material:material:1.1.0'
     implementation "androidx.drawerlayout:drawerlayout:1.1.0"
-    implementation 'com.github.mancj:MaterialSearchBar:0.8.5' // TODO: Remove later
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.code.gson:gson:2.8.6'

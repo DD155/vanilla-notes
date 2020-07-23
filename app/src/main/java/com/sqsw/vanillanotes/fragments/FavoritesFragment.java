@@ -43,6 +43,7 @@ public class FavoritesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Favorites");
+        getActivity().findViewById(R.id.fam).setVisibility(View.VISIBLE);
 
         UTIL = new Utility(getActivity());
         favs = getNotes("favorites");

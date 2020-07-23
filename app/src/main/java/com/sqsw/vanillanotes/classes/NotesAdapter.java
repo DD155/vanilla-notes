@@ -68,15 +68,31 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
         // Set title, content, and color of the note
         TextView title_tv = holder.title;
         title_tv.setText(note.getTitle());
+        //title_tv.
+        //title_tv.setLines(3);
         title_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize + 3);
 
         TextView content_tv = holder.content;
         content_tv.setText(note.getText());
+        content_tv.setMaxLines(determineLines());
+
+
         content_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
 
         View view = holder.img;
         view.setBackgroundColor(note.getColor());
 
+    }
+
+    private int determineLines(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String font = prefs.getString("font_size", null);
+
+        if ("Small".equals(font))
+            return 5;
+        else if ("Large".equals(font))
+            return 3;
+        else return 4;
     }
 
     @Override

@@ -12,12 +12,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionButton;
 import com.sqsw.vanillanotes.classes.Note;
 import com.sqsw.vanillanotes.R;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -46,6 +48,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("More");
         View v = super.onCreateView(inflater, container, savedInstanceState);
         v.setBackgroundColor(getResources().getColor(R.color.background));
+        getActivity().findViewById(R.id.fam).setVisibility(View.GONE);
         return v;
     }
 
