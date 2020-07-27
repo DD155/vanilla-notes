@@ -57,7 +57,7 @@ public class NoteFragment extends Fragment {
         UTIL = new Utility(requireActivity());
         ((AppCompatActivity) requireActivity()).getSupportActionBar().setTitle("Notes");
 
-        FloatingActionMenu fam = getActivity().findViewById(R.id.fam);
+        FloatingActionMenu fam = requireActivity().findViewById(R.id.fam);
         fam.setVisibility(View.VISIBLE);
         fam.setClosedOnTouchOutside(true);
 
@@ -210,7 +210,6 @@ public class NoteFragment extends Fragment {
             public boolean onQueryTextChange(String text) {
                 adapter.getFilter().filter(text);
                 isSearched = true;
-                //Log.d("index_test", "Current amt of notes: " + adapter.getItemCount());
 
                 return true;
             }

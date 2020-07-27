@@ -6,6 +6,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -25,6 +28,7 @@ import java.util.ArrayList;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,7 +40,7 @@ public class FavoritesFragment extends Fragment {
     private Utility UTIL;
     private NotesAdapter adapter;
     private RecyclerView recyclerView;
-    private SharedPreferences prefs;
+    private boolean isSearched = false;
 
     @Nullable
     @Override
@@ -51,16 +55,6 @@ public class FavoritesFragment extends Fragment {
         Log.d("fav_test", favs.size() + "");
 
         recyclerView = view.findViewById(R.id.recycler_notes);
-        //Bundle bundle = getArguments();
-
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
-        //noteList = (ArrayList<Note>)bundle.getSerializable(SERIALIZABLE_KEY);
-        //favs = getNotes("notes");
-
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        int sortValue = sharedPreferences.getInt("sort_index", 0);
-
         adapter = new NotesAdapter(favs);
 
         if (favs.size() == 0) {
@@ -73,19 +67,60 @@ public class FavoritesFragment extends Fragment {
         ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                Intent notesActivity = new Intent();
-                notesActivity.setClass(getActivity(), NoteEditActivity.class);
-                notesActivity.putExtra("oldNote", true);
-                notesActivity.putExtra("index", position);
-                notesActivity.putExtra("favorite", true);
-                startActivity(notesActivity);
+                Intent intent = new Intent(requireActivity(), NoteEditActivity.class);
+                Note current = adapter.getItem(position);
+
+                if (isSearched) {
+                    for (int i = 0; i < getNotes("favorites").size(); i++) {
+                        if (current.equals(getNotes("favorites").get(i))) {
+                            intent.putExtra("index", i);
+                            break;
+                        }
+                    }
+                } else {
+                    intent.putExtra("index", position);
+                }
+                intent.putExtra("oldNote", true);
+                intent.putExtra("favorite", true);
+                startActivity(intent);
             }
         });
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        setHasOptionsMenu(true);
+
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.fav_actions, menu);
+
+        // Initialize the searchview in the toolbar
+        final MenuItem myActionMenuItem = menu.findItem( R.id.action_search);
+        final SearchView searchView = (SearchView)myActionMenuItem.getActionView();
+        searchView.setQueryHint(getResources().getString(R.string.search_hint));
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if(!searchView.isIconified()) {
+                    searchView.setIconified(true);
+                }
+                myActionMenuItem.collapseActionView();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String text) {
+                adapter.getFilter().filter(text);
+                isSearched = true;
+
+                return true;
+            }
+        });
     }
 
     // Returns the ArrayList from sharedprefs

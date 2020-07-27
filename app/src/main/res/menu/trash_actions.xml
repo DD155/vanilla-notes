@@ -3,11 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
+        <!-- Search Note -->
+        <item android:id="@+id/action_search"
+            android:title="@string/action_search"
+            android:icon="@drawable/search_icon"
+            app:showAsAction="ifRoom|collapseActionView"
+            app:actionViewClass="androidx.appcompat.widget.SearchView" />
+
         <!-- Empty trash can -->
         <item android:id="@+id/action_empty"
             android:title="@string/action_empty"
             android:icon="@drawable/delete_icon"
-            app:showAsAction="ifRoom" />
+            app:showAsAction="never" />
 
         <!-- Sort -->
         <item android:id="@+id/action_sort"

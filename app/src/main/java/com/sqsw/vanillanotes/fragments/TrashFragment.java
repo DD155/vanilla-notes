@@ -32,6 +32,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,10 +41,10 @@ import androidx.recyclerview.widget.RecyclerView;
 public class TrashFragment extends Fragment {
     private View view;
     private ArrayList<Note> noteList;
-    private SharedPreferences prefs;
     private Utility UTIL;
     private RecyclerView recyclerView;
     private NotesAdapter adapter;
+    private boolean isSearched = false;
     private int selectedSortItem = 4;
 
 
@@ -58,7 +59,6 @@ public class TrashFragment extends Fragment {
 
         view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
         UTIL = new Utility(getActivity().getApplicationContext());
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         Intent def = new Intent();
         def.putExtra("caller", "Trash");
@@ -68,12 +68,22 @@ public class TrashFragment extends Fragment {
         ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                Intent notesActivity = new Intent(requireActivity(), NoteEditActivity.class);
+                Intent intent = new Intent(requireActivity(), NoteEditActivity.class);
+                Note current = adapter.getItem(position);
 
-                notesActivity.putExtra("oldNote", true);
-                notesActivity.putExtra("index", position);
-                notesActivity.putExtra("caller", "Trash"); // Pass caller to edit activity
-                startActivity(notesActivity);
+                if (isSearched) {
+                    for (int i = 0; i < getNotes("trash").size(); i++) {
+                        if (current.equals(getNotes("trash").get(i))) {
+                            intent.putExtra("index", i);
+                            break;
+                        }
+                    }
+                } else {
+                    intent.putExtra("index", position);
+                }
+                intent.putExtra("oldNote", true);
+                intent.putExtra("caller", "Trash");
+                startActivity(intent);
             }
         });
 
@@ -90,81 +100,6 @@ public class TrashFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        /*
-        if (noteList.size() != 0) { // Makes sure user has already notes, loads them on entering app
-            for (int i = 0; i < noteList.size(); i++) {
-                final TextView text = new TextView(getContext());
-                final Note currNote = noteList.get(i);
-
-                final Drawable drawable = UTIL.changeDrawableColor(R.drawable.note_background, currNote.getColor());
-                text.setBackground(drawable);
-
-                initializeText(text, currNote);
-                //linear.addView(text);
-
-                // Make the text clickable
-                final int index = i; // Index of ArrayList as,dlas
-
-                text.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        switch (event.getAction()){
-                            case MotionEvent.ACTION_CANCEL:
-                                Log.d("cancel_action", "Cancel action");
-                                text.setBackground(drawable);
-                                return true;
-
-                            case MotionEvent.ACTION_DOWN:
-                                if (currNote.getColor() != -1) {
-                                    // Logic for making pressed down color a darker shade
-                                    String newHex = UTIL.getDarkerColor(currNote.getColor());
-                                    // Create new drawable to replace
-                                    Drawable holdDrawable = UTIL.returnDrawable(R.drawable.note_background);
-                                    holdDrawable.setColorFilter(new
-                                            PorterDuffColorFilter(Color.parseColor(newHex), PorterDuff.Mode.MULTIPLY));
-
-                                    text.setBackground(holdDrawable);
-
-                                    Log.d("shade", "New Hex: " + newHex);
-                                } else
-                                    text.setBackgroundResource(R.drawable.shadow_border_hold);
-
-                                return true;
-
-                            case MotionEvent.ACTION_UP:
-                                // Check if location of user touch is still within the TextView
-                                if ((int)event.getX() >= 0 && (int)event.getX() <= 1360
-                                        && (int)event.getY() >= 0 && (int)event.getY() <= 300){
-                                    v.performClick();
-                                    Intent notesActivity = new Intent();
-
-                                    if (getActivity() != null)
-                                        notesActivity.setClass(getActivity().getApplicationContext(), NoteEditActivity.class);
-                                    else {
-                                        Log.e("null_err", "TrashFragment getActivity() in OnCreate() returns null");
-                                    }
-                                    notesActivity.putExtra("oldNote", true);
-                                    notesActivity.putExtra("index", index); // pass index to next activity to change content later
-                                    notesActivity.putExtra("caller", "Trash");
-                                    text.setBackground(drawable);
-                                    startActivity(notesActivity);
-                                } else {
-                                    // Just change the color back if user moves finger out of the textbox
-                                    text.setBackground(drawable);
-                                }
-                                return true;
-                        }
-                        return false;
-                    }
-                });
-            }
-        } else {
-            TextView defaultText = new TextView(getActivity().getApplicationContext());
-            defaultText.setText(getResources().getString(R.string.trash_empty));
-            defaultText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-            defaultText.setGravity(Gravity.CENTER_HORIZONTAL);
-            //linear.addView(defaultText);
-        } */
         setHasOptionsMenu(true);
         return view;
     }
@@ -251,6 +186,29 @@ public class TrashFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.trash_actions, menu);
+
+        final MenuItem myActionMenuItem = menu.findItem( R.id.action_search);
+        final SearchView searchView = (SearchView)myActionMenuItem.getActionView();
+        searchView.setQueryHint(getResources().getString(R.string.search_hint));
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if(!searchView.isIconified()) {
+                    searchView.setIconified(true);
+                }
+                myActionMenuItem.collapseActionView();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String text) {
+                adapter.getFilter().filter(text);
+                isSearched = true;
+
+                return true;
+            }
+        });
     }
 
     @Override
@@ -272,11 +230,11 @@ public class TrashFragment extends Fragment {
                 alert.show();
             }
             return true;
-        } else { // Case where user selects sort
+        } else if (item.getItemId() == R.id.action_sort){ // Case where user selects sort
             sortDialog();
             return true;
         }
-        //return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item);
     }
 
     // Returns the ArrayList from sharedprefs
