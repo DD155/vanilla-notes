@@ -13,7 +13,8 @@
         <!-- Sort -->
         <item android:id="@+id/action_sort"
             android:title="@string/action_sort"
-            app:showAsAction="never" />
+            android:icon="@drawable/sort_icon"
+            app:showAsAction="ifRoom" />
 
         <!-- Clear -->
         <item android:id="@+id/action_clear"

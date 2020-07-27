@@ -9,29 +9,29 @@
     tools:context="com.sqsw.vanillanotes.activities.MainActivity"
     android:background="@color/colorPrimary">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
+        app:elevation="0dp"
         android:orientation="vertical">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            app:layout_scrollFlags="scroll|enterAlways|snap"
             android:background="@color/colorPrimary"
             android:theme="?attr/actionBarTheme"
             android:gravity="start">
         </androidx.appcompat.widget.Toolbar>
-    </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <FrameLayout
-        android:layout_marginTop="?attr/actionBarSize"
         android:id="@+id/fragment_layout"
         android:layout_width="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:layout_height="match_parent">
-    </FrameLayout>
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"></FrameLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"

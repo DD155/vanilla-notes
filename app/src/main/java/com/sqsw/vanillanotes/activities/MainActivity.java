@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         navView.setItemIconTintList(null);
 
         navView.setOnNavigationItemSelectedListener(navListener);
-
+        
         if (getIntent().getStringExtra("caller") != null) { // Start trash fragment
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new TrashFragment()).commit();
             navView.getMenu().getItem(2).setChecked(true);

@@ -52,7 +52,6 @@ public class NoteFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //view = inflater.inflate(R.layout.notes_layout, container, false);
         View view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
         UTIL = new Utility(requireActivity());
         ((AppCompatActivity) requireActivity()).getSupportActionBar().setTitle("Notes");
@@ -63,9 +62,6 @@ public class NoteFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recycler_notes);
         notes = getNotes("notes");
-
-
-        Log.d("search_test", "Original size: " + notes.size());
 
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         int sortValue = sharedPreferences.getInt("sort_index", 0);
@@ -111,6 +107,7 @@ public class NoteFragment extends Fragment {
 
             intent.putExtra("oldNote", true);
             startActivity(intent);
+            requireActivity().finish();
         }
     };
 
@@ -188,13 +185,23 @@ public class NoteFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
+    public void onCreateOptionsMenu(final Menu menu, @NonNull final MenuInflater inflater) {
         inflater.inflate(R.menu.notes_actions, menu);
 
+        final Menu mMenu = menu;
+
         // Initialize the searchview in the toolbar
-        final MenuItem myActionMenuItem = menu.findItem( R.id.action_search);
+        final MenuItem myActionMenuItem = menu.findItem(R.id.action_search);
         searchView = (SearchView)myActionMenuItem.getActionView();
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
+
+        searchView.setOnSearchClickListener(new SearchView.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("sv_test", "opened");
+                mMenu.findItem(R.id.action_sort).setVisible(false);
+            }
+        });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -210,7 +217,6 @@ public class NoteFragment extends Fragment {
             public boolean onQueryTextChange(String text) {
                 adapter.getFilter().filter(text);
                 isSearched = true;
-
                 return true;
             }
         });
@@ -243,4 +249,5 @@ public class NoteFragment extends Fragment {
         }
         return gson.fromJson(json, type);
     }
+
 }

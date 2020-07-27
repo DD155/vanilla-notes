@@ -227,6 +227,7 @@ public class NoteEditActivity extends AppCompatActivity {
             }
         }
         startActivity(intent);
+        finish();
     }
     private void deleteNote(){
         if (!isOldNote){
