@@ -1,6 +1,7 @@
 package com.sqsw.vanillanotes.fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
@@ -40,6 +42,7 @@ public class FavoritesFragment extends Fragment {
     private Utility UTIL;
     private NotesAdapter adapter;
     private RecyclerView recyclerView;
+    private int selectedSortItem = 4;
     private boolean isSearched = false;
 
     @Nullable
@@ -52,8 +55,6 @@ public class FavoritesFragment extends Fragment {
         UTIL = new Utility(getActivity());
         favs = getNotes("favorites");
 
-        Log.d("fav_test", favs.size() + "");
-
         recyclerView = view.findViewById(R.id.recycler_notes);
         adapter = new NotesAdapter(favs);
 
@@ -61,8 +62,6 @@ public class FavoritesFragment extends Fragment {
             TextView defaultText = view.findViewById(R.id.clear_text);
             defaultText.setText(getResources().getString(R.string.favs_empty));
         }
-
-        Log.d("sort_test", "3");
 
         ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
@@ -122,6 +121,50 @@ public class FavoritesFragment extends Fragment {
                 return true;
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_sort){
+            sortDialog();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void sortDialog() {
+        final SharedPreferences prefs = requireActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        if (selectedSortItem != prefs.getInt("sort_index", 0)){
+            selectedSortItem = prefs.getInt("sort_index", 0);
+        }
+
+        String[] items = getResources().getStringArray(R.array.sort_values);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        builder.setTitle("Sort");
+        builder.setCancelable(true);
+        builder.setSingleChoiceItems(items, selectedSortItem, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int index) {
+                selectedSortItem = index;
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt("sort_index", index);
+                editor.apply();
+            }
+        });
+
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.d("selected_index", selectedSortItem + "");
+                dialogInterface.dismiss();
+                UTIL.sortNotes(selectedSortItem, favs, "favorites");
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setCanceledOnTouchOutside(true);
+        alertDialog.show();
     }
 
     // Returns the ArrayList from sharedprefs

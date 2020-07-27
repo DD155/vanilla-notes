@@ -35,6 +35,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -194,12 +195,24 @@ public class NoteFragment extends Fragment {
         final MenuItem myActionMenuItem = menu.findItem(R.id.action_search);
         searchView = (SearchView)myActionMenuItem.getActionView();
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
+        myActionMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                Log.d("sv_test", "opened");
+
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                return true;
+            }
+        });
 
         searchView.setOnSearchClickListener(new SearchView.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.d("sv_test", "opened");
-                mMenu.findItem(R.id.action_sort).setVisible(false);
             }
         });
 
