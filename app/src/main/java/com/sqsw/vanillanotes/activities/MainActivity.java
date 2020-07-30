@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String CHANNEL_ID = "NoteChannel";
     private final Utility UTIL = new Utility(this);
     private Context mContext;
-    private int ctr;
+    private int ctr = 0;
     private int selectedSortItem = 4;
 
 

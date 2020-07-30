@@ -219,7 +219,7 @@ public class NoteEditActivity extends AppCompatActivity {
                 UTIL.saveNotes(list, key);
             }
         }
-        startActivity(intent);
+        finish();
     }
     private void deleteNote(){
         if (!isOldNote){
