@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/DefaultTheme">
         <activity android:name=".classes.ContextActionBar" />
-        <activity android:name=".activities.NoteEditActivity" />
+        <activity android:name=".activities.NoteEditActivity"></activity>
         <activity android:name=".activities.MainActivity"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>

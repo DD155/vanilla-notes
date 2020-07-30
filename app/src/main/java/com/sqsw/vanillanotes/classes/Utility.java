@@ -36,7 +36,9 @@ public class Utility extends ContextWrapper {
     public void goToActivity(Class<?> act, String s, Context context){
         Intent i = new Intent(context, act);
         i.putExtra("caller", s);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
+
     }
 
     // Saves the ArrayList using Gson

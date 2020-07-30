@@ -84,7 +84,7 @@ public class TrashFragment extends Fragment {
                 intent.putExtra("oldNote", true);
                 intent.putExtra("caller", "Trash");
                 startActivity(intent);
-                requireActivity().finish();
+                //requireActivity().finish();
             }
         });
 
@@ -119,7 +119,7 @@ public class TrashFragment extends Fragment {
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                dialog.dismiss();
             }
         });
 

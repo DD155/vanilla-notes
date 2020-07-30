@@ -2,6 +2,7 @@ package com.sqsw.vanillanotes.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.TaskStackBuilder;
@@ -109,28 +110,18 @@ public class NoteEditActivity extends AppCompatActivity {
             // Set content and title
             titleView.setText(currentNote.getTitle());
             contentView.setText(currentNote.getText()); // Set the text on the note page as the old string
-            //contentView.setSelection(contentView.getText().length()); // Set cursor to the end
-            //contentView.requestFocus();
 
-            /* Set color
+            // Set color
             colorPicked = currentNote.getColor();
-            changeViewColor(titleView, colorPicked);
-            changeViewColor(contentView, colorPicked);
-
+            CardView cv = findViewById(R.id.card);
+            cv.setCardBackgroundColor(colorPicked);
 
             // Set text color depending if color is dark or not
             if (UTIL.isDarkColor(colorPicked)) {
                 titleView.setTextColor(getResources().getColor(R.color.white));
                 contentView.setTextColor(getResources().getColor(R.color.white));
-            } */
-        } else {
-            /* Set drawable of new note
-            contentView.setBackgroundResource(R.drawable.note_background);
-            titleView.setBackgroundResource(R.drawable.note_background);
-
-             */
+            }
         }
-
     }
 
     // Retrive ArrayList depending on if user entered from activity trash or home
@@ -229,7 +220,6 @@ public class NoteEditActivity extends AppCompatActivity {
             }
         }
         startActivity(intent);
-        finish();
     }
     private void deleteNote(){
         if (!isOldNote){
@@ -321,8 +311,7 @@ public class NoteEditActivity extends AppCompatActivity {
                 if (prefs.getBoolean("back_dialog_toggle", true))
                     confirmDiscardDialog(MainActivity.class);
                 else{
-                    if (isFavorite) intent.putExtra("favorite", true);
-                    startActivity(intent);
+                    finish();
                 }
                 return true;
 
@@ -378,8 +367,12 @@ public class NoteEditActivity extends AppCompatActivity {
                 if (color != 0) {
                     colorPicked = color;
 
-                    changeViewColor(titleView, color);
-                    changeViewColor(contentView, color);
+                    CardView cv = findViewById(R.id.card);
+                    cv.setCardBackgroundColor(color);
+                    //changeViewColor(cv, color);
+                    //cv.setRadius(6);
+                    //changeViewColor(titleView, color);
+                    //changeViewColor(contentView, color);
 
                     // Change the color of the text depending if the color chosen is dark or not to
                     // make it easier to see for the user
@@ -441,11 +434,13 @@ public class NoteEditActivity extends AppCompatActivity {
         builder.setMessage(getString(R.string.discard_confirm));
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which) { /*
                 if ("Trash".equals(getIntent().getStringExtra("caller")))
-                    UTIL.goToActivity(activity,"Trash", getApplicationContext());
+
+                    UTIL.goToActivity(activity, "Trash", getApplicationContext());
                 else
-                    UTIL.goToActivity(activity,null, getApplicationContext());
+                    UTIL.goToActivity(activity, null, getApplicationContext()); */
+            finish();
             }
         });
 
@@ -598,17 +593,12 @@ public class NoteEditActivity extends AppCompatActivity {
         Toast.makeText(mContext, "Reminder set", Toast.LENGTH_SHORT).show();
     }
 
-    private void changeViewColor(EditText view, int colorPicked){
-        view.setBackgroundResource(R.drawable.note_background);
-        view.getBackground().setColorFilter(colorPicked, PorterDuff.Mode.SRC_ATOP);
-    }
-
     // Shows a dialog when the user presses back while editing a note
     @Override
     public void onBackPressed() {
         if (prefs.getBoolean("back_dialog_toggle", true))
             confirmDiscardDialog(MainActivity.class);
         else
-            super.onBackPressed();
+            finish();
     }
 }

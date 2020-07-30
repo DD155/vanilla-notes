@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String CHANNEL_ID = "NoteChannel";
     private final Utility UTIL = new Utility(this);
     private Context mContext;
+    private int ctr;
     private int selectedSortItem = 4;
 
 
@@ -160,7 +162,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-        super.onBackPressed();
+        if (ctr > 0) {
+            super.onBackPressed();
+        } else {
+            ctr++;
+            Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();
+        }
     }
 }
 

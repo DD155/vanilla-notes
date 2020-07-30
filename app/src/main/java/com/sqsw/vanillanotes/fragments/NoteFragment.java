@@ -108,7 +108,7 @@ public class NoteFragment extends Fragment {
 
             intent.putExtra("oldNote", true);
             startActivity(intent);
-            requireActivity().finish();
+            //requireActivity().finish();
         }
     };
 

@@ -82,7 +82,7 @@ public class FavoritesFragment extends Fragment {
                 intent.putExtra("oldNote", true);
                 intent.putExtra("favorite", true);
                 startActivity(intent);
-                requireActivity().finish();
+                //requireActivity().finish();
             }
         });
 
