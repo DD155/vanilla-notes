@@ -5,8 +5,10 @@
     <color name="colorAccent">#827081</color>
     <color name="pressedColor">#f2f2f2</color>
     <color name="textColor">#434343</color>
-    <color name="background">#f2f2f2</color>
+    <color name="background">@color/colorPrimary</color>
     <color name="colorLight">#a1a8a7</color>
+
+    <color name="black">#000</color>
 
     <!-- Color Dialog -->
     <color name="white">#ffffff</color>

@@ -1,17 +1,19 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="DefaultTheme" parent="Theme.AppCompat.Light">
+    <style name="DefaultTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:fitsSystemWindows">true</item>
-        <item name="android:actionMenuTextColor">@color/white</item>
-        <item name="actionMenuTextColor">@color/white</item>
-        <item name="android:itemTextAppearance">@color/white</item>
+        <item name="android:actionMenuTextColor">@color/black</item>
+        <item name="actionMenuTextColor">@color/black</item>
+        <item name="android:itemTextAppearance">@color/black</item>
 
         <!--  It should be true otherwise action mode will not overlay toolbar -->
         <item name="windowActionModeOverlay">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
 
         <!--  For Custom Action Mode Background Color/Drawable -->
         <item name="actionModeBackground">@color/white</item>
