@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -67,7 +68,7 @@ public class NoteEditActivity extends AppCompatActivity {
         setContentView(R.layout.note_edit_layout);
 
         Toolbar myToolbar = findViewById(R.id.toolbar);
-        myToolbar.setTitle("Edit");
+        myToolbar.setTitle("");
         setSupportActionBar(myToolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -77,6 +78,7 @@ public class NoteEditActivity extends AppCompatActivity {
         contentView = findViewById(R.id.editText);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
         int fontSize = UTIL.getFontSize(getSharedPreferences("NOTES", Context.MODE_PRIVATE)
                 .getString("font_size", ""));
 
@@ -89,14 +91,12 @@ public class NoteEditActivity extends AppCompatActivity {
         newFavorite = isFavorite;
 
         // Set attributes of EditTexts
-        titleView.setElevation(10);
-        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize + 3);
-        titleView.setPadding(50, 50, 50, 0);
+        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (fontSize + 5));
+        titleView.setGravity(Gravity.CENTER_HORIZONTAL);
         titleView.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
 
-        contentView.setElevation(10);
         contentView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
-        contentView.setPadding(50, 50, 50, 50);
+        contentView.setScrollY(0);
 
         if (isOldNote) { // Case where user is editing old note
             Note currentNote = getCurrentNote();
@@ -109,10 +109,10 @@ public class NoteEditActivity extends AppCompatActivity {
             // Set content and title
             titleView.setText(currentNote.getTitle());
             contentView.setText(currentNote.getText()); // Set the text on the note page as the old string
-            contentView.setSelection(contentView.getText().length()); // Set cursor to the end
+            //contentView.setSelection(contentView.getText().length()); // Set cursor to the end
             //contentView.requestFocus();
 
-            // Set color
+            /* Set color
             colorPicked = currentNote.getColor();
             changeViewColor(titleView, colorPicked);
             changeViewColor(contentView, colorPicked);
@@ -122,11 +122,13 @@ public class NoteEditActivity extends AppCompatActivity {
             if (UTIL.isDarkColor(colorPicked)) {
                 titleView.setTextColor(getResources().getColor(R.color.white));
                 contentView.setTextColor(getResources().getColor(R.color.white));
-            }
+            } */
         } else {
-            // Set drawable of new note
+            /* Set drawable of new note
             contentView.setBackgroundResource(R.drawable.note_background);
             titleView.setBackgroundResource(R.drawable.note_background);
+
+             */
         }
 
     }
