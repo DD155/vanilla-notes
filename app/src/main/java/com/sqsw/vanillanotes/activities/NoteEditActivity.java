@@ -219,7 +219,9 @@ public class NoteEditActivity extends AppCompatActivity {
                 UTIL.saveNotes(list, key);
             }
         }
-        finish();
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        NoteEditActivity.this.finish();
     }
     private void deleteNote(){
         if (!isOldNote){
