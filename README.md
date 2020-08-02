@@ -14,7 +14,7 @@ Vanilla Notes is a free, open source android application that lets users take no
 
 The final application will have the following features:
 
-- [x] Reminders
+- :heavy_check_mark: Reminders
 - [ ] Checklists
 - [x] Color code your notes
 - [x] Pin notes to your notification
