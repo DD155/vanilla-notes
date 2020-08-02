@@ -14,16 +14,16 @@ Vanilla Notes is a free, open source android application that lets users take no
 
 The final application will have the following features:
 
-- Reminders
-- Checklists
-- Color code your notes
-- Pin notes to your notification
-- Trash bin for deleted notes
-- Sort by Title or Date Created
-- Favorite notes to view them easier
-- Themes / Dark Mode
-- Import/Export Backup
-- Widgets (?)
+- [x] Reminders
+- [ ] Checklists
+- [x] Color code your notes
+- [x] Pin notes to your notification
+- [x] Trash bin for deleted notes
+- [x] Sort by Title or Date Created
+- [x] Favorite notes to view them easier
+- [ ] Themes / Dark Mode
+- [ ] Import/Export Backup
+- [ ] Widgets (?)
 
 ## Libraries & Tools
 The minimum Android version required is Android 5.0 (SDK 21); Target version is Android 10 (SDK 29)
