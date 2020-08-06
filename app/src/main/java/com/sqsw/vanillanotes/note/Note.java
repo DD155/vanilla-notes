@@ -1,4 +1,4 @@
-package com.sqsw.vanillanotes.classes;
+package com.sqsw.vanillanotes.note;
 
 import android.graphics.Color;
 

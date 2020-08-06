@@ -11,7 +11,6 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -20,7 +19,7 @@ import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.sqsw.vanillanotes.R;
-import com.sqsw.vanillanotes.classes.Utility;
+import com.sqsw.vanillanotes.utility.Utility;
 import com.sqsw.vanillanotes.fragments.FavoritesFragment;
 import com.sqsw.vanillanotes.fragments.NoteFragment;
 import com.sqsw.vanillanotes.fragments.TrashFragment;
@@ -30,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String CHANNEL_ID = "NoteChannel";
     private final Utility UTIL = new Utility(this);
     private Context mContext;
+    private FloatingActionMenu fam;
     private int ctr = 0;
     private int selectedSortItem = 4;
 
@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new NoteFragment()).commit();
             navView.getMenu().getItem(0).setChecked(true);
         }
+
+        fam = findViewById(R.id.fam);
 
         FloatingActionButton fabNote = findViewById(R.id.fab_item_note);
         fabNote.setOnClickListener(new View.OnClickListener() {
@@ -101,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     if (selectedFrag == null) selectedFrag = new NoteFragment();
+                    if (fam.isOpened()) fam.close(true);
+
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_layout, selectedFrag).commit();
 
@@ -162,6 +166,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
+        FloatingActionMenu fam = findViewById(R.id.fam);
+        if (fam.isOpened()) {
+            fam.close(true);
+            return;
+        }
+
         if (ctr > 0) {
             super.onBackPressed();
         } else {

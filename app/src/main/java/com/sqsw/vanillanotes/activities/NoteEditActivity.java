@@ -20,8 +20,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -39,9 +37,10 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.sqsw.vanillanotes.classes.BroadcastReminder;
-import com.sqsw.vanillanotes.classes.Note;
+import com.sqsw.vanillanotes.note.Note;
 import com.sqsw.vanillanotes.R;
-import com.sqsw.vanillanotes.classes.Utility;
+import com.sqsw.vanillanotes.utility.PrefsUtil;
+import com.sqsw.vanillanotes.utility.Utility;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -128,13 +127,13 @@ public class NoteEditActivity extends AppCompatActivity {
     private Note getCurrentNote(){
         Note currentNote;
         if (isTrash)
-            currentNote = UTIL.getNotes("trash")
+            currentNote = PrefsUtil.getNotes("trash", this)
                     .get(getIntent().getIntExtra("index", 0));
         else if (isFavorite)
-            currentNote = UTIL.getNotes("favorites")
+            currentNote = PrefsUtil.getNotes("favorites", this)
                 .get(getIntent().getIntExtra("index", 0));
         else {
-            currentNote = UTIL.getNotes("notes")
+            currentNote = PrefsUtil.getNotes("notes", this)
                     .get(getIntent().getIntExtra("index", 0));
         }
         return currentNote;
@@ -157,17 +156,17 @@ public class NoteEditActivity extends AppCompatActivity {
         Note current = list.get(index);
         // If the note is newly favorited, remove it from its current list and add to favorites list
         if (!isFavorite && newFavorite) {
-            ArrayList<Note> fav = UTIL.getNotes("favorites");
+            ArrayList<Note> fav = PrefsUtil.getNotes("favorites", this);
             Log.d("fav_test", "Current index: " + index);
             fav.add(0, current);
-            UTIL.saveNotes(fav, "favorites");
+            PrefsUtil.saveNotes(fav, "favorites", this);
             list.remove(index);
         } else if (isFavorite && !newFavorite){
             // Case where note was originally in favorites, but user wants to unfavorite
             // So put it back in the note list and remove from the favorite list
-            ArrayList<Note> notes = UTIL.getNotes("notes");
+            ArrayList<Note> notes = PrefsUtil.getNotes("notes", this);
             notes.add(0, current);
-            UTIL.saveNotes(notes, "notes");
+            PrefsUtil.saveNotes(notes, "notes", this);
             list.remove(index);
         } else {
             list.remove(index);
@@ -187,7 +186,7 @@ public class NoteEditActivity extends AppCompatActivity {
             return;
         }
 
-        ArrayList<Note> list = UTIL.getNotes(key);
+        ArrayList<Note> list = PrefsUtil.getNotes(key, this);
 
         if (isOldNote) { // Case where the note is old
             int index = getIntent().getIntExtra("index", 0);
@@ -205,18 +204,18 @@ public class NoteEditActivity extends AppCompatActivity {
             }*/
 
             saveToFavorites(list, index);
-            UTIL.saveNotes(list, key);
+            PrefsUtil.saveNotes(list, key, this);
         } else {
             Note newNote = new Note(titleText, contentText, colorPicked, UTIL.currentDate());
             newNote.setFavorite(newFavorite);
             // If new note is favorited, add it to the favorites list
             if (newFavorite) {
-                ArrayList<Note> fav = UTIL.getNotes("favorites");
+                ArrayList<Note> fav = PrefsUtil.getNotes("favorites", this);
                 fav.add(0, newNote);
-                UTIL.saveNotes(fav, "favorites");
+                PrefsUtil.saveNotes(fav, "favorites", this);
             } else {
                 list.add(0, newNote);
-                UTIL.saveNotes(list, key);
+                PrefsUtil.saveNotes(list, key, this);
             }
         }
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -231,15 +230,15 @@ public class NoteEditActivity extends AppCompatActivity {
 
         String key;
         int index = getIntent().getIntExtra("index", 0);
-        ArrayList<Note> trashList = UTIL.getNotes("trash");
+        ArrayList<Note> trashList = PrefsUtil.getNotes("trash", this);
         ArrayList<Note> list;
 
         if (isFavorite) {
-            list = UTIL.getNotes("favorites");
+            list = PrefsUtil.getNotes("favorites", this);
             key = "favorites";
         }
         else {
-            list = UTIL.getNotes("notes");
+            list = PrefsUtil.getNotes("notes", this);
             key = "notes";
         }
 
@@ -252,8 +251,8 @@ public class NoteEditActivity extends AppCompatActivity {
                     current.getDate()));
             list.remove(index);
         }
-        UTIL.saveNotes(list, key);
-        UTIL.saveNotes(trashList, "trash");
+        PrefsUtil.saveNotes(list, key, this);
+        PrefsUtil.saveNotes(trashList, "trash", this);
 
         Toast.makeText(getApplicationContext(), getString(R.string.delete_toast), Toast.LENGTH_LONG).show();
         // Load previously called activity
@@ -271,15 +270,16 @@ public class NoteEditActivity extends AppCompatActivity {
     private void restoreNote(){
         int index = getIntent().getIntExtra("index", 0);
         ArrayList<Note> trash, list;
-        trash = UTIL.getNotes("trash");
-        list = UTIL.getNotes("notes");
+        trash = PrefsUtil.getNotes("trash", this);
+        list = PrefsUtil.getNotes("notes", this);
 
         list.add(0, trash.get(index));
         trash.remove(index);
 
-        UTIL.saveNotes(trash, "trash");
-        UTIL.saveNotes(list, "notes");
+        PrefsUtil.saveNotes(trash, "trash", this);
+        PrefsUtil.saveNotes(list, "notes", this);
 
+        UTIL.goToActivity(MainActivity.class, null, getApplicationContext());
         Toast.makeText(getApplicationContext(), getString(R.string.restore_toast), Toast.LENGTH_LONG).show();
     }
 
@@ -404,7 +404,7 @@ public class NoteEditActivity extends AppCompatActivity {
 
     // Creates dialog for empty notes
     private void warningDialog(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.DialogThemeLight);
         builder.setTitle(getString(R.string.warning_title));
         builder.setMessage(getString(R.string.warning_confirm));
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -430,7 +430,7 @@ public class NoteEditActivity extends AppCompatActivity {
             }
         });
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.DialogThemeLight);
         builder.setView(checkBoxView);
         builder.setTitle(getString(R.string.discard_title));
         builder.setMessage(getString(R.string.discard_confirm));
@@ -458,7 +458,7 @@ public class NoteEditActivity extends AppCompatActivity {
     }
 
     private void confirmDialog(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.DialogThemeLight);
         if (newFavorite) {
             builder.setTitle(getString(R.string.delete_favorite_title));
             builder.setMessage(getString(R.string.delete_favorite_message));
@@ -540,7 +540,7 @@ public class NoteEditActivity extends AppCompatActivity {
 
         // Create Date Dialog
         DatePickerDialog datePickerDialog =
-                new DatePickerDialog(mContext, android.R.style.Theme_DeviceDefault_Light_Dialog,
+                new DatePickerDialog(mContext, R.style.DialogThemeLight,
         new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int yr, int mon, int day) {
@@ -549,7 +549,7 @@ public class NoteEditActivity extends AppCompatActivity {
                 final int m = mon;
                 final int d = day;
                 TimePickerDialog timePickerDialog =
-                        new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
+                        new TimePickerDialog(mContext, R.style.DialogThemeLight, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hr, int min) {
                         createScheduledNotification(hr, min, y, m, d);

@@ -1,6 +1,6 @@
-package com.sqsw.vanillanotes.classes;
+package com.sqsw.vanillanotes.utility;
 
-import com.sqsw.vanillanotes.classes.Note;
+import com.sqsw.vanillanotes.note.Note;
 
 import java.util.Comparator;
 

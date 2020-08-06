@@ -17,15 +17,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.activities.NoteEditActivity;
-import com.sqsw.vanillanotes.classes.ItemClickSupport;
-import com.sqsw.vanillanotes.classes.Note;
-import com.sqsw.vanillanotes.classes.NotesAdapter;
-import com.sqsw.vanillanotes.classes.Utility;
+import com.sqsw.vanillanotes.utility.ItemClickSupport;
+import com.sqsw.vanillanotes.note.Note;
+import com.sqsw.vanillanotes.note.NotesAdapter;
+import com.sqsw.vanillanotes.utility.PrefsUtil;
+import com.sqsw.vanillanotes.utility.Utility;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
@@ -34,7 +33,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -42,6 +40,7 @@ public class TrashFragment extends Fragment {
     private View view;
     private ArrayList<Note> noteList;
     private Utility UTIL;
+    private Context context;
     private RecyclerView recyclerView;
     private NotesAdapter adapter;
     private boolean isSearched = false;
@@ -55,25 +54,27 @@ public class TrashFragment extends Fragment {
         if (getActivity() != null)
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Trash");
 
+        if (isAdded()) context = getActivity();
+
         getActivity().findViewById(R.id.fam).setVisibility(View.GONE);
 
         view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
-        UTIL = new Utility(getActivity().getApplicationContext());
+        UTIL = new Utility(context);
 
         Intent def = new Intent();
         def.putExtra("caller", "Trash");
-        noteList = getNotes("trash");
+        noteList = PrefsUtil.getNotes("trash", context);
         recyclerView = view.findViewById(R.id.recycler_notes);
 
         ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                Intent intent = new Intent(requireActivity(), NoteEditActivity.class);
+                Intent intent = new Intent(context, NoteEditActivity.class);
                 Note current = adapter.getItem(position);
 
                 if (isSearched) {
-                    for (int i = 0; i < getNotes("trash").size(); i++) {
-                        if (current.equals(getNotes("trash").get(i))) {
+                    for (int i = 0; i < PrefsUtil.getNotes("trash", context).size(); i++) {
+                        if (current.equals(PrefsUtil.getNotes("trash", context).get(i))) {
                             intent.putExtra("index", i);
                             break;
                         }
@@ -106,7 +107,8 @@ public class TrashFragment extends Fragment {
     }
 
     private void confirmDialog(){
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity());
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog
+                .Builder(context, R.style.DialogThemeLight);
         builder.setTitle("Empty Trash");
         builder.setMessage(getResources().getString(R.string.trash_clear_confirm));
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -156,7 +158,8 @@ public class TrashFragment extends Fragment {
         }
 
         String[] items = getResources().getStringArray(R.array.sort_values);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog
+                .Builder(requireActivity(), R.style.DialogThemeLight);
         builder.setTitle("Sort");
         builder.setCancelable(true);
         builder.setSingleChoiceItems(items, selectedSortItem, new DialogInterface.OnClickListener() {
@@ -218,7 +221,8 @@ public class TrashFragment extends Fragment {
             if (noteList.size() != 0)
                 confirmDialog();
             else {  // Case where the trash is already empty
-                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity());
+                android.app.AlertDialog.Builder builder = new android.app.AlertDialog
+                        .Builder(requireActivity(), R.style.DialogThemeLight);
                 builder.setTitle(R.string.clear_error_title);
                 builder.setMessage(getResources().getString(R.string.trash_error));
                 builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
@@ -236,17 +240,5 @@ public class TrashFragment extends Fragment {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    // Returns the ArrayList from sharedprefs
-    public ArrayList<Note> getNotes(String key){
-        SharedPreferences prefs = getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = prefs.getString(key, null);
-        Type type = new TypeToken<ArrayList<Note>>() {}.getType();
-        if (gson.fromJson(json, type) == null) {
-            return new ArrayList<>();
-        }
-        return gson.fromJson(json, type);
     }
 }

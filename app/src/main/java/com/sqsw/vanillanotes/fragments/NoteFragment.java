@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,16 +17,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.activities.NoteEditActivity;
-import com.sqsw.vanillanotes.classes.ItemClickSupport;
-import com.sqsw.vanillanotes.classes.Note;
-import com.sqsw.vanillanotes.classes.NotesAdapter;
-import com.sqsw.vanillanotes.classes.Utility;
+import com.sqsw.vanillanotes.utility.ItemClickSupport;
+import com.sqsw.vanillanotes.note.Note;
+import com.sqsw.vanillanotes.note.NotesAdapter;
+import com.sqsw.vanillanotes.utility.PrefsUtil;
+import com.sqsw.vanillanotes.utility.Utility;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
@@ -35,15 +32,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class NoteFragment extends Fragment {
     private ArrayList<Note> notes;
-    private SearchView searchView;
+    //private SearchView searchView;
     private Utility UTIL;
+    private Context context;
     private RecyclerView recyclerView;
     private boolean isSearched = false;
     private NotesAdapter adapter;
@@ -55,16 +52,21 @@ public class NoteFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
         UTIL = new Utility(requireActivity());
-        ((AppCompatActivity) requireActivity()).getSupportActionBar().setTitle("Notes");
+        //NOTE_PREF = new NotesSharedPreferences(requireActivity());
+        if (isAdded()) context = getActivity();
+        ((AppCompatActivity) context).getSupportActionBar().setTitle("Notes");
 
         FloatingActionMenu fam = requireActivity().findViewById(R.id.fam);
+
         fam.setVisibility(View.VISIBLE);
         fam.setClosedOnTouchOutside(true);
 
+        SharedPreferences sharedPreferences =
+                requireActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         recyclerView = view.findViewById(R.id.recycler_notes);
-        notes = getNotes("notes");
+        notes = PrefsUtil.getNotes("notes", context);
 
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+
         int sortValue = sharedPreferences.getInt("sort_index", 0);
 
         if (notes.size() > 0) {
@@ -92,12 +94,12 @@ public class NoteFragment extends Fragment {
     ItemClickSupport.OnItemClickListener listener = new ItemClickSupport.OnItemClickListener() {
         @Override
         public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-            Intent intent = new Intent(requireActivity(), NoteEditActivity.class);
+            Intent intent = new Intent(context, NoteEditActivity.class);
             Note current = adapter.getItem(position);
 
             if (isSearched) {
-                for (int i = 0; i < getNotes("notes").size(); i++) {
-                    if (current.equals(getNotes("notes").get(i))) {
+                for (int i = 0; i < PrefsUtil.getNotes("notes", context).size(); i++) {
+                    if (current.equals(PrefsUtil.getNotes("notes", context).get(i))) {
                         intent.putExtra("index", i);
                         break;
                     }
@@ -108,19 +110,18 @@ public class NoteFragment extends Fragment {
 
             intent.putExtra("oldNote", true);
             startActivity(intent);
-            //requireActivity().finish();
         }
     };
 
     // Create dialog for sorting notes
     private void sortDialog() {
-        final SharedPreferences prefs = requireActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+        final SharedPreferences prefs = context.getSharedPreferences("NOTES", Context.MODE_PRIVATE);
         if (selectedSortItem != prefs.getInt("sort_index", 0)){
             selectedSortItem = prefs.getInt("sort_index", 0);
         }
 
         String[] items = getResources().getStringArray(R.array.sort_values);
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.DialogThemeLight);
         builder.setTitle("Sort");
         builder.setCancelable(true);
         builder.setSingleChoiceItems(items, selectedSortItem, new DialogInterface.OnClickListener() {
@@ -150,7 +151,7 @@ public class NoteFragment extends Fragment {
 
     // Creates dialog for the clear
     private void createDialog() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.DialogThemeLight);
         builder.setTitle(getString(R.string.clear_notes_title));
         builder.setMessage(getString(R.string.clear_notes_text));
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -173,13 +174,13 @@ public class NoteFragment extends Fragment {
 
     // Remove notes by clearing note ArrayList and resetting linear layout.
     private void clearNotes(){
-        ArrayList<Note> trash = UTIL.getNotes("trash");
+        ArrayList<Note> trash = PrefsUtil.getNotes("trash", context);
         trash.addAll(notes);
         int size = notes.size();
         notes.clear();
 
-        UTIL.saveNotes(notes, "notes");
-        UTIL.saveNotes(trash, "trash");
+        PrefsUtil.saveNotes(notes, "notes", context);
+        PrefsUtil.saveNotes(trash, "trash", context);
 
         adapter.notifyItemRangeRemoved(0, size);
         Toast.makeText(getActivity(), getString(R.string.clear_notes_toast), Toast.LENGTH_LONG).show();
@@ -193,18 +194,18 @@ public class NoteFragment extends Fragment {
 
         // Initialize the searchview in the toolbar
         final MenuItem myActionMenuItem = menu.findItem(R.id.action_search);
-        searchView = (SearchView)myActionMenuItem.getActionView();
+        final SearchView searchView = (SearchView)myActionMenuItem.getActionView();
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
         myActionMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem menuItem) {
                 Log.d("sv_test", "opened");
-
                 return true;
             }
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                isSearched = false;
                 return true;
             }
         });
@@ -250,17 +251,4 @@ public class NoteFragment extends Fragment {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    // Returns the ArrayList from sharedprefs
-    public ArrayList<Note> getNotes(String key){
-        SharedPreferences prefs = requireActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = prefs.getString(key, null);
-        Type type = new TypeToken<ArrayList<Note>>() {}.getType();
-        if (gson.fromJson(json, type) == null) {
-            return new ArrayList<>();
-        }
-        return gson.fromJson(json, type);
-    }
-
 }

@@ -1,6 +1,8 @@
-package com.sqsw.vanillanotes.classes;
+package com.sqsw.vanillanotes.utility;
 
 import android.util.Log;
+
+import com.sqsw.vanillanotes.note.Note;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

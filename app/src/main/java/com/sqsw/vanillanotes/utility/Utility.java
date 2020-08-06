@@ -1,22 +1,14 @@
-package com.sqsw.vanillanotes.classes;
+package com.sqsw.vanillanotes.utility;
 
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
-import android.widget.EditText;
-import android.widget.TextView;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.sqsw.vanillanotes.R;
+import com.sqsw.vanillanotes.note.Note;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -27,6 +19,7 @@ public class Utility extends ContextWrapper {
     public final int FONT_SMALL = 11;
     public final int FONT_MEDIUM = 14;
     public final int FONT_LARGE = 17;
+    private PrefsUtil notesUtility = new PrefsUtil(this);
 
     public Utility(Context base) {
         super(base);
@@ -38,27 +31,6 @@ public class Utility extends ContextWrapper {
         i.putExtra("caller", s);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
-
-    }
-
-    // Saves the ArrayList using Gson
-    public void saveNotes(ArrayList<Note> list, String key){
-        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(list);
-        editor.putString(key, json);
-        editor.apply();
-    }
-
-    // Returns the ArrayList from sharedprefs
-    public ArrayList<Note> getNotes(String key){
-        SharedPreferences prefs = getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = prefs.getString(key, null);
-        Type type = new TypeToken<ArrayList<Note>>() {}.getType();
-        if (gson.fromJson(json, type) == null) return new ArrayList<>();
-        return gson.fromJson(json, type);
     }
 
     // Returns the value of the system navigation bar height
@@ -83,21 +55,6 @@ public class Utility extends ContextWrapper {
     // Return a hex code string from R.color int
     public String hexFromColorInt(int color){
         return String.format("#%06X", (0xFFFFFF & color)).substring(1);
-    }
-
-    public String getDarkerColor(int color){
-        // Logic for making pressed down color a darker shade
-        String[] rgbStr = {(hexFromColorInt(color)).substring(0, 2),
-                (hexFromColorInt(color)).substring(2, 4),
-                (hexFromColorInt(color)).substring(4)
-        };
-        double[] rgb = { // Divide RGB value to make the result darker
-                Math.round(Integer.valueOf(rgbStr[0], 16) * 0.85),
-                Math.round(Integer.valueOf(rgbStr[1], 16) * 0.85),
-                Math.round(Integer.valueOf(rgbStr[2], 16) * 0.85)
-        };
-        // Format string in #RRGGBB style
-        return String.format("#%02X%02X%02X", (int)rgb[0], (int)rgb[1], (int)rgb[2]);
     }
 
     // Returns boolean if the given color is dark or not. Used to change text color for readability
@@ -168,7 +125,8 @@ public class Utility extends ContextWrapper {
 
         String year = Integer.toString(instance.get(Calendar.YEAR));
 
-        if (hour.length() == 1) return month + "/" + dayOfWeek + "/" + year + " " + "0" + hour + ":" + minutes;
+        if (hour.length() == 1)
+            return month + "/" + dayOfWeek + "/" + year + " " + "0" + hour + ":" + minutes;
         return month + "/" + dayOfWeek + "/" + year + " " + hour + ":" + minutes;
     }
 
@@ -178,25 +136,25 @@ public class Utility extends ContextWrapper {
                 // Type 0 = Sort by Title (Ascending)
                 Log.d("selected_index", "case 0");
                 Collections.sort(notes, new NoteComparator());
-                saveNotes(notes, key);
+                PrefsUtil.saveNotes(notes, key, this);
                 break;
             case 1:
                 // Type 1 = Sort by Title (Descending)
                 Log.d("selected_index", "case 1");
                 Collections.sort(notes, new NoteComparator());
                 Collections.reverse(notes);
-                saveNotes(notes, key);
+                PrefsUtil.saveNotes(notes, key, this);
                 break;
             case 2:
                 // Type 2 = Sort by Date Created (Ascending)
                 Collections.sort(notes, new DateComparator());
-                saveNotes(notes, key);
+                PrefsUtil.saveNotes(notes, key, this);
                 break;
             case 3:
                 // Type 3 = Sort by Date Created (Descending)
                 Collections.sort(notes, new DateComparator());
                 Collections.reverse(notes);
-                saveNotes(notes, key);
+                PrefsUtil.saveNotes(notes, key,this);
                 break;
             case 4:
                 break;
