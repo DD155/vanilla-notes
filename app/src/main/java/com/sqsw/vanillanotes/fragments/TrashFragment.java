@@ -85,13 +85,12 @@ public class TrashFragment extends Fragment {
                 intent.putExtra("oldNote", true);
                 intent.putExtra("caller", "Trash");
                 startActivity(intent);
-                //requireActivity().finish();
             }
         });
 
         if (noteList.size() > 0) {
             adapter = new NotesAdapter(noteList);
-            UTIL.sortNotes(getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE).getInt("sort_index", 0),
+            UTIL.sortNotes(context.getSharedPreferences("NOTES", Context.MODE_PRIVATE).getInt("sort_index", 0),
                     noteList, "trash");
             adapter.notifyDataSetChanged();
         } else { // Show text showing the trash is empty
@@ -136,12 +135,7 @@ public class TrashFragment extends Fragment {
         adapter.notifyItemRangeRemoved(0, size);
 
         if (getActivity() != null) {
-            SharedPreferences prefs = getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = prefs.edit();
-            Gson gson = new Gson();
-            String json = gson.toJson(noteList);
-            editor.putString("trash", json);
-            editor.apply();
+            PrefsUtil.saveNotes(noteList, "trash", context);
         } else Log.e("null_err", "TrashFragment getActivity() in clearNotes() returns null");
 
         TextView defaultText = view.findViewById(R.id.clear_text);
@@ -159,7 +153,7 @@ public class TrashFragment extends Fragment {
 
         String[] items = getResources().getStringArray(R.array.sort_values);
         AlertDialog.Builder builder = new AlertDialog
-                .Builder(requireActivity(), R.style.DialogThemeLight);
+                .Builder(context, R.style.DialogThemeLight);
         builder.setTitle("Sort");
         builder.setCancelable(true);
         builder.setSingleChoiceItems(items, selectedSortItem, new DialogInterface.OnClickListener() {
@@ -194,6 +188,20 @@ public class TrashFragment extends Fragment {
         final MenuItem myActionMenuItem = menu.findItem( R.id.action_search);
         final SearchView searchView = (SearchView)myActionMenuItem.getActionView();
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
+
+        myActionMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                Log.d("sv_test", "opened");
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                isSearched = false;
+                return true;
+            }
+        });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override

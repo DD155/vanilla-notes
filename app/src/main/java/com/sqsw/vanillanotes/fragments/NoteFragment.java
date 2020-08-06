@@ -52,7 +52,6 @@ public class NoteFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
         UTIL = new Utility(requireActivity());
-        //NOTE_PREF = new NotesSharedPreferences(requireActivity());
         if (isAdded()) context = getActivity();
         ((AppCompatActivity) context).getSupportActionBar().setTitle("Notes");
 
@@ -63,9 +62,9 @@ public class NoteFragment extends Fragment {
 
         SharedPreferences sharedPreferences =
                 requireActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
+
         recyclerView = view.findViewById(R.id.recycler_notes);
         notes = PrefsUtil.getNotes("notes", context);
-
 
         int sortValue = sharedPreferences.getInt("sort_index", 0);
 
@@ -189,8 +188,6 @@ public class NoteFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(final Menu menu, @NonNull final MenuInflater inflater) {
         inflater.inflate(R.menu.notes_actions, menu);
-
-        final Menu mMenu = menu;
 
         // Initialize the searchview in the toolbar
         final MenuItem myActionMenuItem = menu.findItem(R.id.action_search);
