@@ -1,4 +1,4 @@
-package com.sqsw.vanillanotes.utility;
+package com.sqsw.vanillanotes.util;
 
 // Source code provided by : Hugo Visser
 // https://www.littlerobots.nl/blog/Handle-Android-RecyclerView-Clicks/

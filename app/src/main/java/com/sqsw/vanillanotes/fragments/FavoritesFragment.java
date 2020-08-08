@@ -16,12 +16,12 @@ import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionMenu;
 import com.sqsw.vanillanotes.R;
-import com.sqsw.vanillanotes.activities.NoteEditActivity;
-import com.sqsw.vanillanotes.utility.ItemClickSupport;
+import com.sqsw.vanillanotes.activities.EditActivity;
+import com.sqsw.vanillanotes.util.ItemClickSupport;
 import com.sqsw.vanillanotes.note.Note;
 import com.sqsw.vanillanotes.note.NotesAdapter;
-import com.sqsw.vanillanotes.utility.PrefsUtil;
-import com.sqsw.vanillanotes.utility.Utility;
+import com.sqsw.vanillanotes.util.PrefsUtil;
+import com.sqsw.vanillanotes.util.Utility;
 
 import java.util.ArrayList;
 
@@ -69,7 +69,7 @@ public class FavoritesFragment extends Fragment {
         ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                Intent intent = new Intent(context, NoteEditActivity.class);
+                Intent intent = new Intent(context, EditActivity.class);
                 Note current = adapter.getItem(position);
 
                 if (isSearched) {
@@ -133,7 +133,6 @@ public class FavoritesFragment extends Fragment {
             public boolean onQueryTextChange(String text) {
                 adapter.getFilter().filter(text);
                 isSearched = true;
-
                 return true;
             }
         });

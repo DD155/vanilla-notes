@@ -16,14 +16,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.sqsw.vanillanotes.R;
-import com.sqsw.vanillanotes.activities.NoteEditActivity;
-import com.sqsw.vanillanotes.utility.ItemClickSupport;
+import com.sqsw.vanillanotes.activities.EditActivity;
+import com.sqsw.vanillanotes.util.ItemClickSupport;
 import com.sqsw.vanillanotes.note.Note;
 import com.sqsw.vanillanotes.note.NotesAdapter;
-import com.sqsw.vanillanotes.utility.PrefsUtil;
-import com.sqsw.vanillanotes.utility.Utility;
+import com.sqsw.vanillanotes.util.PrefsUtil;
+import com.sqsw.vanillanotes.util.Utility;
 
 import java.util.ArrayList;
 
@@ -62,14 +61,14 @@ public class TrashFragment extends Fragment {
         UTIL = new Utility(context);
 
         Intent def = new Intent();
-        def.putExtra("caller", "Trash");
+        def.putExtra("isTrash", true);
         noteList = PrefsUtil.getNotes("trash", context);
         recyclerView = view.findViewById(R.id.recycler_notes);
 
         ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                Intent intent = new Intent(context, NoteEditActivity.class);
+                Intent intent = new Intent(context, EditActivity.class);
                 Note current = adapter.getItem(position);
 
                 if (isSearched) {
@@ -83,7 +82,7 @@ public class TrashFragment extends Fragment {
                     intent.putExtra("index", position);
                 }
                 intent.putExtra("oldNote", true);
-                intent.putExtra("caller", "Trash");
+                intent.putExtra("trash", true);
                 startActivity(intent);
             }
         });

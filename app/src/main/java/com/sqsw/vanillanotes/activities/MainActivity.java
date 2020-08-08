@@ -19,7 +19,7 @@ import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.sqsw.vanillanotes.R;
-import com.sqsw.vanillanotes.utility.Utility;
+import com.sqsw.vanillanotes.util.Utility;
 import com.sqsw.vanillanotes.fragments.FavoritesFragment;
 import com.sqsw.vanillanotes.fragments.NoteFragment;
 import com.sqsw.vanillanotes.fragments.TrashFragment;
@@ -27,7 +27,6 @@ import com.sqsw.vanillanotes.fragments.SettingsFragment;
 
 public class MainActivity extends AppCompatActivity {
     private static final String CHANNEL_ID = "NoteChannel";
-    private final Utility UTIL = new Utility(this);
     private Context mContext;
     private FloatingActionMenu fam;
     private int ctr = 0;
@@ -53,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
         navView.setOnNavigationItemSelectedListener(navListener);
 
-        if (getIntent().getStringExtra("caller") != null) { // Start trash fragment
+        if (getIntent().getBooleanExtra("trash", false)) { // Start trash fragment
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, new TrashFragment()).commit();
             navView.getMenu().getItem(2).setChecked(true);
         } else if (getIntent().getBooleanExtra("favorite", false)){ // Start favs fragment
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         fabNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                UTIL.goToActivity(NoteEditActivity.class, null, mContext);
+                Utility.goToActivity(EditActivity.class, mContext);
             }
         });
 
@@ -169,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
         FloatingActionMenu fam = findViewById(R.id.fam);
         if (fam.isOpened()) {
             fam.close(true);
+            ctr = 0;
             return;
         }
 

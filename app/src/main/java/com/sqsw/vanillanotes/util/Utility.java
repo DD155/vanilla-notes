@@ -1,4 +1,4 @@
-package com.sqsw.vanillanotes.utility;
+package com.sqsw.vanillanotes.util;
 
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.util.Log;
 
 import com.sqsw.vanillanotes.R;
+import com.sqsw.vanillanotes.activities.EditActivity;
 import com.sqsw.vanillanotes.note.Note;
 
 import java.util.ArrayList;
@@ -16,21 +17,33 @@ import java.util.Collections;
 // utility class for other com.sqsw.vanillanotes.activities
 public class Utility extends ContextWrapper {
 
-    public final int FONT_SMALL = 11;
-    public final int FONT_MEDIUM = 14;
-    public final int FONT_LARGE = 17;
-    private PrefsUtil notesUtility = new PrefsUtil(this);
+    public static final int FONT_SMALL = 11;
+    public static final int FONT_MEDIUM = 14;
+    public static final int FONT_LARGE = 17;
 
     public Utility(Context base) {
         super(base);
     }
 
     // Creates intent with information of what previous class called the new activity
-    public void goToActivity(Class<?> act, String s, Context context){
-        Intent i = new Intent(context, act);
-        i.putExtra("caller", s);
+    public static void goToActivity(Class<?> activity, Context context){
+        Intent i = new Intent(context, activity);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(i);
+        context.startActivity(i);
+    }
+
+    public static void goToActivityFromTrash(Context context){
+        Intent i = new Intent(context, EditActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i.putExtra("trash", true);
+        context.startActivity(i);
+    }
+
+    public static void goToActivityFromFav(Context context){
+        Intent i = new Intent(context, EditActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i.putExtra("favorite", true);
+        context.startActivity(i);
     }
 
     // Returns the value of the system navigation bar height
@@ -44,7 +57,7 @@ public class Utility extends ContextWrapper {
     }
 
     // Returns the size of the font depending on what user setting is
-    public int getFontSize(String pref){
+    public static int getFontSize(String pref){
         if ("Small".equals(pref)){
             return FONT_SMALL;
         } else if ("Large".equals(pref)){
@@ -58,9 +71,11 @@ public class Utility extends ContextWrapper {
     }
 
     // Returns boolean if the given color is dark or not. Used to change text color for readability
-    public boolean isDarkColor(int color){
-        return color == getResources().getColor(R.color.red) || color == getResources().getColor(R.color.blue) ||
-                color == getResources().getColor(R.color.purple) || color == getResources().getColor(R.color.green);
+    public static boolean isDarkColor(int color, Context context){
+        return color == context.getResources().getColor(R.color.red) ||
+                color == context.getResources().getColor(R.color.blue) ||
+                color == context.getResources().getColor(R.color.purple) ||
+                color == context.getResources().getColor(R.color.green);
     }
 
     public int countLines(String str){
@@ -79,7 +94,7 @@ public class Utility extends ContextWrapper {
     }
 
     // Returns a string of the current time and date in format MM/DD/YY HH:MM:SS
-    public String currentDate(){
+    public static String currentDate(){
         Calendar instance = Calendar.getInstance();
         String dayOfWeek;
         String hour;

@@ -1,4 +1,4 @@
-package com.sqsw.vanillanotes.utility;
+package com.sqsw.vanillanotes.util;
 
 import com.sqsw.vanillanotes.note.Note;
 

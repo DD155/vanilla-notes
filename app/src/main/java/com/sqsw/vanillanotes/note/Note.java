@@ -2,6 +2,8 @@ package com.sqsw.vanillanotes.note;
 
 import android.graphics.Color;
 
+import com.sqsw.vanillanotes.util.Utility;
+
 import java.io.Serializable;
 
 public class Note implements Serializable {
@@ -10,38 +12,25 @@ public class Note implements Serializable {
     private String text;
     private String date;
     private int color;
-    private int index = -1;
 
-    public Note(String title, String text, int color, String date){
+    public static Note createWithFavorite(String title, String text, boolean favorite){
+        return new Note(title, text, Color.WHITE, Utility.currentDate(), favorite);
+    }
+
+    public static Note createWithTitleAndContent(String title, String content){
+        return new Note(title, content, Color.WHITE, Utility.currentDate(), false);
+    }
+
+    public static Note createWithContent(String content){
+        return new Note("", content, Color.WHITE, Utility.currentDate(), false);
+    }
+
+    public Note(String title, String text, int color, String date, boolean favorite){
         this.title = title;
         this.text = text;
         this.date = date;
         this.color = color;
-        this.favorite = false;
-    }
-
-    public Note(String title, String text, int color){
-        this.title = title;
-        this.text = text;
-        this.date = "";
-        this.color = color;
-        this.favorite = false;
-    }
-
-    public Note(String title, String text){
-        this.title = title;
-        this.text = text;
-        this.date = "";
-        this.color = Color.WHITE;
-        this.favorite = false;
-    }
-
-    public Note(String text){
-        this.title = "";
-        this.text = text;
-        this.date = "";
-        this.color = Color.WHITE;
-        this.favorite = false;
+        this.favorite = favorite;
     }
 
     public String getTitle(){

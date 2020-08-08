@@ -12,7 +12,7 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.sqsw.vanillanotes.R;
-import com.sqsw.vanillanotes.utility.Utility;
+import com.sqsw.vanillanotes.util.Utility;
 
 import java.util.ArrayList;
 import java.util.List;

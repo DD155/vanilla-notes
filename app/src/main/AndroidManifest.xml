@@ -9,8 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/DefaultTheme">
-        <activity android:name=".classes.ContextActionBar" />
-        <activity android:name=".activities.NoteEditActivity"
+        <activity android:name=".ContextActionBar" />
+        <activity android:name=".activities.EditActivity"
             android:windowSoftInputMode="adjustResize">
         </activity>
         <activity android:name=".activities.MainActivity"
@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".classes.BroadcastReminder" />
+        <receiver android:name=".BroadcastReminder" />
     </application>
 
     <supports-screens
