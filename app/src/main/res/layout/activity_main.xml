@@ -30,7 +30,7 @@
         android:id="@+id/fragment_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"></FrameLayout>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"
@@ -57,8 +57,8 @@
         fab:menu_shadowXOffset="1dp"
         fab:menu_shadowYOffset="3dp"
         fab:menu_colorNormal="@color/colorAccent"
-        fab:menu_colorPressed="@color/pressedColor"
-        fab:menu_colorRipple="#99FFFFFF"
+        fab:menu_colorPressed="@color/darkPressedColor"
+        fab:menu_colorRipple="@color/rippleColor"
         fab:menu_animationDelayPerItem="50"
         fab:menu_icon="@drawable/fab_add"
         fab:menu_buttonSpacing="0dp"
@@ -74,7 +74,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fab_colorNormal="@color/white"
-            app:fab_colorPressed="@color/pressedColor"
+            app:fab_colorPressed="@color/lightPressedColor"
             android:src="@drawable/edit_icon"
             fab:fab_size="mini"
             fab:fab_label="Checklist Note" />
@@ -84,7 +84,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fab_colorNormal="@color/white"
-            app:fab_colorPressed="@color/pressedColor"
+            app:fab_colorPressed="@color/lightPressedColor"
             android:src="@drawable/edit_icon"
             fab:fab_size="mini"
             fab:fab_label="Text Note" />
