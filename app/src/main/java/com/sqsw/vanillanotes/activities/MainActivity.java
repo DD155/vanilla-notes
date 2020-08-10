@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
     private Context mContext;
     private FloatingActionMenu fam;
     private int ctr = 0;
-    private int selectedSortItem = 4;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -75,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         FloatingActionButton fabChecklist = findViewById(R.id.fab_item_checklist);
-
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =

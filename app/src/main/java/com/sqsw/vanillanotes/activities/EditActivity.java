@@ -51,9 +51,9 @@ public class EditActivity extends AppCompatActivity {
     private boolean isTrash;
     private boolean isFavorite;
     private boolean isOldNote;
+    private boolean newFavorite;
     private int colorPicked;
     private int index;
-    private boolean newFavorite;
 
     private SharedPreferences prefs;
     private Context mContext;
@@ -111,7 +111,7 @@ public class EditActivity extends AppCompatActivity {
 
             // Set content and title
             titleView.setText(currentNote.getTitle());
-            contentView.setText(currentNote.getText()); // Set the text on the note page as the old string
+            contentView.setText(currentNote.getContent()); // Set the text on the note page as the old string
 
             // Set color
             colorPicked = currentNote.getColor();
@@ -126,7 +126,6 @@ public class EditActivity extends AppCompatActivity {
         }
     }
 
-    // Retrive ArrayList depending on if user entered from activity trash or home
     private ArrayList<Note> getCurrentNoteList(){
         if (isTrash)
             return PrefsUtil.getNotes("trash", this);
@@ -137,24 +136,28 @@ public class EditActivity extends AppCompatActivity {
         }
     }
 
-    // Helper function for getting the correct notes depending on the user's previous fragment
     private String returnKeyFromList(){
-        if (isTrash) {
+        if (isTrash)
             return "trash";
-        } else if (isFavorite){
+        else if (isFavorite)
             return "favorites";
-        } else return "notes";
+        else return "notes";
     }
 
-    private void putExtraValue(Intent intent){
-        if (isTrash) {
+    private void returnToPreviousActivity(){
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        if (isTrash)
             intent.putExtra("trash", true);
-        } else if (isFavorite) {
+        else if (isFavorite)
             intent.putExtra("favorite", true);
-        }
+
+        startActivity(intent);
+        EditActivity.this.finish();
     }
 
-    private void saveOldNote(Note note){
+    private void saveOldNoteData(Note note){
         notesList.remove(index);
 
         // If the note is NOT originally a favorited note and is now being favorited by the user
@@ -167,85 +170,58 @@ public class EditActivity extends AppCompatActivity {
             ArrayList<Note> notes = PrefsUtil.getNotes("notes", this);
             notes.add(0, note);
             PrefsUtil.saveNotes(notes, "notes", this);
-        } else {
+        } else
             notesList.add(0, note);
-        }
     }
 
-    // Save the attributes (title, text, color, favorite) of the note to the previous activity
+    private void saveNewNoteData(Note note){
+        if (newFavorite) {
+            ArrayList<Note> fav = PrefsUtil.getNotes("favorites", this);
+            fav.add(0, note);
+            PrefsUtil.saveNotes(fav, "favorites", this);
+        } else
+            notesList.add(0, note);
+    }
+
     private void saveText(){
-        Intent intent = new Intent(this, MainActivity.class);
         String contentText = contentView.getText().toString().trim();
         String titleText = titleView.getText().toString().trim();
 
-        // Check that the note is not empty
-        if (contentView.length() == 0) {
-            warningDialog();
-            return;
-        }
-
         if (isOldNote) {
-            // Set new attributes to the note
             Note note = getCurrentNoteList().get(index);
             note.setColor(colorPicked);
-            note.setText(contentText);
+            note.setContent(contentText);
             note.setTitle(titleText);
             note.setFavorite(newFavorite);
-
-            saveOldNote(note);
+            saveOldNoteData(note);
         } else {
-            Note newNote = Note.createWithFavorite(titleText, contentText, newFavorite);
-            if (newFavorite) { // If new note is favorited, add it to the favorites list
-                ArrayList<Note> fav = PrefsUtil.getNotes("favorites", this);
-                fav.add(0, newNote);
-                PrefsUtil.saveNotes(fav, "favorites", this);
-            } else {
-                notesList.add(0, newNote);
-            }
+            Note newNote = Note.createWithTitleAndContent(titleText, contentText);
+            newNote.setFavorite(newFavorite);
+            saveNewNoteData(newNote);
         }
         PrefsUtil.saveNotes(notesList, returnKeyFromList(), this);
 
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        putExtraValue(intent);
-        startActivity(intent);
-        EditActivity.this.finish();
+        returnToPreviousActivity();
     }
 
-    // Helper function of deleteNote(): removes the note from the ArrayList and adds to trash,
-    // permanently removes if the current list is the trash
-    private void removeNoteFromList(){
+    private void deleteNote(){
         ArrayList<Note> trashList = PrefsUtil.getNotes("trash", this);
 
-        if (isTrash) { // Remove from trash can
+        if (isTrash)
             trashList.remove(index);
-        } else {
+        else {
             trashList.add(0, notesList.get(index));
             notesList.remove(index);
         }
         PrefsUtil.saveNotes(notesList, returnKeyFromList(), this);
         PrefsUtil.saveNotes(trashList, "trash", this);
-    }
-
-    // Menu action: deletes the current note from its list
-    private void deleteNote(){
-        // If it is a new note, just go back to the main activity
-        if (!isOldNote){
-            Utility.goToActivity(MainActivity.class, this);
-            return;
-        }
-        removeNoteFromList();
 
         Toast.makeText(this, getString(R.string.delete_toast), Toast.LENGTH_LONG).show();
 
-        Intent intent = new Intent(this, MainActivity.class);
-        putExtraValue(intent);
-        startActivity(intent);
-        EditActivity.this.finish();
+        returnToPreviousActivity();
     }
 
-    // Menu action: restores the note from the trash can to the main notes
     private void restoreNote(){
-        int index = getIntent().getIntExtra("index", 0);
         ArrayList<Note> trash, list;
         trash = PrefsUtil.getNotes("trash", this);
         list = PrefsUtil.getNotes("notes", this);
@@ -256,11 +232,11 @@ public class EditActivity extends AppCompatActivity {
         PrefsUtil.saveNotes(trash, "trash", this);
         PrefsUtil.saveNotes(list, "notes", this);
 
-        Utility.goToActivity(MainActivity.class, this);
         Toast.makeText(getApplicationContext(), getString(R.string.restore_toast), Toast.LENGTH_LONG).show();
+        returnToPreviousActivity();
     }
 
-    private void toggleIcon(){
+    private void toggleFavoriteIcon(){
         if (newFavorite){
             mMenu.findItem(R.id.action_star).setIcon(R.drawable.favorite_icon);
             newFavorite = false;
@@ -271,7 +247,7 @@ public class EditActivity extends AppCompatActivity {
     }
 
     // Dialog Functions
-    private void colorDialog(){
+    private void showColorDialog(){
         final ColorPicker colorPicker = new ColorPicker(EditActivity.this);
         colorPicker.setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
             @Override
@@ -324,7 +300,7 @@ public class EditActivity extends AppCompatActivity {
         alert.show();
     }
 
-    private void confirmDiscardDialog(final Class<?> activity){
+    private void showDiscardDialog(){
         View checkBoxView = getLayoutInflater().inflate(R.layout.checkbox, null);
         CheckBox checkBox = checkBoxView.findViewById(R.id.checkbox);
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -358,7 +334,7 @@ public class EditActivity extends AppCompatActivity {
         alert.show();
     }
 
-    private void confirmDialog(){
+    private void showConfirmDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.DialogThemeLight);
         if (newFavorite) {
             builder.setTitle(getString(R.string.delete_favorite_title));
@@ -524,7 +500,7 @@ public class EditActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("caller", getIntent().getStringExtra("caller"));
         if (prefs.getBoolean("back_dialog_toggle", true))
-            confirmDiscardDialog(MainActivity.class);
+            showDiscardDialog();
         else{
             finish();
         }
@@ -538,11 +514,14 @@ public class EditActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_save:
-                saveText();
+                if (contentView.length() == 0)
+                    warningDialog();
+                else
+                    saveText();
                 return true;
 
             case R.id.action_star:
-                toggleIcon();
+                toggleFavoriteIcon();
                 return true;
 
             case R.id.action_restore:
@@ -550,7 +529,10 @@ public class EditActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_delete:
-                confirmDialog();
+                if (!isOldNote)
+                    Utility.goToActivity(MainActivity.class, this);
+                else
+                    showConfirmDialog();
                 return true;
 
             case R.id.action_pin:
@@ -562,7 +544,7 @@ public class EditActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_color:
-                colorDialog();
+                showColorDialog();
                 return true;
 
             default:
@@ -574,7 +556,7 @@ public class EditActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (prefs.getBoolean("back_dialog_toggle", true))
-            confirmDiscardDialog(MainActivity.class);
+            showDiscardDialog();
         else
             finish();
     }

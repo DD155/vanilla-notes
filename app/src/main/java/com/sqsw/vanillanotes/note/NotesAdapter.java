@@ -22,8 +22,6 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> implements Filterable {
-    private Utility util;
-
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView title;
@@ -61,19 +59,16 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        util = new Utility(context);
-        int fontSize = util.getFontSize(prefs.getString("font_size", null));
+        int fontSize = Utility.getFontSize(prefs.getString("font_size", null));
         Note note = notes.get(position);
 
         // Set title, content, and color of the note
         TextView title_tv = holder.title;
         title_tv.setText(note.getTitle());
-        //title_tv.
-        //title_tv.setLines(3);
         title_tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize + 3);
 
         TextView content_tv = holder.content;
-        content_tv.setText(note.getText());
+        content_tv.setText(note.getContent());
         content_tv.setMaxLines(determineLines());
 
 
@@ -128,7 +123,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             notes.clear();
-            notes.addAll((List)results.values);
+            notes.addAll((List<Note>)results.values);
             Log.d("index_test", "Current amt of notes: " + getItemCount());
             notifyDataSetChanged();
         }

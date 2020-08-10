@@ -38,10 +38,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class NoteFragment extends Fragment {
     private ArrayList<Note> notes;
-    private Utility UTIL;
+    private Utility UTIL; // Needed for sort method
     private Context context;
-    private RecyclerView recyclerView;
-    private boolean isSearched = false;
+    private boolean isSearched;
     private NotesAdapter adapter;
     private int selectedSortItem = 4;
 
@@ -55,21 +54,18 @@ public class NoteFragment extends Fragment {
         ((AppCompatActivity) context).getSupportActionBar().setTitle("Notes");
 
         FloatingActionMenu fam = requireActivity().findViewById(R.id.fam);
-
         fam.setVisibility(View.VISIBLE);
         fam.setClosedOnTouchOutside(true);
 
         SharedPreferences sharedPreferences =
                 requireActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
 
-        recyclerView = view.findViewById(R.id.recycler_notes);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_notes);
         notes = PrefsUtil.getNotes("notes", context);
 
         int sortValue = sharedPreferences.getInt("sort_index", 0);
-
-        if (notes.size() > 0) {
+        if (notes.size() > 0)
             UTIL.sortNotes(sortValue, notes, "notes");
-        }
         else {
             TextView defaultText = view.findViewById(R.id.clear_text);
             defaultText.setText(getResources().getString(R.string.notes_empty));
@@ -78,14 +74,11 @@ public class NoteFragment extends Fragment {
         adapter = new NotesAdapter(notes);
         adapter.notifyDataSetChanged();
 
-        // Create onclick listener for RecyclerView items
         ItemClickSupport.addTo(recyclerView).setOnItemClickListener(listener);
-
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         setHasOptionsMenu(true);
-
         return view;
     }
 
@@ -102,9 +95,8 @@ public class NoteFragment extends Fragment {
                         break;
                     }
                 }
-            } else {
+            } else
                 intent.putExtra("index", position);
-            }
 
             intent.putExtra("oldNote", true);
             startActivity(intent);

@@ -9,13 +9,9 @@ import java.io.Serializable;
 public class Note implements Serializable {
     private boolean favorite;
     private String title;
-    private String text;
+    private String content;
     private String date;
     private int color;
-
-    public static Note createWithFavorite(String title, String text, boolean favorite){
-        return new Note(title, text, Color.WHITE, Utility.currentDate(), favorite);
-    }
 
     public static Note createWithTitleAndContent(String title, String content){
         return new Note(title, content, Color.WHITE, Utility.currentDate(), false);
@@ -25,9 +21,9 @@ public class Note implements Serializable {
         return new Note("", content, Color.WHITE, Utility.currentDate(), false);
     }
 
-    public Note(String title, String text, int color, String date, boolean favorite){
+    public Note(String title, String content, int color, String date, boolean favorite){
         this.title = title;
-        this.text = text;
+        this.content = content;
         this.date = date;
         this.color = color;
         this.favorite = favorite;
@@ -37,25 +33,24 @@ public class Note implements Serializable {
         return title;
     }
 
-    public String getText(){
-        return text;
+    public String getContent(){
+        return content;
     }
 
-    public String getDate() { return date; }
+    public String getDate() {
+        return date;
+    }
 
-    public int getColor() { return color; }
-
+    public int getColor() {
+        return color;
+    }
 
     public void setTitle(String title){
         this.title = title;
     }
 
-    public void setText(String text){
-        this.text = text;
-    }
-
-    public void setDate(String date){
-        this.date = date;
+    public void setContent(String content){
+        this.content = content;
     }
 
     public void setColor(int color) {
@@ -65,7 +60,6 @@ public class Note implements Serializable {
     public void setFavorite(boolean favorite) {
         this.favorite = favorite;
     }
-
 
     @Override
     public boolean equals(Object obj) {
@@ -77,7 +71,7 @@ public class Note implements Serializable {
 
         final Note b = (Note) obj;
 
-        return (this.getTitle().equals(b.getTitle()) && this.getText().equals(b.getText()) &&
+        return (this.getTitle().equals(b.getTitle()) && this.getContent().equals(b.getContent()) &&
                 this.getDate().equals(b.getDate()) && this.getColor() == b.getColor());
     }
 

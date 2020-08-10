@@ -66,7 +66,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         clearPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogThemeLight);
                 builder.setTitle(getString(R.string.clear_data_dialog_title));
                 builder.setMessage(getString(R.string.clear_data_dialog_text));
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
