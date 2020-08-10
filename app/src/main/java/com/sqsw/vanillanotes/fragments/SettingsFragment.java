@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
@@ -67,6 +68,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         ListPreference fontPref = findPreference(KEY_FONT);
         Preference clearPref = findPreference("clear");
         Preference exportPref = findPreference("export_backup");
+        Preference importPref = findPreference("import_backup");
         SwitchPreferenceCompat backPref = findPreference(KEY_BACK_DIALOG);
 
         if (fontPref == null || clearPref == null || backPref == null){
@@ -167,39 +169,26 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private byte[] createExportData(){
         String data = "";
         for (Note note : PrefsUtil.getNotes("notes", getActivity())){
-            data += "Title: " + note.getTitle()
-                    + "\nContent: " + note.getContent()
-                    + "\nFavorite: " + note.getFavorite()
+            data += "[VN]Title:" + note.getTitle()
+                    + "\n[VN]Content:" + note.getContent()
+                    + "\n[VN]Color:" + note.getColor()
+                    + "\n[VN]Favorite:" + note.getFavorite()
                     + "\n";
         }
 
         for (Note note : PrefsUtil.getNotes("favorites", getActivity())){
-            data += "Title: " + note.getTitle()
-                    + "\nContent: " + note.getContent()
-                    + "\nFavorite: " + note.getFavorite()
+            data += "[VN]Title:" + note.getTitle()
+                    + "\n[VN]Content:" + note.getContent()
+                    + "\n[VN]Color:" + note.getColor()
+                    + "\n[VN]Favorite:" + note.getFavorite()
                     + "\n\n";
         }
         return data.getBytes();
     }
 
-    /*
-    private File createFile(String data, Uri uri){
-        File file = new File(String.valueOf(uri), "vn_data.txt");
-        FileOutputStream fos;
-
-
-        try {
-            fos = getActivity().openFileOutput()
-
-        } catch (FileNotFoundException f) {
-
-        }
-    } */
-
     private void exportFiles() {
         LoadingDialog loadingDialog = new LoadingDialog(getActivity());
         loadingDialog.startDialog();
-        String fileName = "data.txt";
         byte[] data = createExportData();
 
         try {
@@ -212,13 +201,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     }
 
     private void openFileChooser(byte[] data) throws IOException {
-        //File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +"/data.txt");
+        String date;
+        Calendar calendar = Calendar.getInstance();
+        date = calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH)
+                + "-" + calendar.get(Calendar.DAY_OF_MONTH);
+
         Intent target = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         target.setType("text/*");
-        target.putExtra(Intent.EXTRA_TEXT, data);
-        target.putExtra(Intent.EXTRA_TITLE, "vn_data.txt");
-        target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
+        target.putExtra(Intent.EXTRA_TITLE, "vanillanotes-" + date + ".txt");
         Intent intent = Intent.createChooser(target, "Save File");
         startActivityForResult(intent, REQUEST_CODE);
     }
@@ -230,7 +220,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             if (resultData != null) {
                 uri = resultData.getData();
                 try {
-                    File file = new File(uri.getPath());
                     OutputStream outputStream = getActivity().getContentResolver().openOutputStream(uri);
                     outputStream.write(createExportData());
                 } catch (IOException e){
