@@ -44,10 +44,22 @@
 
         <SwitchPreferenceCompat
             app:iconSpaceReserved="false"
-            app:key="attachment"
-            app:summaryOff=""
-            app:summaryOn=""
-            app:title="" />
+            app:key="automatic_backup"
+            app:summaryOff="Currently not backing up files automatically"
+            app:summaryOn="Files are being backed up"
+            app:title="@string/auto_backup_toggle" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="export_backup"
+            app:title="@string/export_backup_title"
+            app:summary="@string/export_backup_summary" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="import_backup"
+            app:title="@string/import_backup_title"
+            app:summary="@string/import_backup_summary" />
 
     </PreferenceCategory>
 

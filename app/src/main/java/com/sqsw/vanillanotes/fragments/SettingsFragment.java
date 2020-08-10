@@ -1,10 +1,14 @@
 package com.sqsw.vanillanotes.fragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,22 +16,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.sqsw.vanillanotes.LoadingDialog;
 import com.sqsw.vanillanotes.note.Note;
 import com.sqsw.vanillanotes.R;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreferenceCompat;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.sqsw.vanillanotes.util.PrefsUtil;
 
-import java.lang.reflect.Type;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
@@ -36,6 +45,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
     private final String KEY_FONT = "font_size";
     private final String KEY_BACK_DIALOG = "back_dialog_toggle";
+    private final int PERMISSION_CODE = 1;
+    private final int REQUEST_CODE = 5;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -55,14 +66,15 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
         ListPreference fontPref = findPreference(KEY_FONT);
         Preference clearPref = findPreference("clear");
+        Preference exportPref = findPreference("export_backup");
         SwitchPreferenceCompat backPref = findPreference(KEY_BACK_DIALOG);
 
         if (fontPref == null || clearPref == null || backPref == null){
             Log.e("settings_error", "Preference initialization has thrown null pointer exception");
             return;
         }
-        // Initialize the clear all notes preference
 
+        // Initialize the clear all notes preference
         clearPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -72,15 +84,15 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ArrayList<Note> note = getNotes("notes");
-                        ArrayList<Note> trash = getNotes("trash");
-                        ArrayList<Note> fav = getNotes("favorites");
+                        ArrayList<Note> note = PrefsUtil.getNotes("notes", getActivity());
+                        ArrayList<Note> trash = PrefsUtil.getNotes("trash", getActivity());
+                        ArrayList<Note> fav = PrefsUtil.getNotes("favorites", getActivity());
                         note.clear();
                         trash.clear();
                         fav.clear();
-                        saveNotes(note, "notes");
-                        saveNotes(trash, "trash");
-                        saveNotes(fav, "favorites");
+                        PrefsUtil.saveNotes(note, "notes", getActivity());
+                        PrefsUtil.saveNotes(trash, "trash", getActivity());
+                        PrefsUtil.saveNotes(fav, "favorites", getActivity());
                         Toast.makeText(getActivity(), getString(R.string.clear_data_toast), Toast.LENGTH_LONG).show();
                     }
                 });
@@ -95,6 +107,22 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 AlertDialog alert = builder.create();
                 alert.show();
                 return true;
+            }
+        });
+
+        exportPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                boolean requireWritePermission = ContextCompat.checkSelfPermission
+                        (getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED;
+
+                if (requireWritePermission) {
+                    requestStoragePermissions();
+                } else {
+                    exportFiles();
+                }
+                return false;
             }
         });
 
@@ -129,21 +157,115 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         };
     }
 
-    private void saveNotes(ArrayList<Note> list, String key){ // saves the arraylist using gson
-        SharedPreferences prefs = this.getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(list);
-        editor.putString(key, json);
-        editor.apply();
+    /*
+    Data format
+    Title: sample title
+    Content: sample content
+    Favorite: false/true
+     */
+
+    private byte[] createExportData(){
+        String data = "";
+        for (Note note : PrefsUtil.getNotes("notes", getActivity())){
+            data += "Title: " + note.getTitle()
+                    + "\nContent: " + note.getContent()
+                    + "\nFavorite: " + note.getFavorite()
+                    + "\n";
+        }
+
+        for (Note note : PrefsUtil.getNotes("favorites", getActivity())){
+            data += "Title: " + note.getTitle()
+                    + "\nContent: " + note.getContent()
+                    + "\nFavorite: " + note.getFavorite()
+                    + "\n\n";
+        }
+        return data.getBytes();
     }
 
-    private ArrayList<Note> getNotes(String key){ //returns the arraylist from sharedprefs
-        SharedPreferences prefs = this.getActivity().getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = prefs.getString(key, null);
-        Type type = new TypeToken<ArrayList<Note>>() {}.getType();
-        return gson.fromJson(json, type);
+    /*
+    private File createFile(String data, Uri uri){
+        File file = new File(String.valueOf(uri), "vn_data.txt");
+        FileOutputStream fos;
+
+
+        try {
+            fos = getActivity().openFileOutput()
+
+        } catch (FileNotFoundException f) {
+
+        }
+    } */
+
+    private void exportFiles() {
+        LoadingDialog loadingDialog = new LoadingDialog(getActivity());
+        loadingDialog.startDialog();
+        String fileName = "data.txt";
+        byte[] data = createExportData();
+
+        try {
+            openFileChooser(data);
+            loadingDialog.dismissDialog();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
+
+    private void openFileChooser(byte[] data) throws IOException {
+        //File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +"/data.txt");
+        Intent target = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        target.setType("text/*");
+        target.putExtra(Intent.EXTRA_TEXT, data);
+        target.putExtra(Intent.EXTRA_TITLE, "vn_data.txt");
+        target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+        Intent intent = Intent.createChooser(target, "Save File");
+        startActivityForResult(intent, REQUEST_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Uri uri;
+            if (resultData != null) {
+                uri = resultData.getData();
+                try {
+                    File file = new File(uri.getPath());
+                    OutputStream outputStream = getActivity().getContentResolver().openOutputStream(uri);
+                    outputStream.write(createExportData());
+                } catch (IOException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
+    private void requestStoragePermissions() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale
+                (getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+            new AlertDialog.Builder(getActivity(), R.style.DialogThemeLight)
+                    .setTitle(getString(R.string.perm_dialog_title))
+                    .setMessage(getString(R.string.perm_dialog_msg))
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ActivityCompat.requestPermissions(getActivity(),
+                                    new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}
+                                    , PERMISSION_CODE);
+                        }
+                    })
+                    .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    }).create().show();
+        } else {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_CODE);
+        }
     }
 
     // Prevent retrieving null from getActivity()

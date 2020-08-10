@@ -45,6 +45,10 @@ public class Note implements Serializable {
         return color;
     }
 
+    public boolean getFavorite() {
+        return favorite;
+    }
+
     public void setTitle(String title){
         this.title = title;
     }
@@ -74,8 +78,6 @@ public class Note implements Serializable {
         return (this.getTitle().equals(b.getTitle()) && this.getContent().equals(b.getContent()) &&
                 this.getDate().equals(b.getDate()) && this.getColor() == b.getColor());
     }
-
-
 
 
 
