@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,19 +12,44 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/DefaultTheme">
-        <activity android:name=".ContextActionBar" />
         <activity android:name=".activities.EditActivity"
             android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/*" />
+                <data android:scheme="http" android:host="*"
+                    android:pathPattern=".*\\.txt" />
+                <data android:scheme="https" android:host="*"
+                    android:pathPattern=".*\\.txt" />
+                <data android:scheme="content" android:host="*"
+                    android:pathPattern=".*\\.txt" />
+                <data android:scheme="file" android:host="*"
+                    android:pathPattern=".*\\.txt" />
+            </intent-filter>
         </activity>
         <activity android:name=".activities.MainActivity"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.EDIT" />
+                <data
+                    android:scheme="file"
+                    android:mimeType="application/vnotes"
+                    android:host="*"
+                    android:pathPattern=".*\\.vnotes"
+                    />
+                <data
+                    android:scheme="file"
+                    android:mimeType="application/octet-stream"
+                    android:host="*"
+                    android:pathPattern=".*\\.vnotes"
+                    />
             </intent-filter>
-        </activity>
 
+
+        </activity>
         <receiver android:name=".BroadcastReminder" />
     </application>
 

@@ -45,8 +45,8 @@
     <string name="action_reminder">Set reminder</string>
     <string name="action_color">Set color</string>
     <string name="action_sort">Sort notes</string>
-    <string name="action_star">Star note</string>
-    <string name="action_starred">Unstar note</string>
+    <string name="action_fav">Favorite note</string>
+    <string name="action_unfav">Unfavorite note</string>
     <string name="action_search">Search note</string>
 
     <!-- Preference Titles -->
@@ -106,7 +106,8 @@
     <string name="perm_dialog_title">Permission needed</string>
     <string name="perm_dialog_msg">This app requires this permission in order to read and write
         files to your device for exporting and importing data.</string>
-
+    <string name="import_error_title">Invalid import file</string>
+    <string name="import_error_msg">The file you selected is not a valid import file.</string>
 
 
 </resources>

@@ -6,8 +6,8 @@
         android:title="@string/action_save"
         app:showAsAction="ifRoom" />
 
-    <item android:id="@+id/action_star"
-        android:title="@string/action_star"
+    <item android:id="@+id/action_fav"
+        android:title="@string/action_fav"
         android:icon="@drawable/star_icon"
         app:showAsAction="ifRoom" />
 

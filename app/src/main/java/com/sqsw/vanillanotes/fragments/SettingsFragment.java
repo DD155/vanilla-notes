@@ -3,17 +3,21 @@ package com.sqsw.vanillanotes.fragments;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.sqsw.vanillanotes.LoadingDialog;
@@ -32,11 +36,15 @@ import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreferenceCompat;
 
 import com.sqsw.vanillanotes.util.PrefsUtil;
+import com.sqsw.vanillanotes.util.Utility;
 
-import java.io.File;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -47,7 +55,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private final String KEY_FONT = "font_size";
     private final String KEY_BACK_DIALOG = "back_dialog_toggle";
     private final int PERMISSION_CODE = 1;
-    private final int REQUEST_CODE = 5;
+    private final int EXPORT_CODE = 5;
+    private final int IMPORT_CODE = 3;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -120,11 +129,27 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                         != PackageManager.PERMISSION_GRANTED;
 
                 if (requireWritePermission) {
-                    requestStoragePermissions();
+                    requestStoragePermissions(true);
                 } else {
-                    exportFiles();
+                    exportNotes();
                 }
-                return false;
+                return true;
+            }
+        });
+
+        importPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                boolean requireWritePermission = ContextCompat.checkSelfPermission
+                        (getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED;
+
+                if (requireWritePermission) {
+                    requestStoragePermissions(false);
+                } else {
+                    importNotes();
+                }
+                return true;
             }
         });
 
@@ -166,71 +191,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     Favorite: false/true
      */
 
-    private byte[] createExportData(){
-        String data = "";
-        for (Note note : PrefsUtil.getNotes("notes", getActivity())){
-            data += "[VN]Title:" + note.getTitle()
-                    + "\n[VN]Content:" + note.getContent()
-                    + "\n[VN]Color:" + note.getColor()
-                    + "\n[VN]Favorite:" + note.getFavorite()
-                    + "\n";
-        }
-
-        for (Note note : PrefsUtil.getNotes("favorites", getActivity())){
-            data += "[VN]Title:" + note.getTitle()
-                    + "\n[VN]Content:" + note.getContent()
-                    + "\n[VN]Color:" + note.getColor()
-                    + "\n[VN]Favorite:" + note.getFavorite()
-                    + "\n\n";
-        }
-        return data.getBytes();
-    }
-
-    private void exportFiles() {
-        LoadingDialog loadingDialog = new LoadingDialog(getActivity());
-        loadingDialog.startDialog();
-        byte[] data = createExportData();
-
-        try {
-            openFileChooser(data);
-            loadingDialog.dismissDialog();
-        }
-        catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
-        }
-    }
-
-    private void openFileChooser(byte[] data) throws IOException {
-        String date;
-        Calendar calendar = Calendar.getInstance();
-        date = calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH)
-                + "-" + calendar.get(Calendar.DAY_OF_MONTH);
-
-        Intent target = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-        target.setType("text/*");
-        target.putExtra(Intent.EXTRA_TITLE, "vanillanotes-" + date + ".txt");
-        Intent intent = Intent.createChooser(target, "Save File");
-        startActivityForResult(intent, REQUEST_CODE);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Uri uri;
-            if (resultData != null) {
-                uri = resultData.getData();
-                try {
-                    OutputStream outputStream = getActivity().getContentResolver().openOutputStream(uri);
-                    outputStream.write(createExportData());
-                } catch (IOException e){
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-
-    private void requestStoragePermissions() {
+    private void requestStoragePermissions(final boolean isExport) {
         if (ActivityCompat.shouldShowRequestPermissionRationale
                 (getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)){
             new AlertDialog.Builder(getActivity(), R.style.DialogThemeLight)
@@ -239,9 +200,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            ActivityCompat.requestPermissions(getActivity(),
-                                    new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}
-                                    , PERMISSION_CODE);
+                            ActivityCompat.requestPermissions(getActivity(), new String[]{
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_CODE);
+                            if (isExport)
+                                exportNotes();
+                            else
+                                importNotes();
                         }
                     })
                     .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -257,7 +221,143 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         }
     }
 
-    // Prevent retrieving null from getActivity()
+    private JSONArray getDataAsJSON(String key){
+        JSONArray noteDataArray = new JSONArray();
+        for (Note note : PrefsUtil.getNotes(key, getActivity())){
+            try {
+                JSONObject noteData = new JSONObject();
+                noteData.put("title", note.getTitle());
+                noteData.put("content", note.getContent());
+                noteData.put("color", note.getColor());
+                noteData.put("favorite", note.getFavorite());
+                noteDataArray.put(noteData);
+            } catch (JSONException e){
+                e.printStackTrace();
+            }
+        }
+        return noteDataArray;
+    }
+
+    private byte[] createExportData(){
+        JSONArray notesData = getDataAsJSON("notes");
+        JSONArray favoritesData = getDataAsJSON("favorites");
+
+        JSONObject dataObject = new JSONObject();
+        try {
+            dataObject.put("Notes", notesData);
+            dataObject.put("Favorites", favoritesData);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        String data = dataObject.toString();
+        Log.d("import_test", data);
+        return data.getBytes();
+    }
+
+    private void saveFileToStorage() throws IOException {
+        String date;
+        Calendar calendar = Calendar.getInstance();
+        date = calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH)+1)
+                + "-" + calendar.get(Calendar.DAY_OF_MONTH);
+
+        Intent target = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        target.setType("application/*");
+        target.putExtra(Intent.EXTRA_TITLE, "vanillanotes-" + date + ".vnotes");
+        Intent intent = Intent.createChooser(target, "Save File");
+        startActivityForResult(intent, EXPORT_CODE);
+    }
+
+    private void writeToFile(Intent intent){
+        if (intent != null) {
+            Uri uri = intent.getData();
+            try {
+                OutputStream outputStream = getActivity().getContentResolver().openOutputStream(uri);
+                outputStream.write(createExportData());
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void exportNotes() {
+        LoadingDialog loadingDialog = new LoadingDialog(getActivity());
+        loadingDialog.startDialog();
+
+        try {
+            saveFileToStorage();
+            loadingDialog.dismissDialog();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
+
+    private void importNotes(){
+        chooseFileForImport();
+    }
+
+    private void chooseFileForImport(){
+        Intent target = new Intent(Intent.ACTION_GET_CONTENT);
+        target.setType("application/*");
+        target.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        target.addCategory(Intent.CATEGORY_OPENABLE);
+        Intent intent = Intent.createChooser(target, "Import File");
+        startActivityForResult(intent, IMPORT_CODE);
+    }
+
+    public String getMimeType(Uri uri) {
+        String mimeType;
+        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            ContentResolver cr = getActivity().getContentResolver();
+            mimeType = cr.getType(uri);
+        } else {
+            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
+                    .toString());
+            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                    fileExtension.toLowerCase());
+        }
+        return mimeType;
+    }
+
+    private void readFile(Intent intent){
+        Uri uri = intent.getData();
+        String mimeType = getMimeType(uri);
+        String fileName = Utility.getFileName(uri, getActivity());
+        Log.d("import_test", fileName.substring(fileName.length() - 6));
+        if (Utility.isValidFileType(fileName)){
+
+        } else {
+            showErrorDialog();
+        }
+    }
+
+    private void showErrorDialog(){
+        new AlertDialog.Builder(getActivity(), R.style.DialogThemeLight)
+                .setTitle(getString(R.string.import_error_title))
+                .setMessage(getString(R.string.import_error_msg))
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                }).create().show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case EXPORT_CODE:
+                    writeToFile(resultData);
+                    break;
+                case IMPORT_CODE:
+                    readFile(resultData);
+                    break;
+            }
+        }
+    }
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);

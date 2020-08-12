@@ -151,7 +151,7 @@ public class Utility extends ContextWrapper {
     public static String getFileName(Uri uri, Context context) {
         String result = null;
         if (uri.getScheme().equals("content")) {
-            Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+            Cursor cursor = context.getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null);
             try {
                 if (cursor != null && cursor.moveToFirst()) {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
@@ -168,6 +168,14 @@ public class Utility extends ContextWrapper {
             }
         }
         return result;
+    }
+
+    public static boolean isValidFileType(String fileName){
+    //    if (")".equals(fileName.charAt(fileName.length() - 1))) {
+    //        return "vnotes".equals(fileName.substring(fileName.length() - 6));
+    //    } else {
+            return "vnotes".equals(fileName.substring(fileName.length() - 6));
+    //    }
     }
 
     public void sortNotes(int type, ArrayList<Note> notes, String key){

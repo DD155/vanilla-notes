@@ -238,10 +238,12 @@ public class EditActivity extends AppCompatActivity {
 
     private void toggleFavoriteIcon(){
         if (newFavorite){
-            mMenu.findItem(R.id.action_star).setIcon(R.drawable.favorite_icon);
+            mMenu.findItem(R.id.action_fav).setIcon(R.drawable.favorite_icon);
+            mMenu.findItem(R.id.action_fav).setTitle(R.string.action_fav);
             newFavorite = false;
         } else {
-            mMenu.findItem(R.id.action_star).setIcon(R.drawable.favorite_icon_selected);
+            mMenu.findItem(R.id.action_fav).setIcon(R.drawable.favorite_icon_selected);
+            mMenu.findItem(R.id.action_fav).setTitle(R.string.action_unfav);
             newFavorite = true;
         }
     }
@@ -489,10 +491,14 @@ public class EditActivity extends AppCompatActivity {
             getMenuInflater().inflate(R.menu.edit_actions, menu);
 
         // Change favorite icon depending on if the current note is favorited or not
-        if (isFavorite)
-            menu.findItem(R.id.action_star).setIcon(R.drawable.favorite_icon_selected);
-        else
-            menu.findItem(R.id.action_star).setIcon(R.drawable.favorite_icon);
+        if (isFavorite) {
+            menu.findItem(R.id.action_fav).setIcon(R.drawable.favorite_icon_selected);
+            mMenu.findItem(R.id.action_fav).setTitle(R.string.action_unfav);
+        }
+        else {
+            menu.findItem(R.id.action_fav).setIcon(R.drawable.favorite_icon);
+            mMenu.findItem(R.id.action_fav).setTitle(R.string.action_fav);
+        }
         return true;
     }
 
@@ -520,7 +526,7 @@ public class EditActivity extends AppCompatActivity {
                     saveText();
                 return true;
 
-            case R.id.action_star:
+            case R.id.action_fav:
                 toggleFavoriteIcon();
                 return true;
 
