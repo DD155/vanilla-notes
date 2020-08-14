@@ -99,6 +99,8 @@ public class NoteFragment extends Fragment {
                 intent.putExtra("index", position);
 
             intent.putExtra("oldNote", true);
+            FloatingActionMenu fam = getActivity().findViewById(R.id.fam);
+            fam.close(true);
             startActivity(intent);
         }
     };

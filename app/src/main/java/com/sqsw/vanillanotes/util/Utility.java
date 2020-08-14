@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.util.Log;
 
+import com.github.clans.fab.FloatingActionMenu;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.activities.EditActivity;
 import com.sqsw.vanillanotes.note.Note;
@@ -146,6 +147,10 @@ public class Utility extends ContextWrapper {
         if (hour.length() == 1)
             return month + "/" + dayOfWeek + "/" + year + " " + "0" + hour + ":" + minutes;
         return month + "/" + dayOfWeek + "/" + year + " " + hour + ":" + minutes;
+    }
+
+    public static void collapseFloatingActionMenu(FloatingActionMenu fam){
+        fam.close(true);
     }
 
     public static String getFileName(Uri uri, Context context) {

@@ -42,7 +42,7 @@ public class FavoritesFragment extends Fragment {
     private NotesAdapter adapter;
     private RecyclerView recyclerView;
     private int selectedSortItem = 4;
-    private boolean isSearched = false;
+    private boolean isSearched;
 
     @Nullable
     @Override
@@ -85,6 +85,7 @@ public class FavoritesFragment extends Fragment {
                 intent.putExtra("oldNote", true);
                 intent.putExtra("favorite", true);
                 startActivity(intent);
+                fam.close(true);
             }
         });
 
