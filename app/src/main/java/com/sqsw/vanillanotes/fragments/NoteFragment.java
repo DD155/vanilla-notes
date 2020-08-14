@@ -41,6 +41,7 @@ public class NoteFragment extends Fragment {
     private Utility UTIL; // Needed for sort method
     private Context context;
     private boolean isSearched;
+    private FloatingActionMenu fam;
     private NotesAdapter adapter;
     private int selectedSortItem = 4;
 
@@ -53,7 +54,7 @@ public class NoteFragment extends Fragment {
         if (isAdded()) context = getActivity();
         ((AppCompatActivity) context).getSupportActionBar().setTitle("Notes");
 
-        FloatingActionMenu fam = requireActivity().findViewById(R.id.fam);
+        fam = requireActivity().findViewById(R.id.fam);
         fam.setVisibility(View.VISIBLE);
         fam.setClosedOnTouchOutside(true);
 
@@ -88,22 +89,23 @@ public class NoteFragment extends Fragment {
             Intent intent = new Intent(context, EditActivity.class);
             Note current = adapter.getItem(position);
 
-            if (isSearched) {
-                for (int i = 0; i < PrefsUtil.getNotes("notes", context).size(); i++) {
-                    if (current.equals(PrefsUtil.getNotes("notes", context).get(i))) {
-                        intent.putExtra("index", i);
-                        break;
-                    }
-                }
-            } else
+            if (isSearched)
+                intent.putExtra("index", getIndexOfSearchedNote(current));
+            else
                 intent.putExtra("index", position);
 
             intent.putExtra("oldNote", true);
-            FloatingActionMenu fam = getActivity().findViewById(R.id.fam);
-            fam.close(true);
             startActivity(intent);
+            fam.close(true);
         }
     };
+
+    private int getIndexOfSearchedNote(Note note){
+        for (int i = 0; i < PrefsUtil.getNotes("notes", context).size(); i++)
+            if (note.equals(PrefsUtil.getNotes("notes", context).get(i)))
+                return i;
+        return 0;
+    }
 
     // Create dialog for sorting notes
     private void sortDialog() {

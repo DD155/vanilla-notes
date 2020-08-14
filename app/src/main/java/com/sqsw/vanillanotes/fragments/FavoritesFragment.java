@@ -41,6 +41,7 @@ public class FavoritesFragment extends Fragment {
     private Utility UTIL;
     private NotesAdapter adapter;
     private RecyclerView recyclerView;
+    private FloatingActionMenu fam;
     private int selectedSortItem = 4;
     private boolean isSearched;
 
@@ -49,59 +50,61 @@ public class FavoritesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Favorites");
-        final FloatingActionMenu fam = getActivity().findViewById(R.id.fam);
+        setHasOptionsMenu(true);
+        if (isAdded()) context = getActivity();
+
+        fam = getActivity().findViewById(R.id.fam);
         fam.setVisibility(View.VISIBLE);
         fam.setClosedOnTouchOutside(true);
 
-        if (isAdded()) context = getActivity();
-
         UTIL = new Utility(getActivity());
         favs = PrefsUtil.getNotes("favorites", context);
-
         recyclerView = view.findViewById(R.id.recycler_notes);
         adapter = new NotesAdapter(favs);
 
-        if (favs.size() == 0) {
+        if (favs.size() > 0)
+            UTIL.sortNotes(selectedSortItem, favs, "notes");
+        else {
             TextView defaultText = view.findViewById(R.id.clear_text);
             defaultText.setText(getResources().getString(R.string.favs_empty));
         }
 
-        ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
-            @Override
-            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                Intent intent = new Intent(context, EditActivity.class);
-                Note current = adapter.getItem(position);
-
-                if (isSearched) {
-                    for (int i = 0; i < PrefsUtil.getNotes("favorites", context).size(); i++) {
-                        if (current.equals(PrefsUtil.getNotes("favorites", context).get(i))) {
-                            intent.putExtra("index", i);
-                            break;
-                        }
-                    }
-                } else {
-                    intent.putExtra("index", position);
-                }
-                intent.putExtra("oldNote", true);
-                intent.putExtra("favorite", true);
-                startActivity(intent);
-                fam.close(true);
-            }
-        });
-
+        ItemClickSupport.addTo(recyclerView).setOnItemClickListener(listener);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        setHasOptionsMenu(true);
-
         return view;
+    }
+
+    ItemClickSupport.OnItemClickListener listener = new ItemClickSupport.OnItemClickListener() {
+        @Override
+        public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+            Intent intent = new Intent(context, EditActivity.class);
+            Note current = adapter.getItem(position);
+
+            if (isSearched)
+                intent.putExtra("index", getIndexOfSearchedNote(current));
+            else
+                intent.putExtra("index", position);
+
+            intent.putExtra("oldNote", true);
+            startActivity(intent);
+            fam.close(true);
+        }
+    };
+
+    private int getIndexOfSearchedNote(Note note){
+        ArrayList<Note> notes = PrefsUtil.getNotes("favorites", context);
+        for (int i = 0; i < notes.size(); i++)
+            if (note.equals(notes.get(i)))
+                return i;
+        return 0;
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.fav_actions, menu);
 
-        // Initialize the searchview in the toolbar
         final MenuItem myActionMenuItem = menu.findItem( R.id.action_search);
         final SearchView searchView = (SearchView)myActionMenuItem.getActionView();
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
@@ -150,9 +153,7 @@ public class FavoritesFragment extends Fragment {
 
     private void sortDialog() {
         final SharedPreferences prefs = context.getSharedPreferences("NOTES", Context.MODE_PRIVATE);
-        if (selectedSortItem != prefs.getInt("sort_index", 0)){
-            selectedSortItem = prefs.getInt("sort_index", 0);
-        }
+        selectedSortItem = prefs.getInt("sort_index", 0);
 
         String[] items = getResources().getStringArray(R.array.sort_values);
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.DialogThemeLight);

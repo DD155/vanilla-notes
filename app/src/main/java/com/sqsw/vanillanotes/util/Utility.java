@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
 import com.sqsw.vanillanotes.R;
@@ -36,28 +37,8 @@ public class Utility extends ContextWrapper {
         context.startActivity(i);
     }
 
-    public static void goToActivityFromTrash(Context context){
-        Intent i = new Intent(context, EditActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        i.putExtra("trash", true);
-        context.startActivity(i);
-    }
-
-    public static void goToActivityFromFav(Context context){
-        Intent i = new Intent(context, EditActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        i.putExtra("favorite", true);
-        context.startActivity(i);
-    }
-
-    // Returns the value of the system navigation bar height
-    public int getNavigationBarSize(Context context){
-        Resources resources = context.getResources();
-        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            return resources.getDimensionPixelSize(resourceId);
-        }
-        return 0;
+    public static void showShortToast(String toastMsg, Context context){
+        Toast.makeText(context, toastMsg, Toast.LENGTH_SHORT).show();
     }
 
     // Returns the size of the font depending on what user setting is
@@ -69,32 +50,12 @@ public class Utility extends ContextWrapper {
         } else return FONT_MEDIUM;
     }
 
-    // Return a hex code string from R.color int
-    public String hexFromColorInt(int color){
-        return String.format("#%06X", (0xFFFFFF & color)).substring(1);
-    }
-
     // Returns boolean if the given color is dark or not. Used to change text color for readability
     public static boolean isDarkColor(int color, Context context){
         return color == context.getResources().getColor(R.color.red) ||
                 color == context.getResources().getColor(R.color.blue) ||
                 color == context.getResources().getColor(R.color.purple) ||
                 color == context.getResources().getColor(R.color.green);
-    }
-
-    public int countLines(String str){
-        String[] lines = str.split("\r\n|\r|\n");
-        return lines.length;
-    }
-
-    public String addEllipsis(String str, int maxChars){
-        String s;
-        if (str.length() >= maxChars){
-            s = str.substring(0, maxChars - 3) + "…";
-        } else {
-            s = str;
-        }
-        return s;
     }
 
     // Returns a string of the current time and date in format MM/DD/YY HH:MM:SS

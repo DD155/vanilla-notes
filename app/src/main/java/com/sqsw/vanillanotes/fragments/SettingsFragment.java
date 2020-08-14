@@ -306,23 +306,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         startActivityForResult(intent, IMPORT_CODE);
     }
 
-    public String getMimeType(Uri uri) {
-        String mimeType;
-        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
-            ContentResolver cr = getActivity().getContentResolver();
-            mimeType = cr.getType(uri);
-        } else {
-            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
-                    .toString());
-            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-                    fileExtension.toLowerCase());
-        }
-        return mimeType;
-    }
-
     private void readFile(Intent intent){
         Uri uri = intent.getData();
-        String mimeType = getMimeType(uri);
         String fileName = Utility.getFileName(uri, getActivity());
         Log.d("import_test", fileName.substring(fileName.length() - 6));
         if (Utility.isValidFileType(fileName)){

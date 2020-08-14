@@ -24,12 +24,10 @@ public class BroadcastReminder extends BroadcastReceiver {
         Intent i = new Intent(context, EditActivity.class);
         i.putExtra("savedTitle", title);
         i.putExtra("savedText", content);
-        i.putExtra("caller", intent.getStringExtra("caller"));
+        i.putExtra("oldNote", true);
         i.putExtra("index", intent.getIntExtra("index", 0));
-        // Create the TaskStackBuilder and add the intent, which inflates the back stack
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         stackBuilder.addNextIntentWithParentStack(i);
-        // Get the PendingIntent containing the entire back stack
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(id, PendingIntent.FLAG_UPDATE_CURRENT);
 

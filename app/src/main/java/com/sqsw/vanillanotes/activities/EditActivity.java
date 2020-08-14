@@ -146,7 +146,7 @@ public class EditActivity extends AppCompatActivity {
 
     private void returnToPreviousActivity(){
         Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         if (isTrash)
             intent.putExtra("trash", true);
@@ -154,7 +154,6 @@ public class EditActivity extends AppCompatActivity {
             intent.putExtra("favorite", true);
 
         startActivity(intent);
-        EditActivity.this.finish();
     }
 
     private void saveOldNoteData(Note note){
@@ -200,7 +199,6 @@ public class EditActivity extends AppCompatActivity {
             saveNewNoteData(newNote);
         }
         PrefsUtil.saveNotes(notesList, returnKeyFromList(), this);
-
         returnToPreviousActivity();
     }
 
@@ -216,8 +214,7 @@ public class EditActivity extends AppCompatActivity {
         PrefsUtil.saveNotes(notesList, returnKeyFromList(), this);
         PrefsUtil.saveNotes(trashList, "trash", this);
 
-        Toast.makeText(this, getString(R.string.delete_toast), Toast.LENGTH_LONG).show();
-
+        Utility.showShortToast(getString(R.string.delete_toast), this);
         returnToPreviousActivity();
     }
 
@@ -232,7 +229,7 @@ public class EditActivity extends AppCompatActivity {
         PrefsUtil.saveNotes(trash, "trash", this);
         PrefsUtil.saveNotes(list, "notes", this);
 
-        Toast.makeText(getApplicationContext(), getString(R.string.restore_toast), Toast.LENGTH_LONG).show();
+        Utility.showShortToast(getString(R.string.restore_toast), this);
         returnToPreviousActivity();
     }
 
@@ -256,12 +253,10 @@ public class EditActivity extends AppCompatActivity {
             public void onChooseColor(int position, int color) {
                 if (color != 0) {
                     colorPicked = color;
-
                     CardView cv = findViewById(R.id.card);
                     cv.setCardBackgroundColor(color);
 
-                    // Change the color of the text depending if the color chosen is dark or not to
-                    // make it easier to see for the user
+                    // Change the color of the text to make it easier to see for the user
                     if (Utility.isDarkColor(color, mContext)) {
                         contentView.setTextColor(getResources().getColor(R.color.white));
                         titleView.setTextColor(getResources().getColor(R.color.white));
@@ -412,11 +407,11 @@ public class EditActivity extends AppCompatActivity {
     private void createReminderDialog() {
         Calendar calendar = Calendar.getInstance();
         // Set as final to be used in inner functions
-        final int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        final int minute = calendar.get(Calendar.MINUTE);
-        final int year = calendar.get(Calendar.YEAR);
-        final int month = calendar.get(Calendar.MONTH);
-        final int day = calendar.get(Calendar.DAY_OF_MONTH);
+        final int initialHour = calendar.get(Calendar.HOUR_OF_DAY);
+        final int initialMinute = calendar.get(Calendar.MINUTE);
+        final int initalYear = calendar.get(Calendar.YEAR);
+        final int initalMonth = calendar.get(Calendar.MONTH);
+        final int initalDay = calendar.get(Calendar.DAY_OF_MONTH);
 
         // Create Date Dialog
         DatePickerDialog datePickerDialog =
@@ -425,37 +420,23 @@ public class EditActivity extends AppCompatActivity {
             @Override
             public void onDateSet(DatePicker datePicker, int yr, int mon, int day) {
                 // After selecting date, open up time dialog
-                final int y = yr;
-                final int m = mon;
-                final int d = day;
+                final int pickedYear = yr;
+                final int pickedMonth = mon;
+                final int pickedDay = day;
                 TimePickerDialog timePickerDialog =
                         new TimePickerDialog(mContext, R.style.DialogThemeLight, new TimePickerDialog.OnTimeSetListener() {
                     @Override
-                    public void onTimeSet(TimePicker timePicker, int hr, int min) {
+                    public void onTimeSet(TimePicker timePicker, int pickedHour, int pickedMinute) {
                         Calendar newTime = Calendar.getInstance();
-                        newTime.set(y, m, d, hr, min);
+                        newTime.setTimeInMillis(System.currentTimeMillis());
+                        newTime.set(pickedYear, pickedMonth, pickedDay, pickedHour, pickedMinute, 0);
                         createScheduledNotification(newTime);
                     }
-                }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
+                }, initialHour, initialMinute, android.text.format.DateFormat.is24HourFormat(mContext));
                 timePickerDialog.show();
             }
-        }, year, month, day);
+        }, initalYear, initalMonth, initalDay);
         datePickerDialog.show();
-    }
-
-    private Calendar createScheduledCalendar(Calendar scheduledTime){
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-
-        // Set schedule based on user selection
-        calendar.set(Calendar.DAY_OF_MONTH, scheduledTime.get(Calendar.DAY_OF_MONTH));
-        calendar.set(Calendar.MONTH, scheduledTime.get(Calendar.MONTH));
-        calendar.set(Calendar.YEAR, scheduledTime.get(Calendar.YEAR));
-        calendar.set(Calendar.HOUR_OF_DAY, scheduledTime.get(Calendar.HOUR_OF_DAY));
-        calendar.set(Calendar.MINUTE, scheduledTime.get(Calendar.MINUTE));
-        calendar.set(Calendar.SECOND, 0);
-
-        return calendar;
     }
 
     // Create a scheduled notification based on user input from previous dialogs
@@ -472,10 +453,10 @@ public class EditActivity extends AppCompatActivity {
         Intent notificationIntent = new Intent( this, BroadcastReminder.class);
         notificationIntent.putExtra("generatedID", id);
         notificationIntent.putExtra("index", index);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id, notificationIntent, 0);
+        PendingIntent pendingIntent =
+                PendingIntent.getBroadcast(this, id, notificationIntent, 0);
 
-        Calendar setScheduledTime = createScheduledCalendar(scheduledTime);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, setScheduledTime.getTimeInMillis(), pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, scheduledTime.getTimeInMillis(), pendingIntent);
         Toast.makeText(mContext, "Reminder set", Toast.LENGTH_SHORT).show();
     }
 

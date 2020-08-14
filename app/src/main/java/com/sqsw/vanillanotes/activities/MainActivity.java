@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         fam = findViewById(R.id.fam);
-
         FloatingActionButton fabNote = findViewById(R.id.fab_item_note);
         fabNote.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
                 Utility.goToActivity(EditActivity.class, mContext);
             }
         });
-
 
         FloatingActionButton fabChecklist = findViewById(R.id.fab_item_checklist);
     }
@@ -83,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
                     Fragment selectedFrag = null;
                     switch (item.getItemId()){
                         case R.id.nav_notes:
-                            //selectedFrag = new NoteFragment();
                             selectedFrag = new NoteFragment();
                             break;
 
