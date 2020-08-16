@@ -2,7 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sqsw.vanillanotes">
 
+    <!-- Used for import/export of notes -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!-- Used for restarting the broadcast receiver on reboot -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
 
 
     <application
@@ -14,19 +18,6 @@
         android:theme="@style/DefaultTheme">
         <activity android:name=".activities.EditActivity"
             android:windowSoftInputMode="adjustResize">
-            <intent-filter>
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/*" />
-                <data android:scheme="http" android:host="*"
-                    android:pathPattern=".*\\.txt" />
-                <data android:scheme="https" android:host="*"
-                    android:pathPattern=".*\\.txt" />
-                <data android:scheme="content" android:host="*"
-                    android:pathPattern=".*\\.txt" />
-                <data android:scheme="file" android:host="*"
-                    android:pathPattern=".*\\.txt" />
-            </intent-filter>
         </activity>
         <activity android:name=".activities.MainActivity"
             android:windowSoftInputMode="adjustNothing">
@@ -50,7 +41,16 @@
 
 
         </activity>
-        <receiver android:name=".BroadcastReminder" />
+        <receiver android:name=".receiver.BroadcastReminder">
+        </receiver>
+
+        <receiver android:name=".receiver.ReceiverOnReboot">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+        <service android:name=".receiver.RebootService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
     </application>
 
     <supports-screens

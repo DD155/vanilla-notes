@@ -37,7 +37,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.sqsw.vanillanotes.BroadcastReminder;
+import com.sqsw.vanillanotes.receiver.BroadcastReminder;
 import com.sqsw.vanillanotes.note.Note;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.util.PrefsUtil;
@@ -446,8 +446,10 @@ public class EditActivity extends AppCompatActivity {
         int id = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
 
         SharedPreferences.Editor editor = getSharedPreferences("ID", Context.MODE_PRIVATE).edit();
-        editor.putString("title" + id, titleView.getText().toString().trim());
-        editor.putString("content" + id, contentView.getText().toString().trim());
+        editor.putString("title", titleView.getText().toString().trim());
+        editor.putString("content", contentView.getText().toString().trim());
+        editor.putInt("id", id);
+        editor.putInt("index", index);
         editor.apply();
 
         Intent notificationIntent = new Intent( this, BroadcastReminder.class);
@@ -457,7 +459,7 @@ public class EditActivity extends AppCompatActivity {
                 PendingIntent.getBroadcast(this, id, notificationIntent, 0);
 
         alarmManager.set(AlarmManager.RTC_WAKEUP, scheduledTime.getTimeInMillis(), pendingIntent);
-        Toast.makeText(mContext, "Reminder set", Toast.LENGTH_SHORT).show();
+        Utility.showShortToast("Reminder set", this);
     }
 
     // Toolbar Functions
