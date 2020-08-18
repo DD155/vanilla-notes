@@ -3,23 +3,21 @@ package com.sqsw.vanillanotes.fragments;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.sqsw.vanillanotes.LoadingDialog;
 import com.sqsw.vanillanotes.note.Note;
 import com.sqsw.vanillanotes.R;
@@ -42,11 +40,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
@@ -147,7 +150,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 if (requireWritePermission) {
                     requestStoragePermissions(false);
                 } else {
-                    importNotes();
+                    chooseFileForImport();
                 }
                 return true;
             }
@@ -205,7 +208,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                             if (isExport)
                                 exportNotes();
                             else
-                                importNotes();
+                                chooseFileForImport();
                         }
                     })
                     .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -221,7 +224,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         }
     }
 
-    private JSONArray getDataAsJSON(String key){
+    private JSONArray getDataAsJSONArray(String key){
         JSONArray noteDataArray = new JSONArray();
         for (Note note : PrefsUtil.getNotes(key, getActivity())){
             try {
@@ -229,6 +232,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 noteData.put("title", note.getTitle());
                 noteData.put("content", note.getContent());
                 noteData.put("color", note.getColor());
+                noteData.put("date", note.getDate());
                 noteData.put("favorite", note.getFavorite());
                 noteDataArray.put(noteData);
             } catch (JSONException e){
@@ -239,8 +243,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     }
 
     private byte[] createExportData(){
-        JSONArray notesData = getDataAsJSON("notes");
-        JSONArray favoritesData = getDataAsJSON("favorites");
+        JSONArray notesData = getDataAsJSONArray("notes");
+        JSONArray favoritesData = getDataAsJSONArray("favorites");
 
         JSONObject dataObject = new JSONObject();
         try {
@@ -293,10 +297,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         }
     }
 
-    private void importNotes(){
-        chooseFileForImport();
-    }
-
     private void chooseFileForImport(){
         Intent target = new Intent(Intent.ACTION_GET_CONTENT);
         target.setType("application/*");
@@ -306,15 +306,73 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         startActivityForResult(intent, IMPORT_CODE);
     }
 
-    private void readFile(Intent intent){
+    private JSONObject readFile(Uri uri){
+        String content = "";
+        try {
+            StringBuffer buffer = new StringBuffer();
+            ArrayList<Note> notes, favorites;
+            InputStream inputStream = getActivity().getContentResolver().openInputStream(uri);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            if (inputStream != null){
+                while ((content = reader.readLine()) != null){
+                    buffer.append(content + "\n");
+                }
+            }
+            content = buffer.toString();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        
+        JSONObject json = null;
+
+        try {
+            json = new JSONObject(content);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
+    private void parseFile(JSONObject content){
+        if (content == null) return;
+
+        JSONObject notes = content;
+        Iterator iterator = notes.keys();
+        JSONArray jsonArr = new JSONArray();
+        while (iterator.hasNext()){
+            String key = iterator.next().toString();
+            try {
+                jsonArr.put(notes.get(key));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            Log.d("file_test", "Notes: " + jsonArr.get(0).toString());
+            Log.d("file_test", "Favorites: " + jsonArr.get(1).toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        //Log.d("file_test", "JSONARR: " + jsonArr.toString());
+
+    }
+
+    private void importFile(Intent intent){
+        if (intent == null) return;
+
         Uri uri = intent.getData();
         String fileName = Utility.getFileName(uri, getActivity());
-        Log.d("import_test", fileName.substring(fileName.length() - 6));
         if (Utility.isValidFileType(fileName)){
-
+            JSONObject fileContents = readFile(uri);
+            parseFile(fileContents);
         } else {
             showErrorDialog();
         }
+
     }
 
     private void showErrorDialog(){
@@ -337,7 +395,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     writeToFile(resultData);
                     break;
                 case IMPORT_CODE:
-                    readFile(resultData);
+                    importFile(resultData);
                     break;
             }
         }

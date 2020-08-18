@@ -137,11 +137,7 @@ public class Utility extends ContextWrapper {
     }
 
     public static boolean isValidFileType(String fileName){
-    //    if (")".equals(fileName.charAt(fileName.length() - 1))) {
-    //        return "vnotes".equals(fileName.substring(fileName.length() - 6));
-    //    } else {
-            return "vnotes".equals(fileName.substring(fileName.length() - 6));
-    //    }
+        return "vnotes".equals(fileName.substring(fileName.length() - 6));
     }
 
     public void sortNotes(int type, ArrayList<Note> notes, String key){

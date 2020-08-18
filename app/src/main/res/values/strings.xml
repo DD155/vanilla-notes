@@ -107,7 +107,8 @@
     <string name="perm_dialog_msg">This app requires this permission in order to read and write
         files to your device for exporting and importing data.</string>
     <string name="import_error_title">Invalid import file</string>
-    <string name="import_error_msg">The file you selected is not a valid import file.</string>
+    <string name="import_error_msg">The file you selected is not a valid import file.
+    Please select a file ending in ".vnotes" </string>
 
 
 </resources>
