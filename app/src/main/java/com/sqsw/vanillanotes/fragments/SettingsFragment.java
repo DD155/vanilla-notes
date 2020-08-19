@@ -114,7 +114,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        dialog.dismiss();
                     }
                 });
 
@@ -128,7 +128,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 boolean requireWritePermission = ContextCompat.checkSelfPermission
-                        (getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        (requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED;
 
                 if (requireWritePermission) {
@@ -144,7 +144,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 boolean requireWritePermission = ContextCompat.checkSelfPermission
-                        (getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        (requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED;
 
                 if (requireWritePermission) {
@@ -160,7 +160,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         fontPref.setSummary(fontPref.getValue());
 
         // Initalize Back Dialog preference
-        if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("back_dialog_toggle", false)){
+        if (PreferenceManager.getDefaultSharedPreferences(requireActivity()).getBoolean("back_dialog_toggle", false)){
             backPref.setSummary("Enabled");
         } else {
             backPref.setSummary("Disabled");
@@ -224,9 +224,23 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         }
     }
 
-    private JSONArray getDataAsJSONArray(String key){
+    private JSONArray getDataAsJSONArray(){
         JSONArray noteDataArray = new JSONArray();
-        for (Note note : PrefsUtil.getNotes(key, getActivity())){
+        for (Note note : PrefsUtil.getNotes("notes", requireActivity())){
+            try {
+                JSONObject noteData = new JSONObject();
+                noteData.put("title", note.getTitle());
+                noteData.put("content", note.getContent());
+                noteData.put("color", note.getColor());
+                noteData.put("date", note.getDate());
+                noteData.put("favorite", note.getFavorite());
+                noteDataArray.put(noteData);
+            } catch (JSONException e){
+                e.printStackTrace();
+            }
+        }
+
+        for (Note note : PrefsUtil.getNotes("favorites", requireActivity())){
             try {
                 JSONObject noteData = new JSONObject();
                 noteData.put("title", note.getTitle());
@@ -243,23 +257,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     }
 
     private byte[] createExportData(){
-        JSONArray notesData = getDataAsJSONArray("notes");
-        JSONArray favoritesData = getDataAsJSONArray("favorites");
-
-        JSONObject dataObject = new JSONObject();
-        try {
-            dataObject.put("Notes", notesData);
-            dataObject.put("Favorites", favoritesData);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        String data = dataObject.toString();
+        JSONArray notesData = getDataAsJSONArray();
+        String data = notesData.toString();
         Log.d("import_test", data);
         return data.getBytes();
     }
 
-    private void saveFileToStorage() throws IOException {
+    private void saveFileToStorage() {
         String date;
         Calendar calendar = Calendar.getInstance();
         date = calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH)+1)
@@ -287,14 +291,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private void exportNotes() {
         LoadingDialog loadingDialog = new LoadingDialog(getActivity());
         loadingDialog.startDialog();
-
-        try {
-            saveFileToStorage();
-            loadingDialog.dismissDialog();
-        }
-        catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
-        }
+        saveFileToStorage();
+        loadingDialog.dismissDialog();
     }
 
     private void chooseFileForImport(){
@@ -306,11 +304,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         startActivityForResult(intent, IMPORT_CODE);
     }
 
-    private JSONObject readFile(Uri uri){
+    private JSONArray readFile(Uri uri){
         String content = "";
         try {
             StringBuffer buffer = new StringBuffer();
-            ArrayList<Note> notes, favorites;
             InputStream inputStream = getActivity().getContentResolver().openInputStream(uri);
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             if (inputStream != null){
@@ -325,40 +322,61 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             e.printStackTrace();
         }
         
-        JSONObject json = null;
-
+        JSONArray json = null;
         try {
-            json = new JSONObject(content);
+            json = new JSONArray(content);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return json;
     }
 
-    private void parseFile(JSONObject content){
+    private void parseFile(JSONArray content){
         if (content == null) return;
-
-        JSONObject notes = content;
-        Iterator iterator = notes.keys();
-        JSONArray jsonArr = new JSONArray();
-        while (iterator.hasNext()){
-            String key = iterator.next().toString();
+        JSONArray notes = content;
+        for (int i = 0; i < notes.length(); i++){
             try {
-                jsonArr.put(notes.get(key));
+                JSONObject noteData = notes.getJSONObject(i);
+                Note importedNote = getNoteFromJSONData(noteData);
+                Log.d("import_test1", "Note retrieved");
+                if (importedNote != null) {
+                    Log.d("import_test1", "Note is not null");
+                    saveImportedNote(importedNote);
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+    }
 
+    private void saveImportedNote(Note note){
+        ArrayList<Note> notes = PrefsUtil.getNotes("notes", requireActivity());
+        ArrayList<Note> favorites = PrefsUtil.getNotes("favorites", requireActivity());
+        if (note.getFavorite()) favorites.add(note);
+        else notes.add(note);
+
+        PrefsUtil.saveNotes(notes, "notes", requireActivity());
+        PrefsUtil.saveNotes(favorites, "favorites", requireActivity());
+    }
+
+    private Note getNoteFromJSONData(JSONObject data) {
         try {
-            Log.d("file_test", "Notes: " + jsonArr.get(0).toString());
-            Log.d("file_test", "Favorites: " + jsonArr.get(1).toString());
+            Log.d("data_test", data.getString("title"));
+            Log.d("data_test", data.getString("content"));
+            Log.d("data_test", data.getInt("color")+"");
+            Log.d("data_test", data.getString("date"));
+            Log.d("data_test", data.getBoolean("favorite")+"");
+
+            return new Note(data.getString("title"),
+                    data.getString("content"),
+                    data.getInt("color"),
+                    data.getString("date").replace("\\", ""),
+                    data.getBoolean("favorite")
+                    );
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        //Log.d("file_test", "JSONARR: " + jsonArr.toString());
-
+        return null;
     }
 
     private void importFile(Intent intent){
@@ -367,7 +385,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         Uri uri = intent.getData();
         String fileName = Utility.getFileName(uri, getActivity());
         if (Utility.isValidFileType(fileName)){
-            JSONObject fileContents = readFile(uri);
+            JSONArray fileContents = readFile(uri);
             parseFile(fileContents);
         } else {
             showErrorDialog();

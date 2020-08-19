@@ -88,6 +88,7 @@ public class FavoritesFragment extends Fragment {
                 intent.putExtra("index", position);
 
             intent.putExtra("oldNote", true);
+            intent.putExtra("favorite", true);
             startActivity(intent);
             fam.close(true);
         }
