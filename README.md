@@ -22,7 +22,7 @@ The final application will have the following features:
 - [x] Sort by Title or Date Created
 - [x] Favorite notes to view them easier
 - [ ] Themes / Dark Mode
-- [ ] Import/Export Backup
+- [x] Import/Export Backup
 - [ ] Widgets (?)
 
 ## Libraries & Tools
