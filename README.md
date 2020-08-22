@@ -41,7 +41,7 @@ Project is created with and uses:
 
 ## Launch
 
-The release for this application will hopefully be in August or Fall 2020.
+The release for this application will hopefully be in Fall 2020.
 
 Planning on releasing to F-Droid and Google Play
 
