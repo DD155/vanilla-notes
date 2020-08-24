@@ -27,7 +27,9 @@ The final application will have the following features:
 
 ## Screenshots (Not Final)
 ![Main](screenshots/screenshot_main.PNG)
+
 ![Edit](screenshots/screenshot_edit.PNG)
+
 ![Color](screenshots/screenshot_color.PNG)
 
 ## Libraries & Tools
