@@ -26,7 +26,7 @@ The final application will have the following features:
 - [ ] Widgets (?)
 
 ## Screenshots (Not Final)
-[Main](screenshots/screenshot_main.png)
+![Main](screenshots/screenshot_main.PNG)
 
 ## Libraries & Tools
 The minimum Android version required is Android 5.0 (SDK 21); Target version is Android 10 (SDK 29)
