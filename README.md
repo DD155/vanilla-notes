@@ -25,6 +25,9 @@ The final application will have the following features:
 - [x] Import/Export Backup
 - [ ] Widgets (?)
 
+## Screenshots (Not Final)
+[Main](screenshots/screenshot_main.png)
+
 ## Libraries & Tools
 The minimum Android version required is Android 5.0 (SDK 21); Target version is Android 10 (SDK 29)
 
