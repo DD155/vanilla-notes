@@ -22,8 +22,15 @@ The final application will have the following features:
 - [x] Sort by Title or Date Created
 - [x] Favorite notes to view them easier
 - [ ] Themes / Dark Mode
-- [ ] Import/Export Backup
+- [x] Import/Export Backup
 - [ ] Widgets (?)
+
+## Screenshots (Not Final)
+![Main](screenshots/screenshot_main.PNG)
+
+![Edit](screenshots/screenshot_edit.PNG)
+
+![Color](screenshots/screenshot_color.PNG)
 
 ## Libraries & Tools
 The minimum Android version required is Android 5.0 (SDK 21); Target version is Android 10 (SDK 29)
@@ -41,7 +48,9 @@ Project is created with and uses:
 
 ## Launch
 
-The release for this application will hopefully be in August or Fall 2020.
+**Project Hiatus Due to Classes**
+
+The release for this application will hopefully be in Fall 2020.
 
 Planning on releasing to F-Droid and Google Play
 
