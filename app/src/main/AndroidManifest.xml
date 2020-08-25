@@ -24,19 +24,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-                <action android:name="android.intent.action.EDIT" />
-                <data
-                    android:scheme="file"
-                    android:mimeType="application/vnotes"
-                    android:host="*"
-                    android:pathPattern=".*\\.vnotes"
-                    />
-                <data
-                    android:scheme="file"
-                    android:mimeType="application/octet-stream"
-                    android:host="*"
-                    android:pathPattern=".*\\.vnotes"
-                    />
             </intent-filter>
 
 
