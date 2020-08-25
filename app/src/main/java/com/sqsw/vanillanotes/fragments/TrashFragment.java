@@ -16,13 +16,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionMenu;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.activities.EditActivity;
-import com.sqsw.vanillanotes.util.ItemClickSupport;
-import com.sqsw.vanillanotes.note.Note;
-import com.sqsw.vanillanotes.note.NotesAdapter;
+import com.sqsw.vanillanotes.ItemClickSupport;
+import com.sqsw.vanillanotes.model.Note;
+import com.sqsw.vanillanotes.model.NotesAdapter;
 import com.sqsw.vanillanotes.util.PrefsUtil;
-import com.sqsw.vanillanotes.util.Utility;
+import com.sqsw.vanillanotes.util.GeneralUtil;
 
 import java.util.ArrayList;
 
@@ -38,7 +39,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class TrashFragment extends Fragment {
     private View view;
     private ArrayList<Note> noteList;
-    private Utility UTIL;
+    private GeneralUtil UTIL;
     private Context context;
     private RecyclerView recyclerView;
     private NotesAdapter adapter;
@@ -52,13 +53,14 @@ public class TrashFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (getActivity() != null)
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Trash");
-
         if (isAdded()) context = getActivity();
 
-        getActivity().findViewById(R.id.fam).setVisibility(View.GONE);
+        FloatingActionMenu fam = requireActivity().findViewById(R.id.fam);
+        fam.close(true);
+        fam.setVisibility(View.GONE);
 
         view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
-        UTIL = new Utility(context);
+        UTIL = new GeneralUtil(context);
 
         Intent def = new Intent();
         def.putExtra("isTrash", true);

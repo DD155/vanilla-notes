@@ -1,4 +1,4 @@
-package com.sqsw.vanillanotes.note;
+package com.sqsw.vanillanotes.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,7 +12,7 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.sqsw.vanillanotes.R;
-import com.sqsw.vanillanotes.util.Utility;
+import com.sqsw.vanillanotes.util.GeneralUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        int fontSize = Utility.getFontSize(prefs.getString("font_size", null));
+        int fontSize = GeneralUtil.getFontSize(prefs.getString("font_size", null));
         Note note = notes.get(position);
 
         // Set title, content, and color of the note

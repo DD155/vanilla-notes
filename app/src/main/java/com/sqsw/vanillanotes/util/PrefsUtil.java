@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.sqsw.vanillanotes.note.Note;
+import com.sqsw.vanillanotes.model.Note;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

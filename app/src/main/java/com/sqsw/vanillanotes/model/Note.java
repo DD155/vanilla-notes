@@ -1,8 +1,8 @@
-package com.sqsw.vanillanotes.note;
+package com.sqsw.vanillanotes.model;
 
 import android.graphics.Color;
 
-import com.sqsw.vanillanotes.util.Utility;
+import com.sqsw.vanillanotes.util.GeneralUtil;
 
 import java.io.Serializable;
 
@@ -14,11 +14,11 @@ public class Note implements Serializable {
     private int color;
 
     public static Note createWithTitleAndContent(String title, String content){
-        return new Note(title, content, Color.WHITE, Utility.currentDate(), false);
+        return new Note(title, content, Color.WHITE, GeneralUtil.currentDate(), false);
     }
 
     public static Note createWithContent(String content){
-        return new Note("", content, Color.WHITE, Utility.currentDate(), false);
+        return new Note("", content, Color.WHITE, GeneralUtil.currentDate(), false);
     }
 
     public Note(String title, String content, int color, String date, boolean favorite){

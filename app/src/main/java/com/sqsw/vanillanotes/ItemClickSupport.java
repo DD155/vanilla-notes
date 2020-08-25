@@ -1,10 +1,10 @@
-package com.sqsw.vanillanotes.util;
+package com.sqsw.vanillanotes;
 
 // Source code provided by : Hugo Visser
 // https://www.littlerobots.nl/blog/Handle-Android-RecyclerView-Clicks/
 
 import android.view.View;
-import com.sqsw.vanillanotes.R;
+
 import androidx.recyclerview.widget.RecyclerView;
 
 public class ItemClickSupport {

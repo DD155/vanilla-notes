@@ -13,13 +13,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.sqsw.vanillanotes.R;
-import com.sqsw.vanillanotes.util.Utility;
+import com.sqsw.vanillanotes.util.GeneralUtil;
 import com.sqsw.vanillanotes.fragments.FavoritesFragment;
 import com.sqsw.vanillanotes.fragments.NoteFragment;
 import com.sqsw.vanillanotes.fragments.TrashFragment;
@@ -46,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
         myToolbar.setTitle("Notes");
         setSupportActionBar(myToolbar);
 
+        Window window = getWindow();
+        window.setStatusBarColor(getResources().getColor(R.color.colorAccent));
+
         BottomNavigationView navView = findViewById(R.id.bottom_nav);
         navView.setItemIconTintList(null);
 
@@ -67,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         fabNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Utility.goToActivity(EditActivity.class, mContext);
+                GeneralUtil.goToActivity(EditActivity.class, mContext);
             }
         });
 

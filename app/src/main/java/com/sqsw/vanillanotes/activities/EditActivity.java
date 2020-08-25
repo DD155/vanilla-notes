@@ -23,25 +23,24 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.sqsw.vanillanotes.receiver.BroadcastReminder;
-import com.sqsw.vanillanotes.note.Note;
+import com.sqsw.vanillanotes.model.Note;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.util.PrefsUtil;
-import com.sqsw.vanillanotes.util.Utility;
+import com.sqsw.vanillanotes.util.GeneralUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -73,7 +72,8 @@ public class EditActivity extends AppCompatActivity {
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Log.d("edit_test", "1");
+        Window window = getWindow();
+        window.setStatusBarColor(getResources().getColor(R.color.colorAccent));
 
         // Initialize fields
         isTrash = getIntent().getBooleanExtra("trash", false);
@@ -88,7 +88,7 @@ public class EditActivity extends AppCompatActivity {
         contentView = findViewById(R.id.editText);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        int fontSize = Utility.getFontSize(prefs.getString("font_size", ""));
+        int fontSize = GeneralUtil.getFontSize(prefs.getString("font_size", ""));
         notesList = getCurrentNoteList();
 
         // Set newFavorite as the value of isFavorite first so the toggle works correctly
@@ -119,7 +119,7 @@ public class EditActivity extends AppCompatActivity {
             cv.setCardBackgroundColor(colorPicked);
 
             // Set text color depending if color is dark or not
-            if (Utility.isDarkColor(colorPicked, this)) {
+            if (GeneralUtil.isDarkColor(colorPicked, this)) {
                 titleView.setTextColor(getResources().getColor(R.color.white));
                 contentView.setTextColor(getResources().getColor(R.color.white));
             }
@@ -214,7 +214,7 @@ public class EditActivity extends AppCompatActivity {
         PrefsUtil.saveNotes(notesList, returnKeyFromList(), this);
         PrefsUtil.saveNotes(trashList, "trash", this);
 
-        Utility.showShortToast(getString(R.string.delete_toast), this);
+        GeneralUtil.showShortToast(getString(R.string.delete_toast), this);
         returnToPreviousActivity();
     }
 
@@ -229,7 +229,7 @@ public class EditActivity extends AppCompatActivity {
         PrefsUtil.saveNotes(trash, "trash", this);
         PrefsUtil.saveNotes(list, "notes", this);
 
-        Utility.showShortToast(getString(R.string.restore_toast), this);
+        GeneralUtil.showShortToast(getString(R.string.restore_toast), this);
         returnToPreviousActivity();
     }
 
@@ -257,7 +257,7 @@ public class EditActivity extends AppCompatActivity {
                     cv.setCardBackgroundColor(color);
 
                     // Change the color of the text to make it easier to see for the user
-                    if (Utility.isDarkColor(color, mContext)) {
+                    if (GeneralUtil.isDarkColor(color, mContext)) {
                         contentView.setTextColor(getResources().getColor(R.color.white));
                         titleView.setTextColor(getResources().getColor(R.color.white));
                     } else {
@@ -365,11 +365,10 @@ public class EditActivity extends AppCompatActivity {
     }
 
     // Notification Functions
-    private Notification buildNotification(String title, String note) {
+    private Notification buildNotification(String title, String content) {
         // Create an Intent for the activity
         Intent intent = new Intent(this, EditActivity.class);
-        intent.putExtra("savedTitle", title);
-        intent.putExtra("savedText", note);
+        intent.putExtra("oldNote", isOldNote);
         intent.putExtra("favorite", isFavorite);
         intent.putExtra("trash", isTrash);
         intent.putExtra("index", index);
@@ -384,9 +383,9 @@ public class EditActivity extends AppCompatActivity {
                 new NotificationCompat.Builder(this, "NoteChannel")
                 .setSmallIcon(R.drawable.event_icon)
                 .setContentTitle(title)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(note))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(content))
                 .setAutoCancel(true)
-                .setContentText(note)
+                .setContentText(content)
                 .setContentIntent(resultPendingIntent)
                 .setGroupSummary(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
@@ -455,11 +454,13 @@ public class EditActivity extends AppCompatActivity {
         Intent notificationIntent = new Intent( this, BroadcastReminder.class);
         notificationIntent.putExtra("generatedID", id);
         notificationIntent.putExtra("index", index);
+        notificationIntent.putExtra("favorite", isFavorite);
+        notificationIntent.putExtra("trash", isTrash);
         PendingIntent pendingIntent =
                 PendingIntent.getBroadcast(this, id, notificationIntent, 0);
 
         alarmManager.set(AlarmManager.RTC_WAKEUP, scheduledTime.getTimeInMillis(), pendingIntent);
-        Utility.showShortToast("Reminder set", this);
+        GeneralUtil.showShortToast("Reminder set", this);
     }
 
     // Toolbar Functions
@@ -519,7 +520,7 @@ public class EditActivity extends AppCompatActivity {
 
             case R.id.action_delete:
                 if (!isOldNote)
-                    Utility.goToActivity(MainActivity.class, this);
+                    GeneralUtil.goToActivity(MainActivity.class, this);
                 else
                     showConfirmDialog();
                 return true;

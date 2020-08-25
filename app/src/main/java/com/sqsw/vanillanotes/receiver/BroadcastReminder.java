@@ -21,12 +21,12 @@ public class BroadcastReminder extends BroadcastReceiver {
         String title = pref.getString("title", null);
         String content = pref.getString("content", null);
 
-        // Create an Intent for the activity
+        // Create an Intent for EditActivity
         Intent i = new Intent(context, EditActivity.class);
-        i.putExtra("savedTitle", title);
-        i.putExtra("savedText", content);
         i.putExtra("oldNote", true);
         i.putExtra("index", intent.getIntExtra("index", 0));
+        i.putExtra("favorite", intent.getBooleanExtra("favorite", false));
+        i.putExtra("trash", intent.getBooleanExtra("trash", false));
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         stackBuilder.addNextIntentWithParentStack(i);
         PendingIntent resultPendingIntent =

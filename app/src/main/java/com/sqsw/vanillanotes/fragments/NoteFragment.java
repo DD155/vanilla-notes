@@ -19,11 +19,11 @@ import android.widget.Toast;
 import com.github.clans.fab.FloatingActionMenu;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.activities.EditActivity;
-import com.sqsw.vanillanotes.util.ItemClickSupport;
-import com.sqsw.vanillanotes.note.Note;
-import com.sqsw.vanillanotes.note.NotesAdapter;
+import com.sqsw.vanillanotes.ItemClickSupport;
+import com.sqsw.vanillanotes.model.Note;
+import com.sqsw.vanillanotes.model.NotesAdapter;
 import com.sqsw.vanillanotes.util.PrefsUtil;
-import com.sqsw.vanillanotes.util.Utility;
+import com.sqsw.vanillanotes.util.GeneralUtil;
 
 import java.util.ArrayList;
 
@@ -38,7 +38,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class NoteFragment extends Fragment {
     private ArrayList<Note> notes;
-    private Utility UTIL; // Needed for sort method
+    private GeneralUtil UTIL; // Needed for sort method
     private Context context;
     private boolean isSearched;
     private FloatingActionMenu fam;
@@ -50,7 +50,7 @@ public class NoteFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.notes_recycler_layout, container, false);
-        UTIL = new Utility(requireActivity());
+        UTIL = new GeneralUtil(requireActivity());
         if (isAdded()) context = getActivity();
         ((AppCompatActivity) context).getSupportActionBar().setTitle("Notes");
 

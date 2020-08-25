@@ -19,7 +19,7 @@ public class ReceiverOnReboot extends BroadcastReceiver {
             notif.putExtra("title", title);
             notif.putExtra("content", content);
             notif.putExtra("id", id);
-            notif.putExtra("id", index);
+            notif.putExtra("index", index);
 
             RebootService.enqueueWork(context, notif);
         }

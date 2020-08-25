@@ -17,11 +17,11 @@ import android.widget.TextView;
 import com.github.clans.fab.FloatingActionMenu;
 import com.sqsw.vanillanotes.R;
 import com.sqsw.vanillanotes.activities.EditActivity;
-import com.sqsw.vanillanotes.util.ItemClickSupport;
-import com.sqsw.vanillanotes.note.Note;
-import com.sqsw.vanillanotes.note.NotesAdapter;
+import com.sqsw.vanillanotes.ItemClickSupport;
+import com.sqsw.vanillanotes.model.Note;
+import com.sqsw.vanillanotes.model.NotesAdapter;
 import com.sqsw.vanillanotes.util.PrefsUtil;
-import com.sqsw.vanillanotes.util.Utility;
+import com.sqsw.vanillanotes.util.GeneralUtil;
 
 import java.util.ArrayList;
 
@@ -38,7 +38,7 @@ public class FavoritesFragment extends Fragment {
     private View view;
     private ArrayList<Note> favs;
     private Context context;
-    private Utility UTIL;
+    private GeneralUtil UTIL;
     private NotesAdapter adapter;
     private RecyclerView recyclerView;
     private FloatingActionMenu fam;
@@ -57,7 +57,7 @@ public class FavoritesFragment extends Fragment {
         fam.setVisibility(View.VISIBLE);
         fam.setClosedOnTouchOutside(true);
 
-        UTIL = new Utility(getActivity());
+        UTIL = new GeneralUtil(getActivity());
         favs = PrefsUtil.getNotes("favorites", context);
         recyclerView = view.findViewById(R.id.recycler_notes);
         adapter = new NotesAdapter(favs);
@@ -108,7 +108,7 @@ public class FavoritesFragment extends Fragment {
 
         final MenuItem myActionMenuItem = menu.findItem( R.id.action_search);
         final SearchView searchView = (SearchView)myActionMenuItem.getActionView();
-        searchView.setQueryHint(getResources().getString(R.string.search_hint));
+        searchView.setQueryHint(getResources().getString(R.string.search_hint_fav));
 
         myActionMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override

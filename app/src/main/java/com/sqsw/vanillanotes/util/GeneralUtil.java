@@ -3,7 +3,6 @@ package com.sqsw.vanillanotes.util;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.OpenableColumns;
@@ -11,22 +10,23 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
+import com.sqsw.vanillanotes.DateComparator;
+import com.sqsw.vanillanotes.NoteComparator;
 import com.sqsw.vanillanotes.R;
-import com.sqsw.vanillanotes.activities.EditActivity;
-import com.sqsw.vanillanotes.note.Note;
+import com.sqsw.vanillanotes.model.Note;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 
 // utility class for other com.sqsw.vanillanotes.activities
-public class Utility extends ContextWrapper {
+public class GeneralUtil extends ContextWrapper {
 
     public static final int FONT_SMALL = 11;
     public static final int FONT_MEDIUM = 14;
     public static final int FONT_LARGE = 17;
 
-    public Utility(Context base) {
+    public GeneralUtil(Context base) {
         super(base);
     }
 
@@ -51,6 +51,7 @@ public class Utility extends ContextWrapper {
     }
 
     // Returns boolean if the given color is dark or not. Used to change text color for readability
+    // TODO: Change to dynamic later
     public static boolean isDarkColor(int color, Context context){
         return color == context.getResources().getColor(R.color.red) ||
                 color == context.getResources().getColor(R.color.blue) ||
@@ -72,17 +73,15 @@ public class Utility extends ContextWrapper {
         else
             seconds = Integer.toString(instance.get(Calendar.SECOND));
 
-        if (instance.get(Calendar.MINUTE) / 10 == 0){
+        if (instance.get(Calendar.MINUTE) / 10 == 0)
             minutes = "0" + (instance.get(Calendar.MINUTE));
-        } else if (instance.get(Calendar.MINUTE) == 0){
+        else if (instance.get(Calendar.MINUTE) == 0)
             minutes = "00";
-        } else
-        {
+        else
             minutes = Integer.toString(instance.get(Calendar.MINUTE));
-        }
+
 
         if (instance.get(Calendar.HOUR_OF_DAY) >= 12){
-
             hour = Integer.toString(instance.get(Calendar.HOUR_OF_DAY) - 12);
             minutes += ":" + seconds + " PM";
         } else
@@ -91,7 +90,8 @@ public class Utility extends ContextWrapper {
             minutes = ":" + seconds + "AM";
         }
 
-        if (hour.equals("0")) hour = "12";
+        if (hour.equals("0"))
+            hour = "12";
 
         if (Integer.toString(instance.get(Calendar.MONTH) + 1).length() == 1)
             month = "0" + (instance.get(Calendar.MONTH) + 1);
@@ -110,20 +110,14 @@ public class Utility extends ContextWrapper {
         return month + "/" + dayOfWeek + "/" + year + " " + hour + ":" + minutes;
     }
 
-    public static void collapseFloatingActionMenu(FloatingActionMenu fam){
-        fam.close(true);
-    }
-
     public static String getFileName(Uri uri, Context context) {
         String result = null;
-        if (uri.getScheme().equals("content")) {
-            Cursor cursor = context.getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null);
-            try {
+        if ("content".equals(uri.getScheme())) {
+            try (Cursor cursor = context.getContentResolver().query(uri,
+                    new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null)) {
                 if (cursor != null && cursor.moveToFirst()) {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                 }
-            } finally {
-                cursor.close();
             }
         }
         if (result == null) {

@@ -33,10 +33,10 @@ public class RebootService extends JobIntentService {
 
         // Create an Intent for the activity
         Intent i = new Intent(getApplicationContext(), EditActivity.class);
-        i.putExtra("savedTitle", title);
-        i.putExtra("savedText", content);
         i.putExtra("oldNote", true);
         i.putExtra("index", index);
+        i.putExtra("favorite", intent.getBooleanExtra("favorite", false));
+        i.putExtra("trash", intent.getBooleanExtra("trash", false));
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(getApplicationContext());
         stackBuilder.addNextIntentWithParentStack(i);
         PendingIntent resultPendingIntent =

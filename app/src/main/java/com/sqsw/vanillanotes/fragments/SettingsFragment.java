@@ -16,10 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.github.clans.fab.FloatingActionMenu;
 import com.sqsw.vanillanotes.LoadingDialog;
-import com.sqsw.vanillanotes.note.Note;
+import com.sqsw.vanillanotes.model.Note;
 import com.sqsw.vanillanotes.R;
 
 import androidx.annotation.NonNull;
@@ -34,26 +33,24 @@ import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreferenceCompat;
 
 import com.sqsw.vanillanotes.util.PrefsUtil;
-import com.sqsw.vanillanotes.util.Utility;
+import com.sqsw.vanillanotes.util.GeneralUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
     Activity mActivity;
+    Context mContext;
     private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
     private final String KEY_FONT = "font_size";
     private final String KEY_BACK_DIALOG = "back_dialog_toggle";
@@ -67,10 +64,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             Log.e("settings_error", "getActivity() has returned null");
             return super.onCreateView(inflater, container, savedInstanceState);
         }
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("More");
+
+        mContext = getActivity();
+        ((AppCompatActivity) mActivity).getSupportActionBar().setTitle("More");
         View v = super.onCreateView(inflater, container, savedInstanceState);
         v.setBackgroundColor(getResources().getColor(R.color.background));
-        getActivity().findViewById(R.id.fam).setVisibility(View.GONE);
+        FloatingActionMenu fam = getActivity().findViewById(R.id.fam);
+        fam.close(true);
+        fam.setVisibility(View.GONE);
         return v;
     }
 
@@ -84,7 +85,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         SwitchPreferenceCompat backPref = findPreference(KEY_BACK_DIALOG);
 
         if (fontPref == null || clearPref == null || backPref == null){
-            Log.e("settings_error", "Preference initialization has thrown null pointer exception");
+            Log.e("settings_error", "Preferences have thrown null pointer exception");
             return;
         }
 
@@ -92,22 +93,22 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         clearPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogThemeLight);
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.DialogThemeLight);
                 builder.setTitle(getString(R.string.clear_data_dialog_title));
                 builder.setMessage(getString(R.string.clear_data_dialog_text));
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ArrayList<Note> note = PrefsUtil.getNotes("notes", getActivity());
-                        ArrayList<Note> trash = PrefsUtil.getNotes("trash", getActivity());
-                        ArrayList<Note> fav = PrefsUtil.getNotes("favorites", getActivity());
+                        ArrayList<Note> note = PrefsUtil.getNotes("notes", mContext);
+                        ArrayList<Note> trash = PrefsUtil.getNotes("trash", mContext);
+                        ArrayList<Note> fav = PrefsUtil.getNotes("favorites", mContext);
                         note.clear();
                         trash.clear();
                         fav.clear();
-                        PrefsUtil.saveNotes(note, "notes", getActivity());
-                        PrefsUtil.saveNotes(trash, "trash", getActivity());
-                        PrefsUtil.saveNotes(fav, "favorites", getActivity());
-                        Toast.makeText(getActivity(), getString(R.string.clear_data_toast), Toast.LENGTH_LONG).show();
+                        PrefsUtil.saveNotes(note, "notes", mContext);
+                        PrefsUtil.saveNotes(trash, "trash", mContext);
+                        PrefsUtil.saveNotes(fav, "favorites", mContext);
+                        Toast.makeText(mContext, getString(R.string.clear_data_toast), Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -196,14 +197,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     private void requestStoragePermissions(final boolean isExport) {
         if (ActivityCompat.shouldShowRequestPermissionRationale
-                (getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-            new AlertDialog.Builder(getActivity(), R.style.DialogThemeLight)
+                (requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+            new AlertDialog.Builder(mContext, R.style.DialogThemeLight)
                     .setTitle(getString(R.string.perm_dialog_title))
                     .setMessage(getString(R.string.perm_dialog_msg))
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            ActivityCompat.requestPermissions(getActivity(), new String[]{
+                            ActivityCompat.requestPermissions(requireActivity(), new String[]{
                                     Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_CODE);
                             if (isExport)
                                 exportNotes();
@@ -218,7 +219,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                         }
                     }).create().show();
         } else {
-            ActivityCompat.requestPermissions(getActivity(),
+            ActivityCompat.requestPermissions(mActivity,
                     new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_CODE);
         }
@@ -280,7 +281,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         if (intent != null) {
             Uri uri = intent.getData();
             try {
-                OutputStream outputStream = getActivity().getContentResolver().openOutputStream(uri);
+                OutputStream outputStream = requireActivity().getContentResolver().openOutputStream(uri);
                 outputStream.write(createExportData());
             } catch (IOException e){
                 e.printStackTrace();
@@ -307,21 +308,19 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private JSONArray readFile(Uri uri){
         String content = "";
         try {
-            StringBuffer buffer = new StringBuffer();
-            InputStream inputStream = getActivity().getContentResolver().openInputStream(uri);
+            StringBuilder buffer = new StringBuilder();
+            InputStream inputStream = requireActivity().getContentResolver().openInputStream(uri);
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             if (inputStream != null){
                 while ((content = reader.readLine()) != null){
-                    buffer.append(content + "\n");
+                    buffer.append(content).append("\n");
                 }
             }
             content = buffer.toString();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
         JSONArray json = null;
         try {
             json = new JSONArray(content);
@@ -331,16 +330,14 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         return json;
     }
 
+    // Use the JSONArray's contents to import the notes
     private void parseFile(JSONArray content){
         if (content == null) return;
-        JSONArray notes = content;
-        for (int i = 0; i < notes.length(); i++){
+        for (int i = 0; i < content.length(); i++){
             try {
-                JSONObject noteData = notes.getJSONObject(i);
+                JSONObject noteData = content.getJSONObject(i);
                 Note importedNote = getNoteFromJSONData(noteData);
-                Log.d("import_test1", "Note retrieved");
                 if (importedNote != null) {
-                    Log.d("import_test1", "Note is not null");
                     saveImportedNote(importedNote);
                 }
             } catch (JSONException e) {
@@ -349,24 +346,22 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         }
     }
 
+    // Check which list to add the imported note to
     private void saveImportedNote(Note note){
         ArrayList<Note> notes = PrefsUtil.getNotes("notes", requireActivity());
         ArrayList<Note> favorites = PrefsUtil.getNotes("favorites", requireActivity());
-        if (note.getFavorite()) favorites.add(note);
-        else notes.add(note);
+        if (note.getFavorite())
+            favorites.add(note);
+        else
+            notes.add(note);
 
         PrefsUtil.saveNotes(notes, "notes", requireActivity());
         PrefsUtil.saveNotes(favorites, "favorites", requireActivity());
     }
 
+    // Turn the JSON data into a Note object and return it
     private Note getNoteFromJSONData(JSONObject data) {
         try {
-            Log.d("data_test", data.getString("title"));
-            Log.d("data_test", data.getString("content"));
-            Log.d("data_test", data.getInt("color")+"");
-            Log.d("data_test", data.getString("date"));
-            Log.d("data_test", data.getBoolean("favorite")+"");
-
             return new Note(data.getString("title"),
                     data.getString("content"),
                     data.getInt("color"),
@@ -383,14 +378,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         if (intent == null) return;
 
         Uri uri = intent.getData();
-        String fileName = Utility.getFileName(uri, getActivity());
-        if (Utility.isValidFileType(fileName)){
+        String fileName = GeneralUtil.getFileName(uri, getActivity());
+        if (GeneralUtil.isValidFileType(fileName)){
             JSONArray fileContents = readFile(uri);
             parseFile(fileContents);
         } else {
             showErrorDialog();
         }
-
     }
 
     private void showErrorDialog(){
@@ -411,9 +405,11 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             switch (requestCode) {
                 case EXPORT_CODE:
                     writeToFile(resultData);
+                    GeneralUtil.showShortToast("Exported notes", requireActivity());
                     break;
                 case IMPORT_CODE:
                     importFile(resultData);
+                    GeneralUtil.showShortToast("Imported notes", requireActivity());
                     break;
             }
         }
@@ -422,7 +418,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-
         if (context instanceof Activity){
             mActivity =(Activity) context;
         }
