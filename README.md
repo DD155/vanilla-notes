@@ -1,4 +1,4 @@
-<h1 align = 'center'>Vanilla Notes</h1> 
+<h1 align = 'center'>Vanilla Notes (Abandoned)</h1> 
 <p align = 'center'>
 Vanilla Notes is a free, open source android application that lets users take notes. The focus is to have a clean, simple, yet functional interface while still having the essentials. It is fully offline, doesn't use unnecessary permissions, and does not save your notes to anywhere other than on your device.
 </p>
@@ -48,11 +48,7 @@ Project is created with and uses:
 
 ## Launch
 
-**Project Hiatus Due to Classes**
-
-The release for this application will hopefully be in Fall 2020.
-
-Planning on releasing to F-Droid and Google Play
+**Abandoned**
 
 ## License
 ```
